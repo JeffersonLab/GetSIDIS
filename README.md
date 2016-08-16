@@ -1,15 +1,15 @@
 
-***       SIDIS Cross Section Model
-**       with nuclear-PDF implemented
-**       for SoLID and EIC
-**       -- Zhihong Ye, 07/26/2016
+===       SIDIS Cross Section Model
+==       with nuclear-PDF implemented
+==       for SoLID and EIC
+==       -- Zhihong Ye, 07/26/2016
 
-** To Do: **
+== To Do: ==
        1) Find the maximum XS value automatically. Now it has to be defined in the input file
        2) Update LHAPDF to the newest version. Now it is still 5.8
        3) Add nCTEQ15 as an alternative nPDF model.
 
-****** Update Version in 08/10/2016: ******
+====== Update Version in 08/10/2016: ======
        1) All input parameters are defined in a input file, e.g. input_c12_pip.dat.
          Please follow the format of the given examples to change the input values
          To run the run, simply type:
@@ -20,7 +20,7 @@
          specified in the input file. I haven't figured out an automatic way to find
          the max cross sections.
 
-****** Current Version Note: ********
+====== Current Version Note: ========
        1), CTEQ-PDF is implemented; Please install cteq-pdf-1.0.4, a C++ libary to get CTEQ data
        2), EPS09 is also implemented; Please include "eps09_cxx" in the compiler
        3), LHAPDF is kept for comparison. You can choose this in "GetSIDIS.C" named "model". It if off by default
@@ -43,10 +43,10 @@
 
 
 ----------------From the old version ----------------
-********************************
-* SIDIS Cross Section Model *
-* -- Zhihong Ye, 06/10/2014 *
-********************************
+================================
+= SIDIS Cross Section Model =
+= -- Zhihong Ye, 06/10/2014 =
+================================
 Note:
 1, This model is extracted fro Xin Qian's SIDIS generator "collider.C"
 which is included as a reference.
@@ -55,13 +55,13 @@ which is included as a reference.
 2, A simpler example of using the model is given in "example.C"
 3, LHAPDF is needed to be installed. Unpar "lhapdf.5.8.8.tar.gz",
 and follow the instruction to install it. Specify the path in "SIDIS.h" or
-define ${LHAPDF}=/your_path/
+define ${LHAPDF}=/yourpath/
 4, The output files include both the ROOT format files and LUND format files,
 where, four root files will generated:
-*_1_0.root, Q2=<10, pt<=1
-*_2_0.root, Q2=<10, pt>1
-*_3_0.root, Q2>10, pt<=1.
-*_4_0.root, Q2>10, pt>1.
+"*_1_0.root", Q2=<10, pt<=1
+"*_2_0.root", Q2=<10, pt>1
+"*_3_0.root", Q2>10, pt<=1.
+"*_4_0.root", Q2>10, pt>1.
 For SoLID config, chain the first two root files.
 The LUND format file saves all events in one file.
 5, A older version of the model wrotten in FORTRAN is also given in "sidis_fortran/", as a reference.
