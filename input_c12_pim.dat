@@ -1,0 +1,44 @@
+#### Input parameters for GetSIDIS ###
+## Use "#" as the first charactor for notes
+## Parameter must follow the order
+## Edit GetSIDIS.h to include or change input parameters
+##
+## ---, Z. Ye, 08/09/2016
+###############################
+## 1), int,  Target A
+ 12
+## 2), int, Target Z
+ 6
+## 3), int , Particle Flag: 1/-1:pi+/-,  2/-2: k+/-
+-1
+## 4), double, Electron Momentum (GeV/c)
+ 10
+## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
+ 100
+## 6), int, Number of events. 
+ 100000
+###  If events are generated based on XS, save total events in one ROOT file
+###  If events are generated uniformly, multiple ROOT files are created:
+###     SoLID+EIC:  1 -> Q2<10, pt<1
+###                 2 -> Q2<10, pt>1
+###           EIC:  3 -> Q2>10, pt<1
+###                 4 -> Q2>10, pt>1
+## 7), int, FileNo, for Batch farm purpose
+##     If it is '0', use the number in the command line, e.g., ./GetSIDIS input_c12_pip.dat 10
+ 0
+## 8), string, Configuration, "EIC" or "SoLID". Can add CLAS12 as well but not now
+ EIC
+## 9), string, PDF Model Type, "LHAPDF" or "EPS09" or "nCTEQ15"(available soon)
+ EPS09
+## 10), Maximum Cross Section Value
+##      0nly useful when generating LUND format or save root files based on XS distribution
+ 1000.0
+## 11), int, LUND output or not, 1-> yes, 0->no
+ 0
+## 12), int, save events based on XS or not, 1-> yes, 0->no
+ 0
+## 13), string, output file name, useful for batch farm jobs. 
+##      Set "NONE" for default names (eg., EIC_A12_Z6_pip_10_100_4_0.root)
+ NONE
+## 14), Debug, print out some useful information. Not in use now
+ 1
