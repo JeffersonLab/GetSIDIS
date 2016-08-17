@@ -7,6 +7,7 @@
   *      Find the maximum XS value automatically. Now it has to be defined in the input file
   *      Update LHAPDF to the newest version. Now it is still 5.8
   *      Add nCTEQ15 as an alternative nPDF model.
+  *      Add absolute lumi
 
 ## Update Version in 08/15/2016
   *      All input parameters are defined in a input file, e.g. `input_c12_pip.dat`.
