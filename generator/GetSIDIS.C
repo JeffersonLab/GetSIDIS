@@ -13,7 +13,7 @@ int main(Int_t argc, char *argv[]){
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
     cout<<"oO0 SIDIS Events Generators for SoLID or EIC                  0Oo//"<<endl;
     cout<<"oO0  with nPDF (EPS09) and free-PDF (LHDAPDF) implemented.    0Oo//"<<endl;
-    cout<<"oO0  -- Zhihong Ye, updated in 08/15/2016                     0Oo//"<<endl;
+    cout<<"oO0  -- Zhihong Ye, updated in 08/12/2016                     0Oo//"<<endl;
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
     cout<<endl;
 
@@ -62,6 +62,8 @@ int main(Int_t argc, char *argv[]){
         return -1;
     }
 
+    //Ion mass is the target mass in SoLID or fixed target experiment
+    Double_t ion_mass = GetIonMass(A, Z);//GeV
     /*}}}*/
 
     /*Define{{{*/
@@ -78,11 +80,9 @@ int main(Int_t argc, char *argv[]){
     Int_t nsim = 0;
 
     //For Beam Position and Vertex info
-    const Double_t raster_x_size = 0.5 * cm;
-    const Double_t raster_y_size = 0.5 * cm;
-    const Double_t target_center = -350.0 * cm;
-    const Double_t target_length = 40.0 *cm;
     Double_t vx_ele, vy_ele, vz_ele, vx_had, vy_had, vz_had;
+    double beamsize_x_ele=0.0, beamsize_y_ele=0.0;
+    double vertex_length =0.0, vertex_center=0.0;
 
     //The idea is to generate a phase-space which is slightly larger than the actual one
     Double_t Mom_Max_e = 0.0, Mom_Min_e = 0.0, Mom_Max_h = 0.0,Mom_Min_h = 0.0;
@@ -92,6 +92,13 @@ int main(Int_t argc, char *argv[]){
         Mom_Min_h = SoLID_Mom_Min_h;  Mom_Max_h = SoLID_Mom_Max_h;
         Th_Min_e = SoLID_Th_Min_e; Th_Max_e = SoLID_Th_Max_e; 
         Th_Min_h = SoLID_Th_Min_h; Th_Max_h = SoLID_Th_Max_h;
+
+        beamsize_x_ele = SoLID_BeamSizeX_ele;
+        beamsize_y_ele = SoLID_BeamSizeY_ele;
+
+        vertex_length = SoLID_Target_Length;
+        vertex_center = SoLID_Target_Center;
+
     }
     //A rough guess but people claim EIC to be a full-acceptance device!
     if(config=="EIC" ){
@@ -99,6 +106,12 @@ int main(Int_t argc, char *argv[]){
         Mom_Min_h = EIC_Mom_Min_h;  Mom_Max_h = EIC_Mom_Max_h;
         Th_Min_e = EIC_Th_Min_e; Th_Max_e = EIC_Th_Max_e; 
         Th_Min_h = EIC_Th_Min_h; Th_Max_h = EIC_Th_Max_h;    
+
+        beamsize_x_ele = EIC_BeamSizeX_ele;
+        beamsize_y_ele = EIC_BeamSizeY_ele;
+
+        vertex_length = EIC_Vertex_Length;
+        vertex_center = EIC_Vertex_Center;
     }
 
     Double_t electron_phase_space=(cos(Th_Min_e/DEG) - cos(Th_Max_e/DEG))*2*PI*(Mom_Max_e - Mom_Min_e);
@@ -317,56 +330,10 @@ int main(Int_t argc, char *argv[]){
     if(bLUND)
         outgemc.open(filename);
 
-    //Define target mass/*{{{*/
-    const Double_t mass_p = 0.93827;//GeV
-    const Double_t mass_n = 0.939566;//GeV
-    const Double_t mass_u = 0.931494;//GeV
-    //Ion mass is the target mass in SoLID or fixed target experiment
-    Double_t ion_mass = 0.0;//GeV
-    if(A==1 && Z==1)//Hydrogen
-        ion_mass = mass_p;
-    else if(A==2 && Z==1)//Deutron
-        ion_mass = mass_u*2.014102;
-    else if(A==3 && Z==1)//Tritium
-        ion_mass = mass_u*3.016049;
-    else if(A==3 && Z==2)//He3
-        ion_mass = mass_u*3.016029;
-    else if(A==4 && Z==2)//He4
-        ion_mass = mass_u*4.002602;
-    else if(A==7 && Z==3)//Lithium
-        ion_mass = mass_u*6.941000;
-    else if(A==9 && Z==4)//Be9
-        ion_mass = mass_u*9.012182;
-    else if(A==10 && Z==5)//Boron
-        ion_mass = mass_u*10.811000;
-    else if(A==12 && Z==6)//Carbon
-        ion_mass = mass_u*12.010700;
-    else if(A==14 && Z==7)//Nitrogen
-        ion_mass = mass_u*14.0067;
-    else if(A==16 && Z==8)//Oxygen
-        ion_mass = mass_u*15.9994;
-    else if(A==27 && Z==13)//Al
-        ion_mass = mass_u*26.981539;
-    else if(A==40 && Z==20)//C40
-        ion_mass = mass_u*40.07800;
-    else if(A==48 && Z==20)//C40
-        ion_mass = mass_u*47.952534;
-    else if(A==56 && Z==26)//Fe
-        ion_mass = mass_u*55.84500;
-    else if(A==64 && Z==29)//Cu
-        ion_mass = mass_u*63.546;
-    else if(A==197 && Z==79)//Cu
-        ion_mass = mass_u*196.966569;
-    //if the target is not in the list above, simply add the total mass of protons and neutrons
-    //but in general you can look at the PERIODIC TABLE for new target you want to add
-    else
-        ion_mass = Z*mass_p+(A-Z)*mass_n;
-    /*}}}*/
-
     //Only initialize once here
     //LHAPDF, CTEQPDF or EPS09
     SIDIS *sidis = new SIDIS(model);
-  
+
     //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, default is 2
     //3->free L0 CTEQ6L1 PDF, 4->free NL0 CTEQ6.1M PDF, default is 4
     //sidis->SetCTEQOrder(2);
@@ -377,9 +344,9 @@ int main(Int_t argc, char *argv[]){
 
         /*Generator{{{*/
         //For electron
-        vx_ele = gRandom->Uniform(-raster_x_size, raster_x_size);
-        vy_ele = gRandom->Uniform(-raster_y_size, raster_y_size);
-        vz_ele = target_center + gRandom->Uniform(-target_length/2.0, target_length/2.0);
+        vx_ele = gRandom->Uniform(-beamsize_x_ele, beamsize_x_ele);
+        vy_ele = gRandom->Uniform(-beamsize_y_ele, beamsize_y_ele);
+        vz_ele = vertex_center + gRandom->Uniform(-vertex_length/2.0, vertex_length/2.0);
 
         phi_gen = gRandom->Uniform(0.,2.*PI);
         theta_gen = acos(gRandom->Uniform(cos(Th_Max_e/DEG),cos(Th_Min_e/DEG)));
@@ -387,8 +354,8 @@ int main(Int_t argc, char *argv[]){
 
         mom_gen_ele = mom_gen; theta_gen_ele = theta_gen*DEG; phi_gen_ele = phi_gen*DEG;
 
-        //For hadron 
-        vx_had = vx_ele; vy_had = vy_ele; vz_had = vz_ele;
+        //For hadron, scattered electrons and hardon should come out from the same location
+        vx_had = vx_ele;      vy_had = vy_ele;        vz_had = vz_ele;
 
         phi_gen = gRandom->Uniform(0.,2.*PI);
         theta_gen = acos(gRandom->Uniform(cos(Th_Max_h/DEG),cos(Th_Min_h/DEG)));
@@ -418,12 +385,12 @@ int main(Int_t argc, char *argv[]){
                             || (count[1]<number_of_events&&pt>1.0&&Q2<=10.)
                             || (count[2]<number_of_events&&pt<=1.0&&Q2>10.)
                             || (count[3]<number_of_events&&pt>1.0&&Q2>10.)) 
-                        )
+                    )
                     ||(config=="SoLID" && z>0.3&&z<0.7 
                         && ((count[0]<number_of_events&&pt<=1.0&&Q2<=10.) 
                             || (count[1]<number_of_events&&pt>1.0&&Q2<=10.))
-                        ) 
-                    )){
+                      ) 
+                  )){
 
 
             sidis->CalcXS();
@@ -656,7 +623,7 @@ int main(Int_t argc, char *argv[]){
             T4->SetBranchAddress("nsim",&nsim);
             T4->GetEntry(N4-1);          //get nsim for this rootfile
             int Nsim4=nsim;
-            
+
             TBranch *branch_weight_hp4=T4->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm4=T4->Branch("weight_hm",&weight_hm,"weight_hm/D");
             for(Long64_t i=0;i<N4;i++){
@@ -674,6 +641,160 @@ int main(Int_t argc, char *argv[]){
     }
     /*}}}*/
 
-
     return 0;
 }
+
+/*Init(){{{*/
+void Init (const TString kInputFile){
+    const Int_t CHAR_LEN = 1000;
+
+    cout<<"============================================================"<<endl;
+    cout<<"&& Initializing Parameters from "<<kInputFile<<" ..."<<endl;
+    int i,j,k;
+    vector<TString> inputdata;
+    /*Read INPUTfile{{{*/
+    FILE* INPUTfile;
+    INPUTfile=fopen(kInputFile.Data(),"r");
+    char buf[CHAR_LEN];
+    char data[CHAR_LEN];
+    while ( fgets(buf,CHAR_LEN,INPUTfile) )
+    {
+        i=0;
+        while ( buf[i]==' '|| buf[i]=='\t' )
+        {
+            i++;
+        }
+        if ( buf[i]!='#' )
+        {
+            j=0;
+            while ( buf[i]!='#' && buf[i]!='\0' && buf[i]!='\t' && buf[i]!='\n' )
+            {
+                if( buf[i]!=' ' && buf[i]!='\t' && buf[i]!='\n' )
+                    data[j]=buf[i];
+                i++; j++;
+            }
+            data[j]='\0';
+            while ( data[--j]==' ' || data[j]=='\t'  || data[j]=='\n' )
+            {
+                //remove space or tab at the end of data
+                data[j]='\0';
+            }
+            inputdata.push_back(data);
+        }
+        //else it's comment, skipped
+    }
+
+    fclose(INPUTfile);
+    /*}}}*/
+
+    /*Set Global Value{{{*/
+    k=0;
+    A=atoi(inputdata[k++]);
+    Z=atoi(inputdata[k++]);
+    particle_flag=atoi(inputdata[k++]);
+    momentum_ele=atof(inputdata[k++]);
+    momentum_ion=atof(inputdata[k++]);
+    number_of_events=atoi(inputdata[k++]);
+    FileNo=atoi(inputdata[k++]);
+    config= inputdata[k++];
+    model= inputdata[k++];
+    cdxs_max=atof(inputdata[k++]);
+    bLUND=atoi(inputdata[k++]);
+    bXSMode=atoi(inputdata[k++]);
+    Output_FileName= inputdata[k++];
+    bDebug=atoi(inputdata[k++]);
+
+    //A=atoi(inputdata[k++].c_str());
+    //Z=atoi(inputdata[k++].c_str());
+    //particle_flag=atoi(inputdata[k++].c_str());
+    //momentum_ele=atof(inputdata[k++].c_str());
+    //momentum_ion=atof(inputdata[k++].c_str());
+    //FileNo=atoi(inputdata[k++].c_str());
+    //number_of_events=atoi(inputdata[k++].c_str());
+    //config= inputdata[k++].c_str();
+    //model= inputdata[k++].c_str();
+    //cdxs_max=atof(inputdata[k++].c_str());
+    //bLUND=atoi(inputdata[k++].c_str());
+    //bXSMode=atoi(inputdata[k++].c_str());
+    //Output_FileName= inputdata[k++].c_str();
+    //bDebug=atoi(inputdata[k++].c_str());
+    /*}}}*/
+
+    cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
+    cout<<"---- A = "<<A<<endl;
+    cout<<"---- Z = "<<Z<<endl;
+    cout<<"---- Partile(pi+/-: +/-1,K+/-: +/-2 ) = ";
+    if(particle_flag==1) cout<<"Pi+"<<endl;
+    else if(particle_flag==-1) cout<<"Pi-"<<endl;
+    else if(particle_flag==2) cout<<"K+"<<endl;
+    else if(particle_flag==-2) cout<<"K-"<<endl;
+    else cout<<"*** ERROR, a wrong particle flag in your input-file!!!"<<endl;
+    cout<<"---- P_e = "<<momentum_ele<<" GeV"<<endl;
+    cout<<"---- P_A = "<<momentum_ion<<" GeV"<<endl;
+    cout<<"---- #Events = "<<number_of_events<<endl;
+    cout<<"---- File# = "<< FileNo;
+    if(FileNo==0) cout<<" (from command line, e.g. ./GetSIDIS input.data FileNo)"<<endl;
+    else cout<<endl;
+    cout<<"---- Configs = "<<config.Data()<<endl;
+    cout<<"---- Model = "<<model.Data()<<endl;
+    cout<<"---- Save to LUND? = "<<bLUND<<endl;
+    cout<<"---- Save in XSMode? = "<<bXSMode<<endl;
+    cout<<"---- Rename files to (*.LUND, *_0.root)= "<<Output_FileName;
+    if(Output_FileName=="NONE") cout <<" (use the default name)"<<endl;
+    else cout<<endl;
+    cout<<"---- Debug? = "<<bDebug<<endl;
+    cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
+
+    inputdata.clear();
+    cerr<<"&& Initialization done!"<<endl;
+    cout<<"============================================================"<<endl;
+}
+/*}}}*/
+
+/*double GetIonMass(const int A, const int Z){{{*/
+double GetIonMass(const int A, const int Z){
+    double ion_mass = 0.0;
+    if(A==1 && Z==1)//Hydrogen
+        ion_mass = mass_p;
+    else if(A==1 && Z==0)//Neutron
+        ion_mass = mass_n;
+    else if(A==2 && Z==1)//Deutron
+        ion_mass = mass_u*2.014102;
+    else if(A==3 && Z==1)//Tritium
+        ion_mass = mass_u*3.016049;
+    else if(A==3 && Z==2)//He3
+        ion_mass = mass_u*3.016029;
+    else if(A==4 && Z==2)//He4
+        ion_mass = mass_u*4.002602;
+    else if(A==7 && Z==3)//Lithium
+        ion_mass = mass_u*6.941000;
+    else if(A==9 && Z==4)//Be9
+        ion_mass = mass_u*9.012182;
+    else if(A==10 && Z==5)//Boron
+        ion_mass = mass_u*10.811000;
+    else if(A==12 && Z==6)//Carbon
+        ion_mass = mass_u*12.010700;
+    else if(A==14 && Z==7)//Nitrogen
+        ion_mass = mass_u*14.0067;
+    else if(A==16 && Z==8)//Oxygen
+        ion_mass = mass_u*15.9994;
+    else if(A==27 && Z==13)//Al
+        ion_mass = mass_u*26.981539;
+    else if(A==40 && Z==20)//C40
+        ion_mass = mass_u*40.07800;
+    else if(A==48 && Z==20)//C40
+        ion_mass = mass_u*47.952534;
+    else if(A==56 && Z==26)//Fe
+        ion_mass = mass_u*55.84500;
+    else if(A==64 && Z==29)//Cu
+        ion_mass = mass_u*63.546;
+    else if(A==197 && Z==79)//Cu
+        ion_mass = mass_u*196.966569;
+    //if the target is not in the list above, simply add the total mass of protons and neutrons
+    //but in general you can look at the PERIODIC TABLE for new target you want to add
+    else
+        ion_mass = Z*mass_p+(A-Z)*mass_n;
+
+    return ion_mass;
+}
+/*}}}*/

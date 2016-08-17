@@ -48,7 +48,14 @@ const double cm = 1.0;//default is cm
 const double m = 1000.0;//default is cm
 //char *LHAPDF_path = getenv("LHAPDF");
 
+//mass
+const Double_t mass_p = 0.93827;//GeV
+const Double_t mass_n = 0.939566;//GeV
+const Double_t mass_u = 0.931494;//GeV
+
+////////////////////////
 //SoLID Acceptance
+////////////////////////
 const Double_t SoLID_Mom_Min_e = 0.5;  
 const Double_t SoLID_Mom_Max_e = 11.0;//not in use 
 const Double_t SoLID_Mom_Min_h = 0.5;  
@@ -59,17 +66,42 @@ const Double_t SoLID_Th_Max_e = 30.0;
 const Double_t SoLID_Th_Min_h  =  7.0; 
 const Double_t SoLID_Th_Max_h =  30.0;
 
+//SoLID BeamSize Info
+const Double_t SoLID_BeamSizeX_ele = 0.5 * cm;
+const Double_t SoLID_BeamSizeY_ele = 0.5 * cm;
+//const Double_t SoLID_BeamSizeX_ion = 0.5 * cm;
+//const Double_t SoLID_BeamSizeY_ion = 0.5 * cm;
+const Double_t SoLID_Target_Center = -350.0 * cm;
+const Double_t SoLID_Target_Length = 40.0 *cm;
+////////////////////////
+
+////////////////////////
+//EIC Acceptance
+////////////////////////
 //A rough guess but people claim EIC to be a full-acceptance device!
 const Double_t EIC_Mom_Min_e = 0.5;  
 const Double_t EIC_Mom_Max_e = 3.*10.0; //not in use 
 const Double_t EIC_Mom_Min_h = 0.0;  
-const Double_t EIC_Mom_Max_h = 50.0;
+//const Double_t EIC_Mom_Max_h = 50.0;
+const Double_t EIC_Mom_Max_h = 10.0;
 
 const Double_t EIC_Th_Min_e = 0.0;  
-const Double_t EIC_Th_Max_e  = 180.0;            
+//const Double_t EIC_Th_Max_e  = 180.0;            
+const Double_t EIC_Th_Max_e  = 140.0;            
 const Double_t EIC_Th_Min_h = 0.0;  
 const Double_t EIC_Th_Max_h  = 180.0;
 
+//EIC BeamSize Info, to be updated
+const Double_t EIC_BeamSizeX_ele = 0. * cm;
+const Double_t EIC_BeamSizeY_ele = 0. * cm;
+//const Double_t EIC_BeamSizeX_ion = 0. * cm;
+//const Double_t EIC_BeamSizeY_ion = 0. * cm;
+const Double_t EIC_Vertex_Center = 0.0 * cm;
+const Double_t EIC_Vertex_Length = 0.0 *cm;
+
+//////////////////////////////////
+//For the input parameters
+//////////////////////////////////
 Int_t A=1;
 Int_t Z=1;
 Int_t particle_flag=1;//particle_flag = 1 for pion+, -1 for pion- and 2 for kaon+, -2 for kaon-
@@ -89,110 +121,5 @@ TString Output_FileName;
 
 Bool_t bDebug = kTRUE;
 
-const Int_t CHAR_LEN = 1000;
-
-/*Init(){{{*/
-void Init (const TString kInputFile){
-
-    cout<<"============================================================"<<endl;
-    cout<<"&& Initializing Parameters from "<<kInputFile<<" ..."<<endl;
-    int i,j,k;
-    vector<TString> inputdata;
-    /*Read INPUTfile{{{*/
-    FILE* INPUTfile;
-    INPUTfile=fopen(kInputFile.Data(),"r");
-    char buf[CHAR_LEN];
-    char data[CHAR_LEN];
-    while ( fgets(buf,CHAR_LEN,INPUTfile) )
-    {
-        i=0;
-        while ( buf[i]==' '|| buf[i]=='\t' )
-        {
-            i++;
-        }
-        if ( buf[i]!='#' )
-        {
-            j=0;
-            while ( buf[i]!='#' && buf[i]!='\0' && buf[i]!='\t' && buf[i]!='\n' )
-            {
-                if( buf[i]!=' ' && buf[i]!='\t' && buf[i]!='\n' )
-                    data[j]=buf[i];
-                i++; j++;
-            }
-            data[j]='\0';
-            while ( data[--j]==' ' || data[j]=='\t'  || data[j]=='\n' )
-            {
-                //remove space or tab at the end of data
-                data[j]='\0';
-            }
-            inputdata.push_back(data);
-        }
-        //else it's comment, skipped
-    }
-    
-    fclose(INPUTfile);
-    /*}}}*/
-
-    /*Set Global Value{{{*/
-    k=0;
-    A=atoi(inputdata[k++]);
-    Z=atoi(inputdata[k++]);
-    particle_flag=atoi(inputdata[k++]);
-    momentum_ele=atof(inputdata[k++]);
-    momentum_ion=atof(inputdata[k++]);
-    number_of_events=atoi(inputdata[k++]);
-    FileNo=atoi(inputdata[k++]);
-    config= inputdata[k++];
-    model= inputdata[k++];
-    cdxs_max=atof(inputdata[k++]);
-    bLUND=atoi(inputdata[k++]);
-    bXSMode=atoi(inputdata[k++]);
-    Output_FileName= inputdata[k++];
-    bDebug=atoi(inputdata[k++]);
-  
-    //A=atoi(inputdata[k++].c_str());
-    //Z=atoi(inputdata[k++].c_str());
-    //particle_flag=atoi(inputdata[k++].c_str());
-    //momentum_ele=atof(inputdata[k++].c_str());
-    //momentum_ion=atof(inputdata[k++].c_str());
-    //FileNo=atoi(inputdata[k++].c_str());
-    //number_of_events=atoi(inputdata[k++].c_str());
-    //config= inputdata[k++].c_str();
-    //model= inputdata[k++].c_str();
-    //cdxs_max=atof(inputdata[k++].c_str());
-    //bLUND=atoi(inputdata[k++].c_str());
-    //bXSMode=atoi(inputdata[k++].c_str());
-    //Output_FileName= inputdata[k++].c_str();
-    //bDebug=atoi(inputdata[k++].c_str());
-    /*}}}*/
-
-    cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
-    cout<<"---- A = "<<A<<endl;
-    cout<<"---- Z = "<<Z<<endl;
-    cout<<"---- Partile(pi+/-: +/-1,K+/-: +/-2 ) = ";
-    if(particle_flag==1) cout<<"Pi+"<<endl;
-    else if(particle_flag==-1) cout<<"Pi-"<<endl;
-    else if(particle_flag==2) cout<<"K+"<<endl;
-    else if(particle_flag==-2) cout<<"K-"<<endl;
-    else cout<<"*** ERROR, a wrong particle flag in your input-file!!!"<<endl;
-    cout<<"---- P_e = "<<momentum_ele<<" GeV"<<endl;
-    cout<<"---- P_A = "<<momentum_ion<<" GeV"<<endl;
-    cout<<"---- #Events = "<<number_of_events<<endl;
-    cout<<"---- File# = "<< FileNo;
-    if(FileNo==0) cout<<" (from command line, e.g. ./GetSIDIS input.data FileNo)"<<endl;
-    else cout<<endl;
-    cout<<"---- Configs = "<<config.Data()<<endl;
-    cout<<"---- Model = "<<model.Data()<<endl;
-    cout<<"---- Save to LUND? = "<<bLUND<<endl;
-    cout<<"---- Save in XSMode? = "<<bXSMode<<endl;
-    cout<<"---- Rename files to (*.LUND, *_0.root)= "<<Output_FileName;
-    if(Output_FileName=="NONE") cout <<" (use the default name)"<<endl;
-    else cout<<endl;
-    cout<<"---- Debug? = "<<bDebug<<endl;
-    cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
-
-    inputdata.clear();
-    cerr<<"&& Initialization done!"<<endl;
-    cout<<"============================================================"<<endl;
-}
-/*}}}*/
+void Init (const TString kInputFile);
+double GetIonMass(const int A, const int Z);
