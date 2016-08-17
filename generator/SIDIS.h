@@ -268,8 +268,7 @@ class SIDIS
 
             s = (*P4_ini_ele + *P4_ini_ion )*(*P4_ini_ele + *P4_ini_ion);
             nu = (*P4_ini_ion) * (*P4_q)/mass_target;
-            //x = Q2/ 2. / mass_target / nu;
-            x = Q2/ 2. / mass_p / nu;
+            x = Q2/(2 * (*P4_ini_ion)*(*P4_q));
             z = ((*P4_ini_ion)*(*P4_fin_had))/((*P4_ini_ion)*(*P4_q));
             y = ((*P4_ini_ion)*(*P4_q))/((*P4_ini_ion)*(*P4_ini_ele));
             W = sqrt(W);
