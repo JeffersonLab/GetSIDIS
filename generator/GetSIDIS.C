@@ -42,21 +42,17 @@ int main(Int_t argc, char *argv[]){
     TString prefix=config.Data();
     prefix += Form("_A%d", target_flag);
 
-    Double_t charge_had = 0;
-    int pid_had = 0;
+    Double_t charge_pos = 0, charge_neg = 0;
+    int pid_pos = 0,pid_neg=0;
     Double_t mass_had = 0.0;
     if (particle_flag == 1){
-        prefix += "_pip";
-        charge_had = 1; pid_had = 211; mass_had = 139.57/1000.;//GeV
-    }else if (particle_flag == -1){
-        prefix += "_pim";
-        charge_had = -1; pid_had = -211; mass_had = 139.57/1000.;//GeV
+        prefix += "_pion";
+        charge_pos = 1; pid_pos = 211; mass_had = 139.57/1000.;//GeV
+        charge_neg =-1; pid_neg =-211; 
     }else if (particle_flag == 2){
-        prefix += "_kp";
-        charge_had = 1; pid_had = 321; mass_had = 493.68/1000.;//GeV
-    }else if (particle_flag == -2){
-        prefix += "_km";
-        charge_had = -1; pid_had = -321; mass_had = 493.68/1000.;//GeV
+        prefix += "_kaon";
+        charge_pos = 1; pid_pos = 321; mass_had = 493.68/1000.;//GeV
+        charge_neg =-1; pid_neg =-321; 
     }else{
         cout << "particle_flag is wrong +-1 and +-2" << endl;
         return -1;
@@ -325,11 +321,13 @@ int main(Int_t argc, char *argv[]){
 
     /*}}}*/
 
-    ofstream outgemc;
-    TString filename = Form("%s_%d.LUND",filename0.Data(), Int_t(FileNo));
-    if(bLUND)
-        outgemc.open(filename);
-
+    ofstream pos_gemc, neg_gemc;
+    TString filename_pos = Form("%s_%d_pos.LUND",filename0.Data(), Int_t(FileNo));
+    TString filename_neg = Form("%s_%d_neg.LUND",filename0.Data(), Int_t(FileNo));
+    if(bLUND){
+        pos_gemc.open(filename_pos);
+        neg_gemc.open(filename_neg);
+    }
     //Only initialize once here
     //LHAPDF, CTEQPDF or EPS09
     SIDIS *sidis = new SIDIS(model);
@@ -398,12 +396,8 @@ int main(Int_t argc, char *argv[]){
             dxs_hm = sidis->GetXS_HM();
             dilute_hp = sidis->GetDilute_HP();
             dilute_hm = sidis->GetDilute_HM();
-            if (particle_flag == 1||particle_flag == 2)
-                cdxs = dxs_hp;
-            else if (particle_flag ==-1||particle_flag ==-2)
-                cdxs = dxs_hm;
-            else
-                cdxs = 0.0;
+            cdxs = dxs_hp;
+            if(cdxs>dxs_hm) cdxs = dxs_hm;
 
             //These section will save events based on their XS distributions
             Double_t cdxs_max_rndm = cdxs_max * gRandom->Uniform(0, 1);/*{{{*/
@@ -411,7 +405,7 @@ int main(Int_t argc, char *argv[]){
                 /*Output as LUND format for GEMC{{{*/
                 //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                 if(bLUND){
-                    outgemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                    pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
                             x,
                             z,
@@ -421,11 +415,11 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            cdxs						
+                            dxs_hp						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
-                    outgemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                    pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             1, //index
                             -1.0,//charge
                             1, //=1 for active 
@@ -442,11 +436,11 @@ int main(Int_t argc, char *argv[]){
                             vz_ele  //vx
                             )<<endl;
                     //hadron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
-                    outgemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                    pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             2, //index
-                            charge_had,//charge
+                            charge_pos,//charge
                             1, //=1 for active 
-                            pid_had,//pid
+                            pid_pos,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
                             px_had,
@@ -457,7 +451,55 @@ int main(Int_t argc, char *argv[]){
                             vx_had, //vx
                             vy_had, //vx
                             vz_had  //vx
+                            )<<endl;/*}}}*/
+                    
+                    neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
+                            2, //ele+had
+                            x,
+                            z,
+                            pt,
+                            1.0, //pol = 1.0 for now
+                            Q2,
+                            W,
+                            phi_s,
+                            phi_h,
+                            dxs_hm						
                             )<<endl;
+
+                    //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            1, //index
+                            -1.0,//charge
+                            1, //=1 for active 
+                            11,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_ele,
+                            py_ele,
+                            pz_ele,
+                            E0_ele,
+                            0.0005, //mass not in used	
+                            vx_ele, //vx
+                            vy_ele, //vx
+                            vz_ele  //vx
+                            )<<endl;
+                    //hadron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            2, //index
+                            charge_neg,//charge
+                            1, //=1 for active 
+                            pid_neg,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_had,
+                            py_had,
+                            pz_had,
+                            E0_had, 
+                            mass_had, //mass not in used
+                            vx_had, //vx
+                            vy_had, //vx
+                            vz_had  //vx
+                            )<<endl;/*}}}*/
                 }
                 /*}}}*/
                 if(bXSMode){
@@ -528,7 +570,10 @@ int main(Int_t argc, char *argv[]){
     }
     delete sidis;
 
-    if(bLUND) outgemc.close();
+    if(bLUND){
+        pos_gemc.close();
+        neg_gemc.close();
+    }
 
 
     //Generate weights for uniform distributed events
@@ -723,11 +768,9 @@ void Init (const TString kInputFile){
     cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
     cout<<"---- A = "<<A<<endl;
     cout<<"---- Z = "<<Z<<endl;
-    cout<<"---- Partile(pi+/-: +/-1,K+/-: +/-2 ) = ";
-    if(particle_flag==1) cout<<"Pi+"<<endl;
-    else if(particle_flag==-1) cout<<"Pi-"<<endl;
-    else if(particle_flag==2) cout<<"K+"<<endl;
-    else if(particle_flag==-2) cout<<"K-"<<endl;
+    cout<<"---- Partile( 1-->Pion, 2-->Kaon) = ";
+    if(particle_flag==1) cout<<"Pion"<<endl;
+    else if(particle_flag==2) cout<<"Kaon"<<endl;
     else cout<<"*** ERROR, a wrong particle flag in your input-file!!!"<<endl;
     cout<<"---- P_e = "<<momentum_ele<<" GeV"<<endl;
     cout<<"---- P_A = "<<momentum_ion<<" GeV"<<endl;
