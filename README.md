@@ -9,6 +9,12 @@
   *      Add nCTEQ15 as an alternative nPDF model.
   *      Add absolute lumi
 
+## Update Version in 08/29/2016:
+* Remove the separation of pip (kp) and pim(km) in the code since the generated
+   file always contains both the info positive and negative particles. 
+     e.g., in the future, only run "c12_input_kaon.dat" to get both Pi+ and Pi- info
+     and in the root files, their difference are just the cross sections and weight etc.
+
 ## Update Version in 08/15/2016
   *      All input parameters are defined in a input file, e.g. `input_c12_pip.dat`.
          Please follow the format of the given examples to change the input values
