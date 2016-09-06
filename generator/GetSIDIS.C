@@ -71,7 +71,7 @@ int main(Int_t argc, char *argv[]){
     Double_t theta_gen_ele,theta_gen_had;
     Double_t phi_gen_ele,phi_gen_had;
     Double_t theta_q, theta_s,phi_h,phi_s,mom_ele,mom_had,theta_ele, theta_had,phi_ele,phi_had;
-    Double_t cdxs,dxs_hm,dxs_hp,dilute_hp,dilute_hm;
+    Double_t dxs_incl,dxs_hm,dxs_hp,dilute_hp,dilute_hm;
     Double_t px_ele, py_ele,pz_ele, px_had, py_had, pz_had, E0_ele,E0_had;
     Int_t nsim = 0;
 
@@ -145,7 +145,7 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("jacoF",&jacoF,"jacoF/D");
     t1->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
     t1->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t1->Branch("cdxs",&cdxs,"cdxs/D");
+    t1->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
     t1->Branch("mom_ele",&mom_ele,"mom_ele/D");
     t1->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
     t1->Branch("mom_had",&mom_had,"mom_had/D");
@@ -197,7 +197,7 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("jacoF",&jacoF,"jacoF/D");
         t2->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
         t2->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-        t2->Branch("cdxs",&cdxs,"cdxs/D");
+        t2->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
         t2->Branch("mom_ele",&mom_ele,"mom_ele/D");
         t2->Branch("mom_had",&mom_had,"mom_had/D");
         t2->Branch("theta_ele",&theta_ele,"theta_ele/D");
@@ -251,7 +251,7 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("jacoF",&jacoF,"jacoF/D");
         t3->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
         t3->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-        t3->Branch("cdxs",&cdxs,"cdxs/D");
+        t3->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
         t3->Branch("mom_ele",&mom_ele,"mom_ele/D");
         t3->Branch("mom_had",&mom_had,"mom_had/D");
         t3->Branch("theta_ele",&theta_ele,"theta_ele/D");
@@ -293,7 +293,7 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("jacoF",&jacoF,"jacoF/D");
         t4->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
         t4->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-        t4->Branch("cdxs",&cdxs,"cdxs/D");
+        t4->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
         t4->Branch("mom_ele",&mom_ele,"mom_ele/D");
         t4->Branch("mom_had",&mom_had,"mom_had/D");
         t4->Branch("theta_ele",&theta_ele,"theta_ele/D");
@@ -378,7 +378,7 @@ int main(Int_t argc, char *argv[]){
 
         /*Get XS{{{*/
         if (x>=0.0&&x<=1.0&&Q2 >=1.0 && W>= 2.0 //&&Wp>= 1.6
-                &&( (config=="EIC" //&& z>0.2&&z<0.8&&y>0.05&&y<0.8
+                &&( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
                         && ((count[0]<number_of_events&&pt<=1.0&&Q2<=10.) 
                             || (count[1]<number_of_events&&pt>1.0&&Q2<=10.)
                             || (count[2]<number_of_events&&pt<=1.0&&Q2>10.)
@@ -392,11 +392,32 @@ int main(Int_t argc, char *argv[]){
 
 
             sidis->CalcXS();
+            dxs_incl = sidis->GetXS_Inclusive();
             dxs_hp = sidis->GetXS_HP();
             dxs_hm = sidis->GetXS_HM();
             dilute_hp = sidis->GetDilute_HP();
             dilute_hm = sidis->GetDilute_HM();
-            cdxs = dxs_hp;
+
+            //to avoid some wired behavior in log scale
+            if((dxs_incl)<1e-16) dxs_incl=1e-16;
+            if((dxs_hp)<1e-16) dxs_hp=1e-16;
+            if((dxs_hm)<1e-16) dxs_hm=1e-16;
+            if((dilute_hp)<1e-16) dilute_hp=1e-16;
+            if((dilute_hm)<1e-16) dilute_hm=1e-16;
+
+            if(isnan(dxs_incl)) dxs_incl=1e-16;
+            if(isnan(dxs_hp)) dxs_hp=1e-16;
+            if(isnan(dxs_hm)) dxs_hm=1e-16;
+            if(isnan(dilute_hp)) dilute_hp=1e-16;
+            if(isnan(dilute_hm)) dilute_hm=1e-16;
+            if(isinf(dxs_incl)) dxs_incl=1e-16;
+            if(isinf(dxs_hp)) dxs_hp=1e-16;
+            if(isinf(dxs_hm)) dxs_hm=1e-16;
+            if(isinf(dilute_hp)) dilute_hp=1e-16;
+            if(isinf(dilute_hm)) dilute_hm=1e-16;
+           
+ 
+            double cdxs = dxs_hp;
             if(cdxs>dxs_hm) cdxs = dxs_hm;
 
             //These section will save events based on their XS distributions
@@ -515,7 +536,7 @@ int main(Int_t argc, char *argv[]){
             }/*}}}*/
 
             if(!bXSMode){/*{{{*/
-                if ((dxs_hp+dxs_hm)!=0){
+                if ((dxs_hp)!=0&&(dxs_hm)!=0){
                     if (Q2<=10.&&pt<=1.0){
                         t1->Fill();
                         count[0] ++;//cout << 0 << " " << count[0] << endl;
@@ -578,8 +599,8 @@ int main(Int_t argc, char *argv[]){
 
     //Generate weights for uniform distributed events
     if(!bXSMode){/*{{{*/
-        double weight_hp=0;
-        double weight_hm=0;
+        double weight_hp=1.0e-16;
+        double weight_hm=1.0e-16;
         /*Generate weights for file1{{{*/
         cout<<"--- Now insert weights to Root-file #1"<<filename1.Data()<<endl;
         TFile *f1 = new TFile(filename1.Data(), "update");
@@ -593,11 +614,21 @@ int main(Int_t argc, char *argv[]){
 
         TBranch *branch_weight_hp1=T1->Branch("weight_hp",&weight_hp,"weight_hp/D");
         TBranch *branch_weight_hm1=T1->Branch("weight_hm",&weight_hm,"weight_hm/D");
+            cout<<Form("---Filling weights foor ROOT#1, Nsim=%d, Phase_space = %f", Nsim1, Phase_space)<<endl;
         for(Long64_t i=0;i<N1;i++){
             T1->GetEntry(i);
             //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
             weight_hp=dxs_hp*Phase_space/Nsim1;   
             weight_hm=dxs_hm*Phase_space/Nsim1;
+
+            if((weight_hp)<1e-16) weight_hp=1e-16;
+            if((weight_hm)<1e-16) weight_hm=1e-16;
+            if(isnan(weight_hp)) weight_hp=1e-16;
+            if(isnan(weight_hm)) weight_hm=1e-16;
+            if(isinf(weight_hp)) weight_hp=1e-16;
+            if(isinf(weight_hm)) weight_hm=1e-16;
+
+
             branch_weight_hp1->Fill();
             branch_weight_hm1->Fill();
         }
@@ -619,10 +650,20 @@ int main(Int_t argc, char *argv[]){
 
             TBranch *branch_weight_hp2=T2->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm2=T2->Branch("weight_hm",&weight_hm,"weight_hm/D");
+            cout<<Form("---Filling weights foor ROOT#2, Nsim=%d, Phase_space = %f", Nsim2, Phase_space)<<endl;
             for(Long64_t i=0;i<N2;i++){
                 T2->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_hp=dxs_hp*Phase_space/Nsim2;   
+             
+                if((weight_hp)<1e-16) weight_hp=1e-16;
+                if((weight_hm)<1e-16) weight_hm=1e-16;
+                if(isnan(weight_hp)) weight_hp=1e-16;
+                if(isnan(weight_hm)) weight_hm=1e-16;
+                if(isinf(weight_hp)) weight_hp=1e-16;
+                if(isinf(weight_hm)) weight_hm=1e-16;
+
+
                 weight_hm=dxs_hm*Phase_space/Nsim2;
                 branch_weight_hp2->Fill();
                 branch_weight_hm2->Fill();
@@ -646,10 +687,20 @@ int main(Int_t argc, char *argv[]){
 
             TBranch *branch_weight_hp3=T3->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm3=T3->Branch("weight_hm",&weight_hm,"weight_hm/D");
+            cout<<Form("---Filling weights foor ROOT#3, Nsim=%d, Phase_space = %f", Nsim3, Phase_space)<<endl;
             for(Long64_t i=0;i<N3;i++){
                 T3->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_hp=dxs_hp*Phase_space/Nsim3;   
+            
+                if((weight_hp)<1e-16) weight_hp=1e-16;
+                if((weight_hm)<1e-16) weight_hm=1e-16;
+                if(isnan(weight_hp)) weight_hp=1e-16;
+                if(isnan(weight_hm)) weight_hm=1e-16;
+                if(isinf(weight_hp)) weight_hp=1e-16;
+                if(isinf(weight_hm)) weight_hm=1e-16;
+
+ 
                 weight_hm=dxs_hm*Phase_space/Nsim3;
                 branch_weight_hp3->Fill();
                 branch_weight_hm3->Fill();
@@ -671,11 +722,21 @@ int main(Int_t argc, char *argv[]){
 
             TBranch *branch_weight_hp4=T4->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm4=T4->Branch("weight_hm",&weight_hm,"weight_hm/D");
+            cout<<Form("---Filling weights foor ROOT#4, Nsim=%d, Phase_space = %f", Nsim4, Phase_space)<<endl;
             for(Long64_t i=0;i<N4;i++){
                 T4->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_hp=dxs_hp*Phase_space/Nsim4;   
                 weight_hm=dxs_hm*Phase_space/Nsim4;
+            
+                if((weight_hp)<1e-16) weight_hp=1e-16;
+                if((weight_hm)<1e-16) weight_hm=1e-16;
+                if(isnan(weight_hp)) weight_hp=1e-16;
+                if(isnan(weight_hm)) weight_hm=1e-16;
+                if(isinf(weight_hp)) weight_hp=1e-16;
+                if(isinf(weight_hm)) weight_hm=1e-16;
+
+
                 branch_weight_hp4->Fill();
                 branch_weight_hm4->Fill();
             }

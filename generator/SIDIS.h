@@ -65,6 +65,7 @@ using namespace LHAPDF;
 char *LHAPDF_Dir = std::getenv("LHAPDF");
 const double DEG=180./3.1415926;
 const double PI=3.1415926;
+const double GeV2_to_nbarn = 0.3894 * 1e6; //GeV^2 to nbarn
 //ofstream outlog("pdf_check.dat");
 class SIDIS
 {
@@ -341,6 +342,18 @@ class SIDIS
             double dxs_hm = -1000.0;
 
             /*Calculate XS{{{*/
+            double mass_p = 0.938272;
+            double mass_n = 0.939566;
+            double kSinSQ = pow( sin(theta_ele*0.5),2);
+            double kCosSQ = pow( cos(theta_ele*0.5),2);
+            double xs_p = 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
+                * (1./nu *kCosSQ + 1/mass_p/x * kSinSQ) * fF2p * GeV2_to_nbarn;
+
+            double xs_n = 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
+                * (1./nu *kCosSQ + 1/mass_n/x * kSinSQ) * fF2n * GeV2_to_nbarn;
+            XS_Inclusive = fZ * xs_p + (fA-fZ)*xs_n;//nbarn
+
+
             if (pt<0.8){
                 //first method 	 
                 bpt_p = 1./(0.2+z*z*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
@@ -482,6 +495,11 @@ class SIDIS
         /*}}}*/
 
         /*Return Values{{{*/
+
+        double GetXS_Inclusive(){
+            return XS_Inclusive;
+        }
+
         double GetXS_HP(){
             return XS_HP;
         }
@@ -718,6 +736,10 @@ class SIDIS
             ////outlog<<Form("%f   %f   %f   %f    %f",Q2, x, u1, u2, uquark)<<endl;
             ////cout<<Form("Q2=%f, x=%f, LHAPDF=%f, CTEQ=%f, EPS09=%f",Q2, x, u1, u2, uquark)<<endl;
             //}/*}}}*/
+
+            //calculate F2p and F2n for inclusive XS calculations
+            fF2p = pow( 2./3.,2) * (uquark+ubarquark) + pow(-1./3.,2)*(dquark+dbarquark) + pow(-1./3.,2)*(squark+sbarquark); 
+            fF2n = pow(-1./3.,2) * (uquark+ubarquark) + pow( 2./3.,2)*(dquark+dbarquark) + pow(-1./3.,2)*(squark+sbarquark); //u-->d, d-->u, 
 
             double D_fav,D_unfav,D_s,D_g;
             if (fabs(particle_flag)==1) {
@@ -1056,6 +1078,8 @@ class SIDIS
         double fubar;
         double fdbar;
         double fsbar;
+        double fF2p;
+        double fF2n;
 
         TString fModel;
         int fOrder;
@@ -1096,6 +1120,7 @@ class SIDIS
         double gamma;
         double epsilon;
         double jacoF;
+        double XS_Inclusive;
         double XS_HP;
         double XS_HM;
         double dilute_hp;
