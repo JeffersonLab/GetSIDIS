@@ -3,6 +3,34 @@
 ## with nuclear-PDF implemented for SoLID and EIC
 ## -- Zhihong Ye, 07/26/2016
 
+## How to use the generator:
+* Compile CTEQ libary:
+```js
+    cd ./CTEQ/cteq-pdf-1.0.4/
+    make
+```
+
+* If using LHAPDF5.8 (to be updated to LHAPDF6), download the package and compile it by yourself. 
+  Specify the path in Makefile
+```js
+    wget http://www.hepforge.org/archive/lhapdf/lhapdf-5.8.0.tar.gz
+    tar -zxvf lhapdf-5.8.0.tar.gz
+    cd lhapdf-5.8.0/
+    make
+```
+
+* Compile the generator (use SIDIS_Lite.h for the version w/o LHAPDF5.8):
+```js
+   cd ./generator/
+   make
+```
+
+* Change the configuration file if needed, e.g. "input_c12_pion.dat", and run the code
+```js
+         ./GetSIDIS input_c12_pion.dat, if the "FileNo" value in the file is not "0",
+         ./GetSIDIS input_c12_pion.dat N, for N=1, 2, ..., if the "FileNo" value in the file is "0"
+```
+
 ## To Do
   *      Find the maximum XS value automatically. Now it has to be defined in the input file
   *      Update LHAPDF to the newest version. Now it is still 5.8
@@ -17,10 +45,7 @@
    file always contains both the info positive and negative particles. 
      e.g., in the future, only run "c12_input_kaon.dat" to get both Pi+ and Pi- info
      and in the root files, their difference are just the cross sections and weight etc.
-```js
-         ./GetSIDIS input_c12_pion.dat, if the "FileNo" value in the file is not "0",
-         ./GetSIDIS input_c12_pion.dat N, for N=1, 2, ..., if the "FileNo" value in the file is "0"
-```
+
 ## Update Version in 08/15/2016
   *      All input parameters are defined in a input file, e.g. `input_c12_pip.dat`.
          Please follow the format of the given examples to change the input values
