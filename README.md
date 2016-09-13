@@ -9,6 +9,9 @@
   *      Add nCTEQ15 as an alternative nPDF model.
   *      Add absolute lumi
 
+## Update Version in 09/13/2016:
+* Block the feature of calling "LHAPDF" model since we don't need it now. I will add the LHAPDF6 later.
+
 ## Update Version in 08/29/2016:
 * Remove the separation of pip (kp) and pim(km) in the code since the generated
    file always contains both the info positive and negative particles. 
