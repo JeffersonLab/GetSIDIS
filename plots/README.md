@@ -1,6 +1,6 @@
 # SIDIS Events were generated based on the following kinematics:
-  ## P_ebeam = 10 GeV/c, P_ion = 600 GeV/c for the C12 target
-  ## Phase-Space are:
+## P_ebeam = 10 GeV/c, P_ion = 600 GeV/c for the C12 target
+## Phase-Space are:
   * Electrons:   
 ```js              
       Pe_min = 0.5 GeV/c,      Pe_max = 30.0 GeV/c
