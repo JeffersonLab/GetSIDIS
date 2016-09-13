@@ -6,8 +6,7 @@
 //  -- Zhihong Ye, 06/10/2014                       //
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
-//#include "SIDIS.h"
-#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+#include "SIDIS.h"
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;

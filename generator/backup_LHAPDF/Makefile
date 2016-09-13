@@ -10,18 +10,19 @@ CXXFLAGS      = -Wall -g -frtti -fexceptions -fPIC \
 
 EPS09=../eps09_cxx/
 CTEQPDF=../CTEQ6/cteq-pdf-1.0.4
+LHAPDF=../lhapdf/
 
 O=GetSIDIS
 
 # Linux with g++
-INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
+INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(LHAPDF)/include -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
 #CXX           = clang++
 CXX           = g++
 #LD            = clang++
 LD            = g++
 LDFLAGS       = 
 
-LIBS          = $(ROOTLIBS)  -L/usr/lib/ -lcteqpdf -L$(CTEQPDF)/lib
+LIBS          = $(ROOTLIBS) -L$(LHAPDF)/lib -L/usr/lib/ -lLHAPDF -lcteqpdf -L$(CTEQPDF)/lib
 GLIBS         = $(ROOTGLIBS) -L/usr/X11/lib -L/usr/lib/ -lXpm -lX11 
 
 ALL_LIBS =  $(GLIBS) $(LIBS)

@@ -53,16 +53,16 @@
 #include <TApplication.h>
 #include <Rtypes.h>
 #include <TTree.h>
-#include "LHAPDF/LHAPDF.h"
+//#include "LHAPDF/LHAPDF.h"
 //#include <TMatrix.h>
 /*}}}*/
 #include "cteqpdf.h"
 #include "eps09.h"
 
 using namespace std;
-using namespace LHAPDF;
+//using namespace LHAPDF;
 
-char *LHAPDF_Dir = std::getenv("LHAPDF");
+//char *LHAPDF_Dir = std::getenv("LHAPDF");
 const double DEG=180./3.1415926;
 const double PI=3.1415926;
 const double GeV2_to_nbarn = 0.3894 * 1e6; //GeV^2 to nbarn
@@ -82,12 +82,12 @@ class SIDIS
                 fOrder = 4;
                 SetCTEQ();
             }
-            else if(fModel=="LHAPDF") {
-                SetLHAPDF();
-                fOrder = 0;
-            }
+            //else if(fModel=="LHAPDF") {
+                //SetLHAPDF();
+                //fOrder = 0;
+            //}
             else{
-                cerr<<"*** ERROR, I don't understand the XS model (not EPS09 or LHAPDF) :"<<fModel.Data()<<endl;
+                cerr<<"*** ERROR, I don't understand the XS model (not EPS09) :"<<fModel.Data()<<endl;
                 exit(-2);
             }
         }/*}}}*/
@@ -117,15 +117,15 @@ class SIDIS
         /*}}}*/
 
         /*SetLHAPDF{{{*/
-        void SetLHAPDF(){
-            const int SUBSET = 1;
-            //const string NAME = "CT10nlo";
-            const string NAME = "cteq6m";
+ /*       void SetLHAPDF(){*/
+            //const int SUBSET = 1;
+            ////const string NAME = "CT10nlo";
+            //const string NAME = "cteq6m";
 
-            TString LHAPDF_path=Form("%s/share/lhapdf",LHAPDF_Dir);
-            setPDFPath(LHAPDF_path.Data());
-            LHAPDF::initPDFSet(NAME, LHAPDF::LHPDF, SUBSET);
-        }
+            //TString LHAPDF_path=Form("%s/share/lhapdf",LHAPDF_Dir);
+            //setPDFPath(LHAPDF_path.Data());
+            //LHAPDF::initPDFSet(NAME, LHAPDF::LHPDF, SUBSET);
+        /*}*/
         /*}}}*/
 
         void SetCTEQ(int mode){/*{{{*/
@@ -164,7 +164,7 @@ class SIDIS
                 SetCTEQ();
             }
             else{
-                cerr<<"*** ERROR, I don't understand the XS model (not EPS09 or LHAPDF) :"<<fModel.Data()<<endl;
+                cerr<<"*** ERROR, I don't understand the XS model (not EPS09) :"<<fModel.Data()<<endl;
                 exit(-2);
             }
         }/*}}}*/
@@ -185,7 +185,7 @@ class SIDIS
 
             particle_flag = ptcl_flag;
             double mass_e = 0.511e-3; // electron mass in GeV
-            double mass_p = 0.93827;
+            //double mass_p = 0.93827;
             double mass_pi = 0.13957;
             //double mass_pi0 = 0.1349766;
             double mass_kaon = 0.493667;
@@ -699,15 +699,16 @@ class SIDIS
             double df_n_hp=0,df_n_hm=0;
 
             double uquark=0.0,dquark=0.0,squark=0.0,ubarquark=0.0,dbarquark=0.0,sbarquark=0.0;
-            if(fOrder==0){
-                uquark = Get_LHAPDF(1,x,Q2);
-                dquark = Get_LHAPDF(2,x,Q2);
-                squark = Get_LHAPDF(3,x,Q2);
-                ubarquark = Get_LHAPDF(-1,x,Q2);
-                dbarquark = Get_LHAPDF(-2,x,Q2);
-                sbarquark = Get_LHAPDF(-3,x,Q2);
-            }
-            else if(fOrder==1 || fOrder==2){/*{{{*/
+            //if(fOrder==0){
+                //uquark = Get_LHAPDF(1,x,Q2);
+                //dquark = Get_LHAPDF(2,x,Q2);
+                //squark = Get_LHAPDF(3,x,Q2);
+                //ubarquark = Get_LHAPDF(-1,x,Q2);
+                //dbarquark = Get_LHAPDF(-2,x,Q2);
+                //sbarquark = Get_LHAPDF(-3,x,Q2);
+            //}
+            //else 
+            if(fOrder==1 || fOrder==2){/*{{{*/
                 //Calculate medium modified PDFs:
                 RunEPS09(fOrder, fErrSet, fA, fZ, x, Q2);
 
@@ -785,8 +786,11 @@ class SIDIS
         /*void dxs_hpt(double pt_tmp, double* dxs_hp,...){{{*/
         void dxs_hpt(double pt_tmp, double* dxs_hp, double* dxs_hm,double* dxs_all){
 
-            double alpha_s;
-            alpha_s = alphasPDF(sqrt(Q2));
+            double alpha_s = 0.0;
+          /*  if(fOrder==0)*/
+                //alpha_s = alphasPDF(sqrt(Q2));
+            /*else*/
+                alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
 
 
             //cout << y << "\t" << Q2 << endl;
@@ -834,17 +838,18 @@ class SIDIS
                 //     Pgq = 0.;
 
 
-                if(fOrder==0){
-                    //free PDF from LHAPDF
-                    uquark = Get_LHAPDF(1,x/xp,Q2);
-                    dquark = Get_LHAPDF(2,x/xp,Q2);
-                    squark = Get_LHAPDF(3,x/xp,Q2);
-                    ubarquark = Get_LHAPDF(-1,x/xp,Q2);
-                    dbarquark = Get_LHAPDF(-2,x/xp,Q2);
-                    sbarquark = Get_LHAPDF(-3,x/xp,Q2);
-                    gluon = Get_LHAPDF(0,x/xp,Q2);
-                }
-                else if(fOrder==1 || fOrder==2){
+                //if(fOrder==0){
+                    ////free PDF from LHAPDF
+                    //uquark = Get_LHAPDF(1,x/xp,Q2);
+                    //dquark = Get_LHAPDF(2,x/xp,Q2);
+                    //squark = Get_LHAPDF(3,x/xp,Q2);
+                    //ubarquark = Get_LHAPDF(-1,x/xp,Q2);
+                    //dbarquark = Get_LHAPDF(-2,x/xp,Q2);
+                    //sbarquark = Get_LHAPDF(-3,x/xp,Q2);
+                    //gluon = Get_LHAPDF(0,x/xp,Q2);
+                //}
+                //else
+                if(fOrder==1 || fOrder==2){
                     //Calculate medium modified PDFs:
                     RunEPS09(fOrder, fErrSet, fA, fZ, x/xp, Q2);
 
@@ -967,42 +972,42 @@ class SIDIS
         /*}}}*/
 
         /*double Get_LHAPDF(int iparton,double x,double Q2){{{*/          
-        double Get_LHAPDF(int iparton,double x,double Q2)          
-        {
-            double Q = sqrt(Q2);
-            double result = 0;
+/*        double Get_LHAPDF(int iparton,double x,double Q2)          */
+        //{
+            //double Q = sqrt(Q2);
+            //double result = 0;
 
-            ///////////////in LHAPDF->xfx(): 
-            // 1->d, 2->u, 3->s, 4->c, 5->b, 6->t, 21->g 
-            //-1->dbar, -2->ubar,-3->sbar,-4->cbar,-5->bbar,-6->tbar
-            //For valance quarks:
-            //  dv-> d-dbar, u->u-ubar
+            /////////////////in LHAPDF->xfx(): 
+            //// 1->d, 2->u, 3->s, 4->c, 5->b, 6->t, 21->g 
+            ////-1->dbar, -2->ubar,-3->sbar,-4->cbar,-5->bbar,-6->tbar
+            ////For valance quarks:
+            ////  dv-> d-dbar, u->u-ubar
 
 
-            if (iparton==1){
-                // u quark
-                result = xfx(x, Q, 2);
-            }else if (iparton==2){
-                // d quark
-                result = xfx(x, Q, 1);
-            }else if (iparton==-1){
-                // \bar{u} quark
-                result = xfx(x, Q, -2);
-            }else if (iparton==-2){
-                // \bar{d} quark
-                result = xfx(x, Q, -1);
-            }else if (iparton==3){
-                // strange quark
-                result = xfx(x, Q, 3);
-            }else if (iparton==-3){
-                // \bar{s} quark
-                result = xfx(x, Q, -3);
-            }else if (iparton==0){
-                result = xfx(x,Q,0);
-            }
+            //if (iparton==1){
+                //// u quark
+                //result = xfx(x, Q, 2);
+            //}else if (iparton==2){
+                //// d quark
+                //result = xfx(x, Q, 1);
+            //}else if (iparton==-1){
+                //// \bar{u} quark
+                //result = xfx(x, Q, -2);
+            //}else if (iparton==-2){
+                //// \bar{d} quark
+                //result = xfx(x, Q, -1);
+            //}else if (iparton==3){
+                //// strange quark
+                //result = xfx(x, Q, 3);
+            //}else if (iparton==-3){
+                //// \bar{s} quark
+                //result = xfx(x, Q, -3);
+            //}else if (iparton==0){
+                //result = xfx(x,Q,0);
+            //}
 
-            return(result);
-        }
+            //return(result);
+        /*}*/
         /*}}}*/
 
         /*double Get_CTEQPDF(int iparton,double x,double Q2){{{*/          
