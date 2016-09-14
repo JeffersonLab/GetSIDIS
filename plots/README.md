@@ -30,6 +30,7 @@
     c12_pion_multiplicity_z.png: "Multiplicity" vs. Z, but here "Multiplicity" is just simply the ratio of SIDIS XS to inclusive XS. 
                                   Three plots: pi+, pi-, and (pi+)-(pi-)
     c12_pion_pt.png: 1D distributions of pt.
+    ![alt tag](https://github.com/JeffersonLab/EIC-SIDIS/blob/master/plots/c12_pion_pt_log.png)
 ```
     
 
