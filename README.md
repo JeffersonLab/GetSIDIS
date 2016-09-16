@@ -37,6 +37,11 @@
   *      Add nCTEQ15 as an alternative nPDF model.
   *      Add absolute lumi
 
+## Update Version in 09/16/2016:
+* Add LHAPDF6 (replace LHAPDF5.8). Please install your won LHAPDF6.
+* Keep the "Lite" version which only include EPS09 and CTEQ, and also the full version
+* When choosing output LUND format files, generate PI+(K+) and PI-(K-) separately.
+
 ## Update Version in 09/13/2016:
 * Block the feature of calling "LHAPDF" model since we don't need it now. I will add the LHAPDF6 later.
 
