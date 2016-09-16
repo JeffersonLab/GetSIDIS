@@ -16,7 +16,7 @@
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
  600
 ## 6), int, Number of events. 
- 100000
+ 1000000
 ###  If events are generated based on XS, save total events in one ROOT file
 ###  If events are generated uniformly, multiple ROOT files are created:
 ###     SoLID+EIC:  1 -> Q2<10, pt<1
@@ -29,10 +29,10 @@
 ## 8), string, Configuration, "EIC" or "SoLID". Can add CLAS12 as well but not now
  EIC
 ## 9), string, PDF Model Type, "LHAPDF" or "EPS09" or "nCTEQ15"(available soon)
-LHAPDF
+EPS09
 ## 10), Maximum Cross Section Value
 ##      0nly useful when generating LUND format or save root files based on XS distribution
- 1000.0
+ 10000.0
 ## 11), int, LUND output or not, 1-> yes, 0->no
  0
 ## 12), int, save events based on XS or not, 1-> yes, 0->no

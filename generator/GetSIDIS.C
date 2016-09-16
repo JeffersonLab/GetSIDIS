@@ -444,7 +444,7 @@ int main(Int_t argc, char *argv[]){
             /*LUND For Positive Hadron{{{*/
             //These section will save events based on their XS distributions
             Double_t cdxs_max_rndm_hp = cdxs_max * gRandom->Uniform(0, 1);
-            if(bLUND&&dxs_hp < cdxs_max_rndm_hp){
+            if(bLUND&&dxs_hp > cdxs_max_rndm_hp){
                 //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                 pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                         2, //ele+had
@@ -499,7 +499,7 @@ int main(Int_t argc, char *argv[]){
             /*LUND For Negative Hadron{{{*/
             //These section will save events based on their XS distributions
             Double_t cdxs_max_rndm_hm = cdxs_max * gRandom->Uniform(0, 1);
-            if(bLUND&&dxs_hm < cdxs_max_rndm_hm){
+            if(bLUND&&dxs_hm > cdxs_max_rndm_hm){
                 //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                 neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                         2, //ele+had
@@ -552,7 +552,7 @@ int main(Int_t argc, char *argv[]){
             /*}}}*/
 
             /*Save PI+ ROOT file based on XS distribution{{{*/
-            if(bXSMode&&(dxs_hp < cdxs_max_rndm_hp)){
+            if(bXSMode&&(dxs_hp > cdxs_max_rndm_hp)){
                 t1->Fill();
 
                 //Just save events in one root files in this case
@@ -564,7 +564,7 @@ int main(Int_t argc, char *argv[]){
             /*}}}*/
 
             /*Save PI- ROOT file based on XS distribution{{{*/
-            if(bXSMode&&(dxs_hm < cdxs_max_rndm_hm)){
+            if(bXSMode&&(dxs_hm > cdxs_max_rndm_hm)){
                 t2->Fill();
 
                 //Just save events in one root files in this case
