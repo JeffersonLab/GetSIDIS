@@ -30,11 +30,11 @@
   *      Add absolute lumi
 
 ## Update Version in 09/16/2016:
-* Add LHAPDF6 (replace LHAPDF5.8). Please install your won LHAPDF6.
+* Add LHAPDF6 (replace LHAPDF5.8). Please install your won LHAPDF6. LHAPDF5.8 is still in the code but blocked-out.
 * Keep the "Lite" version which only include EPS09 and CTEQ, and also the full version
 * When choosing output LUND format files, generate PI+(K+) and PI-(K-) separately.
 * When chossing output root files based on XS, save PI+(K+) and PI-(K-) into *_1.root and *_2.root separately
-* Add a new configuraiton for spectrometer type configuration, e.g. HRS
+* Add a new configuraiton, name "SPECT", for spectrometer type configuration, e.g. HRS
 
 ## Update Version in 09/13/2016:
 * Block the feature of calling "LHAPDF" model since we don't need it now. I will add the LHAPDF6 later.

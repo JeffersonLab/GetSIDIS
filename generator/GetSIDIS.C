@@ -355,9 +355,33 @@ int main(Int_t argc, char *argv[]){
     //LHAPDF, CTEQPDF or EPS09
     SIDIS *sidis = new SIDIS(model);
 
-    //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, default is 2
-    //3->free L0 CTEQ6L1 PDF, 4->free NL0 CTEQ6.1M PDF, default is 4
-    //sidis->SetCTEQOrder(2);/*}}}*/
+    ////////////////////////////////
+    //*** If using EPS09, two CTEQ PDF sets are used for LO and NLO EPS09 sets
+    //*** 1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, default is 2
+    //////////
+    //sidis->SetEPS09(2);
+    ////////////////////////////////
+   
+    ////////////////////////////////
+    /////////////
+    //*** If using CTEQPDF, default is CTEQ6.1M, but you can specify the name of the PDF sets
+    //*** For exmaple, 4--> CTEQ6L1 (LO), 200-->CTEQ6.1M (NLO)
+    //*** See ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
+    /////////////
+    //SetCTEQ( mode);
+    ////////////////////////////////
+     
+    ////////////////////////////////
+    //*** If using LHAPDF6, default is "CTnlo", but you can add this line here to specify the set of PDF you want
+    ////////////////////////////////
+    ////*** in general, just tell the name of the set
+    ////***  see https://lhapdf.hepforge.org/pdfsets.html 
+    //SetLHAPDF("CJ15nlo");
+   
+    ////*** Or if using nCTEQ, add this to specify the associated PDF set of the target
+    //sidis->SetLHAPDF(A, Z); 
+    ////////////////////////////////
+    /*}}}*/
 
     bool exitcondition=true;	
     while(exitcondition){/*{{{*/
@@ -575,29 +599,34 @@ int main(Int_t argc, char *argv[]){
             }
             /*}}}*/
 
-            if(!bXSMode){/*{{{*/
-                if ((dxs_hp)!=0&&(dxs_hm)!=0){
-                    if((config=="SPECT")||(Q2<=10.&&pt<=1.0&&(config=="SoLID"||config=="EIC"))){
+            if(!bXSMode&&((dxs_hp)!=0&&(dxs_hm)!=0)){/*{{{*/
+                if(config=="SPECT"){
+                    t1->Fill();
+                    count[0] ++;//cout << 0 << " " << count[0] << endl;
+
+                    count[1] = number_of_events;
+                    count[2] = number_of_events;
+                    count[3] = number_of_events;
+                }
+
+                if(config=="SoLID"||config=="EIC"){
+                    if(Q2<=10.&&pt<=1.0){
                         t1->Fill();
                         count[0] ++;//cout << 0 << " " << count[0] << endl;
                     }
-
-                    if(config=="SoLID"||config=="EIC"){
-                        if (Q2<=10.&&pt>1.0){
-                            t2->Fill();
-                        }
+                    if (Q2<=10.&&pt>1.0){
+                        t2->Fill();
+                        count[1] ++;
                     }
 
-                    if(config=="EIC"){
-                        if (Q2>10.&&pt<=1.0){
-                            t3->Fill();
-                            count[2] ++;//cout << 2 << " " << count[2] << endl;
-                        }
-                        if (Q2>10.&&pt>1.0){
-                            t4->Fill();
-                            count[3] ++;//cout << 3 << " " << count[3] <<  endl;
-                        }
-                    } 
+                    if (config=="EIC"&&Q2>10.&&pt<=1.0){
+                        t3->Fill();
+                        count[2] ++;//cout << 2 << " " << count[2] << endl;
+                    }
+                    if (config=="EIC"&&Q2>10.&&pt>1.0){
+                        t4->Fill();
+                        count[3] ++;//cout << 3 << " " << count[3] <<  endl;
+                    }
                 }
                 cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
                 //cout << nsim << endl;
