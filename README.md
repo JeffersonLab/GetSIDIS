@@ -10,14 +10,8 @@
     make
 ```
 
-* If using LHAPDF5.8 (to be updated to LHAPDF6), download the package and compile it by yourself. 
-  Specify the path in Makefile
-```js
-    wget http://www.hepforge.org/archive/lhapdf/lhapdf-5.8.0.tar.gz
-    tar -zxvf lhapdf-5.8.0.tar.gz
-    cd lhapdf-5.8.0/
-    make
-```
+* Install LHAPDF6, download the package and compile it by yourself. 
+  Specify the path in Makefile or define it in your system PATH and LIBARAY
 
 * Compile the generator (use SIDIS_Lite.h for the version w/o LHAPDF5.8):
 ```js
@@ -25,17 +19,22 @@
    make
 ```
 
-* Change the configuration file if needed, e.g. "input_c12_pion.dat", and run the code
+* Change the configuration file if needed, e.g. "eic_c12_pion.dat", and run the code
 ```js
-         ./GetSIDIS input_c12_pion.dat, if the "FileNo" value in the file is not "0",
-         ./GetSIDIS input_c12_pion.dat N, for N=1, 2, ..., if the "FileNo" value in the file is "0"
+         ./GetSIDIS eic_c12_pion.dat, if the "FileNo" value in the file is not "0",
+         ./GetSIDIS eic_c12_pion.dat N, for N=1, 2, ..., if the "FileNo" value in the file is "0"
 ```
 
 ## To Do
   *      Find the maximum XS value automatically. Now it has to be defined in the input file
-  *      Update LHAPDF to the newest version. Now it is still 5.8
-  *      Add nCTEQ15 as an alternative nPDF model.
   *      Add absolute lumi
+
+## Update Version in 09/16/2016:
+* Add LHAPDF6 (replace LHAPDF5.8). Please install your won LHAPDF6. LHAPDF5.8 is still in the code but blocked-out.
+* Keep the "Lite" version which only include EPS09 and CTEQ, and also the full version
+* When choosing output LUND format files, generate PI+(K+) and PI-(K-) separately.
+* When chossing output root files based on XS, save PI+(K+) and PI-(K-) into *_1.root and *_2.root separately
+* Add a new configuraiton, name "SPECT", for spectrometer type configuration, e.g. HRS
 
 ## Update Version in 09/13/2016:
 * Block the feature of calling "LHAPDF" model since we don't need it now. I will add the LHAPDF6 later.
@@ -43,16 +42,16 @@
 ## Update Version in 08/29/2016:
 * Remove the separation of pip (kp) and pim(km) in the code since the generated
    file always contains both the info positive and negative particles. 
-     e.g., in the future, only run "c12_input_kaon.dat" to get both Pi+ and Pi- info
+     e.g., in the future, only run "eic_c12_kaon.dat" to get both Pi+ and Pi- info
      and in the root files, their difference are just the cross sections and weight etc.
 
 ## Update Version in 08/15/2016
-  *      All input parameters are defined in a input file, e.g. `input_c12_pip.dat`.
+  *      All input parameters are defined in a input file, e.g. `eic_c12_pip.dat`.
          Please follow the format of the given examples to change the input values
          To run the run, simply type:
 ```js
-         ./GetSIDIS input_c12_pip.dat, if the "FileNo" value in the file is not "0",
-         ./GetSIDIS input_c12_pip.dat N, for N=1, 2, ..., if the "FileNo" value in the file is "0"
+         ./GetSIDIS eic_c12_pip.dat, if the "FileNo" value in the file is not "0",
+         ./GetSIDIS eic_c12_pip.dat N, for N=1, 2, ..., if the "FileNo" value in the file is "0"
 ```
   *      Allow the generator to generate events uniformaly or based on the cross
                 section shape. For the later case, a MAX cross section value is needed to be

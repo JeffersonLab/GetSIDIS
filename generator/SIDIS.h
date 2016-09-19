@@ -62,7 +62,7 @@
 using namespace std;
 using namespace LHAPDF;
 
-char *LHAPDF_Dir = std::getenv("LHAPDF");
+//char *LHAPDF_Dir = std::getenv("LHAPDF");
 const double DEG=180./3.1415926;
 const double PI=3.1415926;
 const double GeV2_to_nbarn = 0.3894 * 1e6; //GeV^2 to nbarn
@@ -87,7 +87,7 @@ class SIDIS
                 fOrder = 0;
             }
             else{
-                cerr<<"*** ERROR, I don't understand the XS model (not EPS09 or LHAPDF) :"<<fModel.Data()<<endl;
+                cerr<<"*** ERROR, I don't understand the XS model (not EPS09) :"<<fModel.Data()<<endl;
                 exit(-2);
             }
         }/*}}}*/
@@ -95,6 +95,7 @@ class SIDIS
         virtual ~SIDIS(){/*{{{*/
             if(fModel=="CTEQPDF"||fModel=="EPS09") 
                 cteq_pdf_free(fPDF);
+            delete lhapdfs;
         }/*}}}*/
 
         /*void Print(){{{*/
@@ -118,30 +119,87 @@ class SIDIS
 
         /*SetLHAPDF{{{*/
         void SetLHAPDF(){
-            const int SUBSET = 1;
-            //const string NAME = "CT10nlo";
-            const string NAME = "cteq6m";
+            //const int SUBSET = 1;
+            //const string SETNAME = "CT10nlo";
 
-            TString LHAPDF_path=Form("%s/share/lhapdf",LHAPDF_Dir);
-            setPDFPath(LHAPDF_path.Data());
-            LHAPDF::initPDFSet(NAME, LHAPDF::LHPDF, SUBSET);
+            /////////////
+            //LHAPDF5.8
+            ////////////
+            //const string NAME = "cteq6m";
+            //TString LHAPDF_path=Form("%s/share/lhapdf",LHAPDF_Dir);
+            //setPDFPath(LHAPDF_path.Data());
+            //LHAPDF::initPDFSet(NAME, LHAPDF::LHPDF, SUBSET);
+
+            ////////////
+            //LHAPDF6
+            ///////////
+            //also: cteq6, cteq6l1,CT10nlo,nCTEQ15 etc., see https://lhapdf.hepforge.org/pdfsets.html 
+            lhapdfs = LHAPDF::mkPDF("CT10nlo");
+
         }
         /*}}}*/
-
-        void SetCTEQ(int mode){/*{{{*/
-            //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
-            fPDF = cteq_pdf_alloc_id(mode);
-        }/*}}}*/
         
+        /*SetLHAPDF(const TString& kName){{{*/
+        void SetLHAPDF(const TString& kName){
+            ////////////
+            //LHAPDF6
+            ///////////
+            //Directly tell the name of the PDF set
+            //also: cteq6, cteq6l1,CT10nlo,nCTEQ15 etc., see https://lhapdf.hepforge.org/pdfsets.html 
+            if(fModel=="LHAPDF"){
+                lhapdfs = LHAPDF::mkPDF(kName.Data());
+            }
+            else{
+                cerr<<"*** ERROR, I don't understand the XS model (not LHAPDF) :"<<fModel.Data()<<endl;
+                exit(-2);
+            }
+
+        }
+        /*}}}*/
+        
+        /*SetLHAPDF(const int kA, const int kZ){{{*/
+        void SetLHAPDF(const int kA, const int kZ){
+            ////////////
+            //LHAPDF6
+            ///////////
+            //also: cteq6, cteq6l1,CT10nlo,nCTEQ15 etc., see https://lhapdf.hepforge.org/pdfsets.html 
+            
+            //To call nCTEQ PDF based on the specified target
+            //Must have download the associated PDF sets for this target
+            if(fModel=="LHAPDF"){
+                lhapdfs = LHAPDF::mkPDF(Form("nCTEQ15_%d_%d", kA, kZ));
+            }
+                else{
+                cerr<<"*** ERROR, I don't understand the XS model (not LHAPDF) :"<<fModel.Data()<<endl;
+                exit(-2);
+                }
+                    
+            }
+        /*}}}*/
+
         void SetCTEQ(){/*{{{*/
             int mode = 0;
             if(fOrder==1||fOrder==3)
+                //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, 
                 mode = 4; //CTEQ6L1, see JHEP04 (2009) 065
             else if(fOrder==2||fOrder==4)
+                //3->free L0 CTEQ6L1 PDF, 4->free NL0 CTEQ6.1M PDF
                 mode = 200; //CTEQ6.1M, see JHEP04 (2009) 065
 
-             //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
+            //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
             fPDF = cteq_pdf_alloc_id(mode);
+        }/*}}}*/
+
+        void SetCTEQ(int mode){/*{{{*/
+            //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
+            if(fModel=="EPS09"||fModel=="CTEQPDF"){
+            fPDF = cteq_pdf_alloc_id(mode);
+            }
+            else{
+                cerr<<"*** ERROR, I don't understand the XS model (not EPS09 or CTEQPDF) :"<<fModel.Data()<<endl;
+                exit(-2);
+            }
+
         }/*}}}*/
 
         void SetEPS09(){/*{{{*/
@@ -149,22 +207,19 @@ class SIDIS
             SetCTEQ();
         }/*}}}*/
 
-        void SetCTEQOrder(int kOrder){/*{{{*/
+        void SetEPS09(int kOrder){/*{{{*/
             fOrder = kOrder;
 
             //Reinitialize:
             if(fModel=="EPS09"){
                 if(fOrder!=1 && fOrder!=2)
+                    //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, 
                     fOrder = 2;//default is 2 if neither 1 or 2
-                SetEPS09();
-            }
-            else if(fModel=="CTEQPDF"){
-                if(fOrder!=3 && fOrder!=4)
-                    fOrder = 4;//default is 4 if neither 3 or 4
+                fErrSet = 1;
                 SetCTEQ();
             }
             else{
-                cerr<<"*** ERROR, I don't understand the XS model (not EPS09 or LHAPDF) :"<<fModel.Data()<<endl;
+                cerr<<"*** ERROR, I don't understand the XS model (not EPS09) :"<<fModel.Data()<<endl;
                 exit(-2);
             }
         }/*}}}*/
@@ -493,7 +548,7 @@ class SIDIS
             /*}}}*/
         } 
         /*}}}*/
-
+        
         /*Return Values{{{*/
 
         double GetXS_Inclusive(){
@@ -520,7 +575,7 @@ class SIDIS
         double get_dbar(){ return fdbar; }//return the average d
         double get_sbar(){ return fsbar; }//return the average s
         /*}}}*/
-
+        
     private:
         /*double Azimuthalphi(double vx, double vy){{{*/
         double Azimuthalphi(double vx, double vy){
@@ -787,11 +842,10 @@ class SIDIS
 
             double alpha_s = 0.0;
             if(fOrder==0)
-                alpha_s = alphasPDF(sqrt(Q2));
-            else
-                alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
-
-
+                //alpha_s = alphasPDF(sqrt(Q2));//LHAPDF5
+                alpha_s = lhapdfs->alphasQ(sqrt(Q2));
+            else//Use CTEQ    
+                //alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
 
             //cout << y << "\t" << Q2 << endl;
             //cout << alpha_s << endl;
@@ -839,7 +893,7 @@ class SIDIS
 
 
                 if(fOrder==0){
-                    //free PDF from LHAPDF
+                    // PDF from LHAPDF
                     uquark = Get_LHAPDF(1,x/xp,Q2);
                     dquark = Get_LHAPDF(2,x/xp,Q2);
                     squark = Get_LHAPDF(3,x/xp,Q2);
@@ -973,36 +1027,61 @@ class SIDIS
         /*double Get_LHAPDF(int iparton,double x,double Q2){{{*/          
         double Get_LHAPDF(int iparton,double x,double Q2)          
         {
-            double Q = sqrt(Q2);
             double result = 0;
+            double Q = sqrt(Q2);
 
-            ///////////////in LHAPDF->xfx(): 
+            ///LHAPDF5////////////in LHAPDF->xfx(): /*{{{*/
             // 1->d, 2->u, 3->s, 4->c, 5->b, 6->t, 21->g 
             //-1->dbar, -2->ubar,-3->sbar,-4->cbar,-5->bbar,-6->tbar
             //For valance quarks:
             //  dv-> d-dbar, u->u-ubar
-
-
+            /*            if (iparton==1){*/
+            //// u quark
+            //result = xfx(x, Q, 2);
+            //}else if (iparton==2){
+            //// d quark
+            //result = xfx(x, Q, 1);
+            //}else if (iparton==-1){
+            //// \bar{u} quark
+            //result = xfx(x, Q, -2);
+            //}else if (iparton==-2){
+            //// \bar{d} quark
+            //result = xfx(x, Q, -1);
+            //}else if (iparton==3){
+            //// strange quark
+            //result = xfx(x, Q, 3);
+            //}else if (iparton==-3){
+            //// \bar{s} quark
+            //result = xfx(x, Q, -3);
+            //}else if (iparton==0){
+            //result = xfx(x,Q,0);
+            //}
+            /*}}}*/
+            ///////////////
+            //LHAPDF6
+            ///////////////
+            //Note that LHAPDF6 use PDG scheme ID as the PID
             if (iparton==1){
                 // u quark
-                result = xfx(x, Q, 2);
+                result = lhapdfs->xfxQ(2, x, Q);
             }else if (iparton==2){
                 // d quark
-                result = xfx(x, Q, 1);
+                result = lhapdfs->xfxQ(1, x, Q);
             }else if (iparton==-1){
                 // \bar{u} quark
-                result = xfx(x, Q, -2);
+                result = lhapdfs->xfxQ(-2, x, Q);
             }else if (iparton==-2){
                 // \bar{d} quark
-                result = xfx(x, Q, -1);
+                result = lhapdfs->xfxQ(-1, x, Q);
             }else if (iparton==3){
                 // strange quark
-                result = xfx(x, Q, 3);
+                result = lhapdfs->xfxQ(3, x, Q);
             }else if (iparton==-3){
                 // \bar{s} quark
-                result = xfx(x, Q, -3);
+                result = lhapdfs->xfxQ(-3, x, Q);
             }else if (iparton==0){
-                result = xfx(x,Q,0);
+                //gluon
+                result = lhapdfs->xfxQ(21, x,Q);
             }
 
             return(result);
@@ -1089,6 +1168,7 @@ class SIDIS
         int fOrder;
         int fErrSet;
 
+        LHAPDF::PDF* lhapdfs;
     public:
         double mom_ele;
         double theta_ele; 

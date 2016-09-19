@@ -213,6 +213,9 @@ class SIDIS
                 cout << "particle_flag is wrong +-1 and +-2" << endl;
             }	
 
+            E0_beam_ele = mom_beam_ele;
+            E0_beam_ion = mom_beam_ion;
+
             // //define the 4-momentum
             //define electron direction as +z assuming a proton/neutron for the ion mass now 
             // approximation for SIDIS
@@ -322,8 +325,6 @@ class SIDIS
             //cout<<Form("--  Hadron: phi_gen = %f,  phi=%f", ph_had, phi_had)<<endl;
 
             jacoF = Jacobian(mom_ele,theta_ele,phi_ele,mom_had,theta_had,phi_had,mom_ion,energy_ion,mom_beam_ele);
-            //jacoF = 1.0;
-
             /*}}}*/
 
             delete P4_ini_ele; delete P4_ini_ion;  
@@ -346,13 +347,19 @@ class SIDIS
             double mass_n = 0.939566;
             double kSinSQ = pow( sin(theta_ele*0.5),2);
             double kCosSQ = pow( cos(theta_ele*0.5),2);
-            double xs_p = 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
+
+            ////This definition is in the CM frame, i.e. dSigma/dx/dy
+            //double xs_p = 2.0*PI*pow(1/137.036,2)*s/Q2/Q2*(1+pow(1-y, 2)) * fF2p * GeV2_to_nbarn;
+            //double xs_n = 2.0*PI*pow(1/137.036,2)*s/Q2/Q2*(1+pow(1-y, 2)) * fF2n * GeV2_to_nbarn;
+            //double Trans = 2.*mass_p*E0_beam_ele/mom_ele * PI *y; 
+
+            ////This definition is in the lab frame, e.g. dSigma/dE'dOmega, where dE'dOmega = 2.*M*E0/E'*PI*y*dxdy
+            double xs_p= 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
                 * (1./nu *kCosSQ + 1/mass_p/x * kSinSQ) * fF2p * GeV2_to_nbarn;
-
-            double xs_n = 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
+            double xs_n= 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
                 * (1./nu *kCosSQ + 1/mass_n/x * kSinSQ) * fF2n * GeV2_to_nbarn;
-            XS_Inclusive = fZ * xs_p + (fA-fZ)*xs_n;//nbarn
 
+            XS_Inclusive = fZ * xs_p + (fA-fZ)*xs_n;//nbarn
 
             if (pt<0.8){
                 //first method 	 
@@ -689,7 +696,7 @@ class SIDIS
             double qd=-1./3.;
             double qs=-1./3.;
 
-            *dxs_hp = 1./137.035/137.035/x/y/Q2/1000000. *y*y/(2*(1-epsilon))*(1+gamma*gamma/2./x)*(197.3*197.3/100.*1.0e9);
+            *dxs_hp = 1./137.035/137.035/x/y/Q2 *y*y/(2*(1-epsilon))*(1+gamma*gamma/2./x)*GeV2_to_nbarn;
             *dxs_hm = *dxs_hp;
 
             *dxs_hp = (*dxs_hp)*bpt_p/PI*exp(-bpt_p*pt_tmp*pt_tmp)*x;
@@ -739,8 +746,8 @@ class SIDIS
             //}/*}}}*/
 
             //calculate F2p and F2n for inclusive XS calculations
-            fF2p = pow( 2./3.,2) * (uquark+ubarquark) + pow(-1./3.,2)*(dquark+dbarquark) + pow(-1./3.,2)*(squark+sbarquark); 
-            fF2n = pow(-1./3.,2) * (uquark+ubarquark) + pow( 2./3.,2)*(dquark+dbarquark) + pow(-1./3.,2)*(squark+sbarquark); //u-->d, d-->u, 
+            fF2p = pow(qu,2) * (uquark+ubarquark) + pow(qd,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); 
+            fF2n = pow(qd,2) * (uquark+ubarquark) + pow(qu,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); //u-->d, d-->u, 
 
             double D_fav,D_unfav,D_s,D_g;
             if (fabs(particle_flag)==1) {
@@ -1091,6 +1098,8 @@ class SIDIS
         int fErrSet;
 
     public:
+        double E0_beam_ele;
+        double E0_beam_ion;
         double mom_ele;
         double theta_ele; 
         double phi_ele; 

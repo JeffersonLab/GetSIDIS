@@ -4,6 +4,12 @@
 *   for SoLID and EIC          *
 *  -- Zhihong Ye, 07/26/2016   *
 ********************************
+Update Version in 09/16/2016:
+1) Add LHAPDF6 (replace LHAPDF5.8). Please install your won LHAPDF6.
+2) Keep the "Lite" version which only include EPS09 and CTEQ, and also the full version
+3) When choosing output LUND format files, generate PI+(K+) and PI-(K-) separately.
+
+
 Update Version in 08/29/2016:
 1) Remove the separation of pip (kp) and pim(km) in the code since the generated
    file always contains both the info positive and negative particles. 

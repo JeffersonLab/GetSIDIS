@@ -66,6 +66,11 @@ const Double_t SoLID_Th_Max_e = 30.0;
 const Double_t SoLID_Th_Min_h  =  7.0; 
 const Double_t SoLID_Th_Max_h =  30.0;
 
+const Double_t SoLID_Ph_Min_e  = 0.0;  
+const Double_t SoLID_Ph_Max_e = 360.0; 
+const Double_t SoLID_Ph_Min_h  =  0.0; 
+const Double_t SoLID_Ph_Max_h =  360.0;
+
 //SoLID BeamSize Info
 const Double_t SoLID_BeamSizeX_ele = 0.5 * cm;
 const Double_t SoLID_BeamSizeY_ele = 0.5 * cm;
@@ -91,6 +96,11 @@ const Double_t EIC_Th_Max_e  = 140.0;
 const Double_t EIC_Th_Min_h = 0.0;  
 const Double_t EIC_Th_Max_h  = 180.0;
 
+const Double_t EIC_Ph_Min_e = 0.0;  
+const Double_t EIC_Ph_Max_e  = 360.0;            
+const Double_t EIC_Ph_Min_h = 0.0;  
+const Double_t EIC_Ph_Max_h  = 360.0;
+
 //EIC BeamSize Info, to be updated
 const Double_t EIC_BeamSizeX_ele = 0. * cm;
 const Double_t EIC_BeamSizeY_ele = 0. * cm;
@@ -98,6 +108,35 @@ const Double_t EIC_BeamSizeY_ele = 0. * cm;
 //const Double_t EIC_BeamSizeY_ion = 0. * cm;
 const Double_t EIC_Vertex_Center = 0.0 * cm;
 const Double_t EIC_Vertex_Length = 0.0 *cm;
+
+
+////////////////////////
+//SPECT Acceptance
+////////////////////////
+const Double_t SPECT_Mom_Min_e = 2.0;  
+const Double_t SPECT_Mom_Max_e = 6.0;
+const Double_t SPECT_Mom_Min_h = 2.0;  
+const Double_t SPECT_Mom_Max_h = 6.0;
+
+const Double_t SPECT_Th_Min_e  = 5.0;  
+const Double_t SPECT_Th_Max_e = 40.0; 
+const Double_t SPECT_Th_Min_h  = 5.0; 
+const Double_t SPECT_Th_Max_h =  40.0;
+
+const Double_t SPECT_Ph_Min_e  =-5.0;  
+const Double_t SPECT_Ph_Max_e = 5.0; 
+const Double_t SPECT_Ph_Min_h  = -5.0; 
+const Double_t SPECT_Ph_Max_h =  5.0;
+
+
+//SPECT BeamSize Info
+const Double_t SPECT_BeamSizeX_ele = 0.5 * cm;
+const Double_t SPECT_BeamSizeY_ele = 0.5 * cm;
+//const Double_t SPECT_BeamSizeX_ion = 0.5 * cm;
+//const Double_t SPECT_BeamSizeY_ion = 0.5 * cm;
+const Double_t SPECT_Target_Center = -0.0 * cm;
+const Double_t SPECT_Target_Length = 10.0 *cm;
+ 
 
 //////////////////////////////////
 //For the input parameters
