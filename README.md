@@ -10,14 +10,8 @@
     make
 ```
 
-* If using LHAPDF5.8 (to be updated to LHAPDF6), download the package and compile it by yourself. 
-  Specify the path in Makefile
-```js
-    wget http://www.hepforge.org/archive/lhapdf/lhapdf-5.8.0.tar.gz
-    tar -zxvf lhapdf-5.8.0.tar.gz
-    cd lhapdf-5.8.0/
-    make
-```
+* Install LHAPDF6, download the package and compile it by yourself. 
+  Specify the path in Makefile or define it in your system PATH and LIBARAY
 
 * Compile the generator (use SIDIS_Lite.h for the version w/o LHAPDF5.8):
 ```js
@@ -39,6 +33,8 @@
 * Add LHAPDF6 (replace LHAPDF5.8). Please install your won LHAPDF6.
 * Keep the "Lite" version which only include EPS09 and CTEQ, and also the full version
 * When choosing output LUND format files, generate PI+(K+) and PI-(K-) separately.
+* When chossing output root files based on XS, save PI+(K+) and PI-(K-) into *_1.root and *_2.root separately
+* Add a new configuraiton for spectrometer type configuration, e.g. HRS
 
 ## Update Version in 09/13/2016:
 * Block the feature of calling "LHAPDF" model since we don't need it now. I will add the LHAPDF6 later.
