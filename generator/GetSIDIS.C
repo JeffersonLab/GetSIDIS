@@ -31,7 +31,7 @@ int main(Int_t argc, char *argv[]){
         }
     }
 
-    Double_t Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon, jacoF;
+    Double_t Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon,rapidity, jacoF;
 
     if (config != "EIC" && config != "SoLID" && config != "SPECT"){
         cout << "not supported config = "<<config.Data() << endl;
@@ -73,7 +73,7 @@ int main(Int_t argc, char *argv[]){
     Double_t phi_gen_ele,phi_gen_had;
     Double_t theta_q, theta_s,phi_h,phi_s,mom_ele,mom_had,theta_ele, theta_had,phi_ele,phi_had;
     Double_t dxs_incl,dxs_hm,dxs_hp,dilute_hp,dilute_hm;
-    Double_t px_ele, py_ele,pz_ele, px_had, py_had, pz_had, E0_ele,E0_had;
+    Double_t px_ele, py_ele,pz_ele, px_had, py_had, pz_had, E_ele,E_had;
     Int_t nsim = 0;
 
     //For Beam Position and Vertex info
@@ -158,6 +158,7 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("nu",&nu,"data/D");
     t1->Branch("s",&s,"data/D");
     t1->Branch("pt",&pt,"data/D");
+    t1->Branch("rapidity",&rapidity,"data/D");
     t1->Branch("theta_q",&theta_q,"data/D");
     t1->Branch("theta_s",&theta_s,"data/D");
     t1->Branch("phi_h",&phi_h,"data/D");
@@ -184,11 +185,11 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("px_ele",&px_ele, "px_ele/D");
     t1->Branch("py_ele",&py_ele, "py_ele/D");
     t1->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t1->Branch("E0_ele",&E0_ele, "E0_ele/D");
+    t1->Branch("E_ele",&E_ele, "E_ele/D");
     t1->Branch("px_had",&px_had, "px_had/D");
     t1->Branch("py_had",&py_had, "py_had/D");
     t1->Branch("pz_had",&pz_had, "pz_had/D");
-    t1->Branch("E0_had",&E0_had, "E0_had/D");
+    t1->Branch("E_had",&E_had, "E_had/D");
     t1->Branch("vx_ele",&vx_ele, "vx_ele/D");
     t1->Branch("vy_ele",&vy_ele, "vy_ele/D");
     t1->Branch("vz_ele",&vz_ele, "vz_ele/D");
@@ -212,6 +213,7 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("nu",&nu,"data/D");
         t2->Branch("s",&s,"data/D");
         t2->Branch("pt",&pt,"data/D");
+        t2->Branch("rapidity",&rapidity,"data/D");
         t2->Branch("theta_q",&theta_q,"data/D");
         t2->Branch("theta_s",&theta_s,"data/D");
         t2->Branch("phi_h",&phi_h,"data/D");
@@ -232,11 +234,11 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("px_ele",&px_ele, "px_ele/D");
         t2->Branch("py_ele",&py_ele, "py_ele/D");
         t2->Branch("pz_ele",&pz_ele, "pz_ele/D");
-        t2->Branch("E0_ele",&E0_ele, "E0_ele/D");
+        t2->Branch("E_ele",&E_ele, "E_ele/D");
         t2->Branch("px_had",&px_had, "px_had/D");
         t2->Branch("py_had",&py_had, "py_had/D");
         t2->Branch("pz_had",&pz_had, "pz_had/D");
-        t2->Branch("E0_had",&E0_had, "E0_had/D");
+        t2->Branch("E_had",&E_had, "E_had/D");
         t2->Branch("vx_ele",&vx_ele, "vx_ele/D");
         t2->Branch("vy_ele",&vy_ele, "vy_ele/D");
         t2->Branch("vz_ele",&vz_ele, "vz_ele/D");
@@ -266,6 +268,7 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("nu",&nu,"data/D");
         t3->Branch("s",&s,"data/D");
         t3->Branch("pt",&pt,"data/D");
+        t3->Branch("rapidity",&rapidity,"data/D");
         t3->Branch("theta_q",&theta_q,"data/D");
         t3->Branch("theta_s",&theta_s,"data/D");
         t3->Branch("phi_h",&phi_h,"data/D");
@@ -286,11 +289,11 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("px_ele",&px_ele, "px_ele/D");
         t3->Branch("py_ele",&py_ele, "py_ele/D");
         t3->Branch("pz_ele",&pz_ele, "pz_ele/D");
-        t3->Branch("E0_ele",&E0_ele, "E0_ele/D");
+        t3->Branch("E_ele",&E_ele, "E_ele/D");
         t3->Branch("px_had",&px_had, "px_had/D");
         t3->Branch("py_had",&py_had, "py_had/D");
         t3->Branch("pz_had",&pz_had, "pz_had/D");
-        t3->Branch("E0_had",&E0_had, "E0_had/D");
+        t3->Branch("E_had",&E_had, "E_had/D");
         t3->Branch("vx_ele",&vx_ele, "vx_ele/D");
         t3->Branch("vy_ele",&vy_ele, "vy_ele/D");
         t3->Branch("vz_ele",&vz_ele, "vz_ele/D");
@@ -308,6 +311,7 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("nu",&nu,"data/D");
         t4->Branch("s",&s,"data/D");
         t4->Branch("pt",&pt,"data/D");
+        t4->Branch("rapidity",&rapidity,"data/D");
         t4->Branch("theta_q",&theta_q,"data/D");
         t4->Branch("theta_s",&theta_s,"data/D");
         t4->Branch("phi_h",&phi_h,"data/D");
@@ -328,11 +332,11 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("px_ele",&px_ele, "px_ele/D");
         t4->Branch("py_ele",&py_ele, "py_ele/D");
         t4->Branch("pz_ele",&pz_ele, "pz_ele/D");
-        t4->Branch("E0_ele",&E0_ele, "E0_ele/D");
+        t4->Branch("E_ele",&E_ele, "E_ele/D");
         t4->Branch("px_had",&px_had, "px_had/D");
         t4->Branch("py_had",&py_had, "py_had/D");
         t4->Branch("pz_had",&pz_had, "pz_had/D");
-        t4->Branch("E0_had",&E0_had, "E0_had/D");
+        t4->Branch("E_had",&E_had, "E_had/D");
         t4->Branch("vx_ele",&vx_ele, "vx_ele/D");
         t4->Branch("vy_ele",&vy_ele, "vy_ele/D");
         t4->Branch("vz_ele",&vz_ele, "vz_ele/D");
@@ -416,29 +420,31 @@ int main(Int_t argc, char *argv[]){
         mom_ele = sidis->mom_ele; theta_ele = sidis->theta_ele; phi_ele = sidis->phi_ele;
         mom_had = sidis->mom_had; theta_had = sidis->theta_had; phi_had = sidis->phi_had;
         theta_q=sidis->theta_q;  theta_s=sidis->theta_s; phi_s= sidis->phi_s; phi_h = sidis->phi_h;
-        px_ele = sidis->px_ele;	py_ele = sidis->py_ele;	pz_ele = sidis->pz_ele; E0_ele = sidis->E0_ele;
-        px_had = sidis->px_had;	py_had = sidis->py_had;	pz_had = sidis->pz_had; E0_had = sidis->E0_had;
+        px_ele = sidis->px_ele;	py_ele = sidis->py_ele;	pz_ele = sidis->pz_ele; E_ele = sidis->E_ele;
+        px_had = sidis->px_had;	py_had = sidis->py_had;	pz_had = sidis->pz_had; E_had = sidis->E_had;
 
         x=sidis->x; y=sidis->y; z=sidis->z; Q2=sidis->Q2; W=sidis->W; Wp=sidis->Wp;
         s=sidis->s; nu=sidis->nu; pt=sidis->pt; gamma=sidis->gamma; epsilon=sidis->epsilon;
+        rapidity = sidis->rapidity;
         jacoF=sidis->jacoF;/*}}}*/
 
         /*Get XS{{{*/
         if (x>=0.0&&x<=1.0&&Q2 >=1.0 && W>= 2.0 //&&Wp>= 1.6
                 &&( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
-                        && ((count[0]<number_of_events&&pt<=1.0&&Q2<=10.) 
-                            || (count[1]<number_of_events&&pt>1.0&&Q2<=10.)
-                            || (count[2]<number_of_events&&pt<=1.0&&Q2>10.)
-                            || (count[3]<number_of_events&&pt>1.0&&Q2>10.)) 
-                    )
+                        &&( (!bXSMode&&((count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
+                                    || (count[1]<number_of_events&&pt>1.0&&Q2<=10.)
+                                    ||(count[2]<number_of_events&&pt<=1.0&&Q2>10.)
+                                    || (count[3]<number_of_events&&pt>1.0&&Q2>10.)))
+                            ||(bXSMode&&((count[0]<number_of_events)
+                                    || (count[1]<number_of_events)))))
                     ||(config=="SoLID" && z>0.3&&z<0.7 
-                        && ((count[0]<number_of_events&&pt<=1.0&&Q2<=10.) 
-                            || (count[1]<number_of_events&&pt>1.0&&Q2<=10.))
-                      ) 
-                    ||(config=="SPECT" && z>0.2&&z<0.9 
-                        && count[0]<number_of_events 
-                      )
-                  )){
+                        &&( (!bXSMode&&((count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
+                                    || (count[1]<number_of_events&&pt>1.0&&Q2<=10.)))
+                            ||(bXSMode&&((count[0]<number_of_events)
+                                    || (count[1]<number_of_events))))) 
+                    ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events)))
+        {
+
             sidis->CalcXS();/*{{{*/
             dxs_incl = sidis->GetXS_Inclusive();
             dxs_hp = sidis->GetXS_HP();
@@ -494,7 +500,7 @@ int main(Int_t argc, char *argv[]){
                         px_ele,
                         py_ele,
                         pz_ele,
-                        E0_ele,
+                        E_ele,
                         0.0005, //mass not in used	
                         vx_ele, //vx
                         vy_ele, //vx
@@ -511,7 +517,7 @@ int main(Int_t argc, char *argv[]){
                         px_had,
                         py_had,
                         pz_had,
-                        E0_had, 
+                        E_had, 
                         mass_had, //mass not in used
                         vx_had, //vx
                         vy_had, //vx
@@ -549,7 +555,7 @@ int main(Int_t argc, char *argv[]){
                         px_ele,
                         py_ele,
                         pz_ele,
-                        E0_ele,
+                        E_ele,
                         0.0005, //mass not in used	
                         vx_ele, //vx
                         vy_ele, //vx
@@ -566,7 +572,7 @@ int main(Int_t argc, char *argv[]){
                         px_had,
                         py_had,
                         pz_had,
-                        E0_had, 
+                        E_had, 
                         mass_had, //mass not in used
                         vx_had, //vx
                         vy_had, //vx
@@ -628,10 +634,10 @@ int main(Int_t argc, char *argv[]){
                         count[3] ++;//cout << 3 << " " << count[3] <<  endl;
                     }
                 }
-                cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
                 //cout << nsim << endl;
             }
             /*}}}*/
+            cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
         }
 
         //judging exitcondition/*{{{*/
