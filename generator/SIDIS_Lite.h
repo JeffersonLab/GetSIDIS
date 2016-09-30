@@ -248,7 +248,7 @@ class SIDIS
             px_ele = p_ele*sin(th_ele/180.*3.1415926)*cos(ph_ele/180.*3.1415926);
             py_ele = p_ele*sin(th_ele/180.*3.1415926)*sin(ph_ele/180.*3.1415926);
             pz_ele = p_ele*cos(th_ele/180.*3.1415926);
-            E0_ele = sqrt(p_ele*p_ele+mass_e*mass_e);
+            E_ele = sqrt(p_ele*p_ele+mass_e*mass_e);
             P4_fin_ele->SetPxPyPzE(p_ele*sin(th_ele/180.*3.1415926)*cos(ph_ele/180.*3.1415926),
                     p_ele*sin(th_ele/180.*3.1415926)*sin(ph_ele/180.*3.1415926),
                     p_ele*cos(th_ele/180.*3.1415926)
@@ -258,7 +258,7 @@ class SIDIS
             px_had = p_had*sin(th_had/180.*3.1415926)*cos(ph_had/180.*3.1415926);
             py_had = p_had*sin(th_had/180.*3.1415926)*sin(ph_had/180.*3.1415926);
             pz_had = p_had*cos(th_had/180.*3.1415926);
-            E0_had = sqrt(p_had*p_had+mass_hadron*mass_hadron);
+            E_had = sqrt(p_had*p_had+mass_hadron*mass_hadron);
             P4_fin_had->SetPxPyPzE(p_had*sin(th_had/180.*3.1415926)*cos(ph_had/180.*3.1415926),
                     p_had*sin(th_had/180.*3.1415926)*sin(ph_had/180.*3.1415926),
                     p_had*cos(th_had/180.*3.1415926)
@@ -318,6 +318,8 @@ class SIDIS
             theta_had = P4_fin_had->Theta();
             phi_ele = P4_fin_ele->Phi();
             phi_had = P4_fin_had->Phi();
+            
+            rapidity = 0.5 * log((mom_had + pz_had)/(mom_had - pz_had)  );
 
             //phi_ele *= 180/3.1415926; if(py_ele<0.) phi_ele+=360;
             //phi_had *= 180/3.1415926; if(py_had<0.) phi_had+=360;
@@ -1116,11 +1118,11 @@ class SIDIS
         double px_ele;
         double py_ele;
         double pz_ele;
-        double E0_ele;
+        double E_ele;
         double px_had;
         double py_had;
         double pz_had;
-        double E0_had;
+        double E_had;
 
         double Q2;
         double W;
@@ -1131,6 +1133,7 @@ class SIDIS
         double pt;
         double nu;
         double s;
+        double rapidity;
         double gamma;
         double epsilon;
         double jacoF;
