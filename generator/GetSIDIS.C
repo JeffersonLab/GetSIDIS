@@ -590,6 +590,7 @@ int main(Int_t argc, char *argv[]){
                 cout << count[0] <<"\r";
                 count[2] = number_of_events;
                 count[3] = number_of_events;
+                cout<<"**** TEST 1"<<endl;
             }
             /*}}}*/
 
@@ -602,10 +603,11 @@ int main(Int_t argc, char *argv[]){
                 cout << count[1] <<"\r";
                 count[2] = number_of_events;
                 count[3] = number_of_events;
+                cout<<"**** TEST 2"<<endl;
             }
             /*}}}*/
 
-            if(!bXSMode&&((dxs_hp)!=0&&(dxs_hm)!=0)){/*{{{*/
+            if(!bXSMode&&((dxs_hp+dxs_hm)>1e-33)){/*{{{*/
                 if(config=="SPECT"){
                     t1->Fill();
                     count[0] ++;//cout << 0 << " " << count[0] << endl;
