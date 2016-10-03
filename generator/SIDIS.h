@@ -519,6 +519,8 @@ class SIDIS
             dxs_hp = decay_part * dxs_hp; 
             dxs_hm = decay_part * dxs_hm;
 
+
+
             int err_hp = -1, err_hm=-1;
             if (dxs_hp>0.&& dxs_hp<10000.){
                 err_hp = 0;
@@ -531,6 +533,7 @@ class SIDIS
             XS_HP = dxs_hp;
             XS_HM = dxs_hm;
 
+            
             if (dxs_hm>0.&& dxs_hm<10000.){
                 err_hm = 0;
             }
@@ -836,6 +839,9 @@ class SIDIS
             *dxs_hp *= (df_p_hp*fZ+df_n_hp*(fA-fZ))/x;
             *dxs_hm *= (df_p_hm*fZ+df_n_hm*(fA-fZ))/x;
 
+/*            if(pt>1&&Q2<10.)*/
+                //cout << Form("dxs_hp = %e", *dxs_hp)<<endl; 
+
         }
         /*}}}*/
 
@@ -847,7 +853,7 @@ class SIDIS
                 //alpha_s = alphasPDF(sqrt(Q2));//LHAPDF5
                 alpha_s = lhapdfs->alphasQ(sqrt(Q2));
             else//Use CTEQ    
-                //alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
+                alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
 
             //cout << y << "\t" << Q2 << endl;
             //cout << alpha_s << endl;

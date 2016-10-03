@@ -318,6 +318,8 @@ class SIDIS
             theta_had = P4_fin_had->Theta();
             phi_ele = P4_fin_ele->Phi();
             phi_had = P4_fin_had->Phi();
+            
+            rapidity = 0.5 * log((mom_had + pz_had)/(mom_had - pz_had)  );
 
             rapidity = 0.5 * log((mom_had + pz_had)/(mom_had - pz_had)  );
 
