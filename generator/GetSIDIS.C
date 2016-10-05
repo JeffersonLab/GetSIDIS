@@ -180,7 +180,7 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
     t1->Branch("phi_had",&phi_had,"phi_had/D");
     t1->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t1->Branch("nsim",&nsim,"nsim/I");
+    t1->Branch("nsim",&nsim,"nsim/l");
     t1->Branch("dilute_p",&dilute_hp,"data/D");
     t1->Branch("dilute_m",&dilute_hm ,"data/D");
     t1->Branch("px_ele",&px_ele, "px_ele/D");
@@ -229,7 +229,7 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("theta_had",&theta_had,"theta_had/D");
         t2->Branch("phi_ele",&phi_ele,"phi_ele/D");
         t2->Branch("phi_had",&phi_had,"phi_had/D");
-        t2->Branch("nsim",&nsim,"nsim/I");
+        t2->Branch("nsim",&nsim,"nsim/l");
         t2->Branch("dilute_p",&dilute_hp ,"data/D");
         t2->Branch("dilute_m",&dilute_hm ,"data/D");
         t2->Branch("px_ele",&px_ele, "px_ele/D");
@@ -284,7 +284,7 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("theta_had",&theta_had,"theta_had/D");
         t3->Branch("phi_ele",&phi_ele,"phi_ele/D");
         t3->Branch("phi_had",&phi_had,"phi_had/D");
-        t3->Branch("nsim",&nsim,"nsim/I");
+        t3->Branch("nsim",&nsim,"nsim/l");
         t3->Branch("dilute_p",&dilute_hp ,"data/D");
         t3->Branch("dilute_m",&dilute_hm ,"data/D");
         t3->Branch("px_ele",&px_ele, "px_ele/D");
@@ -327,7 +327,7 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("theta_had",&theta_had,"theta_had/D");
         t4->Branch("phi_ele",&phi_ele,"phi_ele/D");
         t4->Branch("phi_had",&phi_had,"phi_had/D");
-        t4->Branch("nsim",&nsim,"nsim/I");
+        t4->Branch("nsim",&nsim,"nsim/l");
         t4->Branch("dilute_p",&dilute_hp ,"data/D");
         t4->Branch("dilute_m",&dilute_hm ,"data/D");
         t4->Branch("px_ele",&px_ele, "px_ele/D");
@@ -841,20 +841,20 @@ int main(Int_t argc, char *argv[]){
         cout<<"--- Now insert weights to Root-file #1"<<filename1.Data()<<endl;
         TFile *f1 = new TFile(filename1.Data(), "update");
         TTree *T1=(TTree*) f1->Get("T");
-        Long64_t N1=T1->GetEntries();
+        ULong64_t N1=T1->GetEntries();
         T1->SetBranchAddress("dxs_hp",&dxs_hp);
         T1->SetBranchAddress("dxs_hm",&dxs_hm);
         T1->SetBranchAddress("dxs_incl",&dxs_incl);
-        T1->SetBranchAddress("nsim",&nsim);
-        T1->GetEntry(N1-1);          //get nsim for this rootfile
-        ULong64_t Nsim11=nsim;
-        cout<<Form("--- N1 = %lld / %lld", Nsim1, Nsim11)<<endl;
+        //ULong64_t nsim1; 
+        //T1->SetBranchAddress("nsim",&nsim1);
+        //T1->GetEntry(N1-1);          //get nsim for this rootfile
+        //ULong64_t Nsim1=nsim1;
 
         TBranch *branch_weight_in1=T1->Branch("weight_in",&weight_in,"weight_in/D");
         TBranch *branch_weight_hp1=T1->Branch("weight_hp",&weight_hp,"weight_hp/D");
         TBranch *branch_weight_hm1=T1->Branch("weight_hm",&weight_hm,"weight_hm/D");
         cout<<Form("---Filling weights foor ROOT#1, Nsim=%lld, Phase_space = %f", Nsim1, Phase_space)<<endl;
-        for(Long64_t i=0;i<N1;i++){
+        for(ULong64_t i=0;i<N1;i++){
             T1->GetEntry(i);
             //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
             weight_in=dxs_incl*electron_phase_space/Nsim1;   
@@ -885,20 +885,20 @@ int main(Int_t argc, char *argv[]){
             cout<<"--- Now insert weights to Root-file #2"<<filename2.Data()<<endl;
             TFile *f2 = new TFile(filename2.Data(), "update");
             TTree *T2=(TTree*) f2->Get("T");
-            Long64_t N2=T2->GetEntries();
+            ULong64_t N2=T2->GetEntries();
             T2->SetBranchAddress("dxs_incl",&dxs_incl);
             T2->SetBranchAddress("dxs_hp",&dxs_hp);
             T2->SetBranchAddress("dxs_hm",&dxs_hm);
-            T2->SetBranchAddress("nsim",&nsim);
-            T2->GetEntry(N2-1);          //get nsim for this rootfile
-            ULong64_t Nsim21=nsim;
-            cout<<Form("--- N2 = %lld / %lld", Nsim2, Nsim21)<<endl;
+            //ULong64_t nsim2; 
+            //T2->SetBranchAddress("nsim",&nsim2);
+            //T2->GetEntry(N2-1);          //get nsim for this rootfile
+            //ULong64_t Nsim2=nsim2;
 
             TBranch *branch_weight_in2=T2->Branch("weight_in",&weight_in,"weight_in/D");
             TBranch *branch_weight_hp2=T2->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm2=T2->Branch("weight_hm",&weight_hm,"weight_hm/D");
             cout<<Form("---Filling weights foor ROOT#2, Nsim=%lld, Phase_space = %f", Nsim2, Phase_space)<<endl;
-            for(Long64_t i=0;i<N2;i++){
+            for(ULong64_t i=0;i<N2;i++){
                 T2->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim2;   
@@ -928,21 +928,21 @@ int main(Int_t argc, char *argv[]){
             cout<<"--- Now insert weights to Root-file #3"<<filename3.Data()<<endl;
             TFile *f3 = new TFile(filename3.Data(), "update");
             TTree *T3=(TTree*) f3->Get("T");
-            Long64_t N3=T3->GetEntries();
+            ULong64_t N3=T3->GetEntries();
             T3->SetBranchAddress("dxs_incl",&dxs_incl);
             T3->SetBranchAddress("dxs_hp",&dxs_hp);
             T3->SetBranchAddress("dxs_hm",&dxs_hm);
-            T3->SetBranchAddress("nsim",&nsim);
-            T3->GetEntry(N3-1);          //get nsim for this rootfile
-            ULong64_t Nsim31=nsim;
-            cout<<Form("--- N3 = %lld / %lld", Nsim3, Nsim31)<<endl;
+            //ULong64_t nsim3; 
+            //T3->SetBranchAddress("nsim",&nsim3);
+            //T3->GetEntry(N3-1);          //get nsim for this rootfile
+            //ULong64_t Nsim3=nsim3;
 
 
             TBranch *branch_weight_in3=T3->Branch("weight_in",&weight_in,"weight_in/D");
             TBranch *branch_weight_hp3=T3->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm3=T3->Branch("weight_hm",&weight_hm,"weight_hm/D");
             cout<<Form("---Filling weights foor ROOT#3, Nsim=%lld, Phase_space = %f", Nsim3, Phase_space)<<endl;
-            for(Long64_t i=0;i<N3;i++){
+            for(ULong64_t i=0;i<N3;i++){
                 T3->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim3;   
@@ -971,21 +971,20 @@ int main(Int_t argc, char *argv[]){
             cout<<"--- Now insert weights to Root-file #4"<<filename4.Data()<<endl;
             TFile *f4 = new TFile(filename4.Data(), "update");
             TTree *T4=(TTree*) f4->Get("T");
-            Long64_t N4=T4->GetEntries();
+            ULong64_t N4=T4->GetEntries();
             T4->SetBranchAddress("dxs_incl",&dxs_incl);
             T4->SetBranchAddress("dxs_hp",&dxs_hp);
             T4->SetBranchAddress("dxs_hm",&dxs_hm);
-            T4->SetBranchAddress("nsim",&nsim);
-            T4->GetEntry(N4-1);          //get nsim for this rootfile
-            ULong64_t Nsim41=nsim;
-            cout<<Form("--- N4 = %lld / %lld", Nsim4, Nsim41)<<endl;
-
+            //ULong64_t nsim4; 
+            //T4->SetBranchAddress("nsim",&nsim4);
+            //T4->GetEntry(N4-1);          //get nsim for this rootfile
+            //ULong64_t Nsim4=nsim4;
 
             TBranch *branch_weight_in4=T4->Branch("weight_in",&weight_in,"weight_in/D");
             TBranch *branch_weight_hp4=T4->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm4=T4->Branch("weight_hm",&weight_hm,"weight_hm/D");
             cout<<Form("---Filling weights foor ROOT#4, Nsim=%lld, Phase_space = %f", Nsim4, Phase_space)<<endl;
-            for(Long64_t i=0;i<N4;i++){
+            for(ULong64_t i=0;i<N4;i++){
                 T4->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim4;   
