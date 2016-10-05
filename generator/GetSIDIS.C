@@ -6,8 +6,8 @@
 //  -- Zhihong Ye, 06/10/2014                       //
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
-#include "SIDIS.h"
-//#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+//#include "SIDIS.h"
+#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
@@ -74,8 +74,7 @@ int main(Int_t argc, char *argv[]){
     Double_t theta_q, theta_s,phi_h,phi_s,mom_ele,mom_had,theta_ele, theta_had,phi_ele,phi_had;
     Double_t dxs_incl,dxs_hm,dxs_hp,dilute_hp,dilute_hm;
     Double_t px_ele, py_ele,pz_ele, px_had, py_had, pz_had, E_ele,E_had;
-    Int_t nsim = 0;
-
+    ULong64_t nsim = 0, Nsim1 = 0, Nsim2 = 0, Nsim3 = 0,Nsim4 = 0;
     //For Beam Position and Vertex info
     Double_t vx_ele, vy_ele, vz_ele, vx_had, vy_had, vz_had;
     double beamsize_x_ele=0.0, beamsize_y_ele=0.0;
@@ -85,7 +84,7 @@ int main(Int_t argc, char *argv[]){
     Double_t Mom_Max_e = 0.0, Mom_Min_e = 0.0, Mom_Max_h = 0.0,Mom_Min_h = 0.0;
     Double_t Th_Max_e = 0.0,Th_Min_e = 0.0,Th_Max_h = 0.0, Th_Min_h = 0.0;
     Double_t Ph_Max_e = 0.0,Ph_Min_e = 0.0,Ph_Max_h = 0.0, Ph_Min_h = 0.0;
-    if(config=="SoLID" ){
+    if(config=="SoLID" ){/*{{{*/
         Mom_Min_e = SoLID_Mom_Min_e;  Mom_Max_e = momentum_ele; 
         Mom_Min_h = SoLID_Mom_Min_h;  Mom_Max_h = SoLID_Mom_Max_h;
         Th_Min_e = SoLID_Th_Min_e; Th_Max_e = SoLID_Th_Max_e; 
@@ -98,9 +97,10 @@ int main(Int_t argc, char *argv[]){
         vertex_length = SoLID_Target_Length;
         vertex_center = SoLID_Target_Center;
 
-    }
+    }/*}}}*/
+   
     //A rough guess but people claim EIC to be a full-acceptance device!
-    else if(config=="EIC" ){
+    else if(config=="EIC" ){/*{{{*/
         Mom_Min_e = EIC_Mom_Min_e;  Mom_Max_e =  momentum_ele * 3.0; 
         Mom_Min_h = EIC_Mom_Min_h;  Mom_Max_h = EIC_Mom_Max_h;
         Th_Min_e = EIC_Th_Min_e; Th_Max_e = EIC_Th_Max_e; 
@@ -112,8 +112,9 @@ int main(Int_t argc, char *argv[]){
         beamsize_y_ele = EIC_BeamSizeY_ele;
         vertex_length = EIC_Vertex_Length;
         vertex_center = EIC_Vertex_Center;
-    }
-    else if(config=="SPECT"){
+    }/*}}}*/
+   
+    else if(config=="SPECT"){/*{{{*/
         Mom_Min_e = SPECT_Mom_Min_e;  Mom_Max_e = SPECT_Mom_Max_e; 
         Mom_Min_h = SPECT_Mom_Min_h;  Mom_Max_h = SPECT_Mom_Max_h;
         Th_Min_e = SPECT_Th_Min_e; Th_Max_e = SPECT_Th_Max_e; 
@@ -126,7 +127,7 @@ int main(Int_t argc, char *argv[]){
 
         vertex_length = SPECT_Target_Length;
         vertex_center = SPECT_Target_Center;
-    }
+    }/*}}}*/
 
     Double_t electron_phase_space =(cos(Th_Min_e/DEG) - cos(Th_Max_e/DEG))*(Ph_Max_e/DEG - Ph_Min_e/DEG)*(Mom_Max_e - Mom_Min_e);
     Double_t hadron_phase_space   =(cos(Th_Min_h/DEG) - cos(Th_Max_h/DEG))*(Ph_Max_h/DEG - Ph_Min_h/DEG)*(Mom_Max_h - Mom_Min_h);
@@ -355,7 +356,7 @@ int main(Int_t argc, char *argv[]){
         neg_gemc.open(filename_neg);
     }/*}}}*/
 
-    //Only initialize once here/*{{{*/
+    //Initialize XS Model here/*{{{*/
     //LHAPDF, CTEQPDF or EPS09
     SIDIS *sidis = new SIDIS(model);
 
@@ -387,8 +388,9 @@ int main(Int_t argc, char *argv[]){
     ////////////////////////////////
     /*}}}*/
 
+    /*Start to generate events{{{*/
     bool exitcondition=true;	
-    while(exitcondition){/*{{{*/
+    while(exitcondition){
         nsim ++;
 
         /*Generator{{{*/
@@ -428,236 +430,386 @@ int main(Int_t argc, char *argv[]){
         rapidity = sidis->rapidity;
         jacoF=sidis->jacoF;/*}}}*/
 
-        /*Get XS{{{*/
-        if (x>=0.0&&x<=1.0&&Q2 >=1.0 && W>= 2.0 //&&Wp>= 1.6
-                &&( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
-                        &&( (!bXSMode&&((count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
-                                    || (count[1]<number_of_events&&pt>1.0&&Q2<=10.)
-                                    ||(count[2]<number_of_events&&pt<=1.0&&Q2>10.)
-                                    || (count[3]<number_of_events&&pt>1.0&&Q2>10.)))
-                            ||(bXSMode&&((count[0]<number_of_events)
-                                    || (count[1]<number_of_events)))))
+        if(bXSMode){
+            /*Generate Events based on XS and also for LUND output{{{*/
+            if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
+            //For EIC  
+            if( (config=="EIC" && z>0.2&&z<0.9
+                        &&((count[0]<number_of_events)|| (count[1]<number_of_events)))
                     ||(config=="SoLID" && z>0.3&&z<0.7 
-                        &&( (!bXSMode&&((count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
-                                    || (count[1]<number_of_events&&pt>1.0&&Q2<=10.)))
-                            ||(bXSMode&&((count[0]<number_of_events)
-                                    || (count[1]<number_of_events))))) 
-                    ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events)))
-        {
+                        &&((count[0]<number_of_events)|| (count[1]<number_of_events)))
+                    ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events)){
 
-            sidis->CalcXS();/*{{{*/
-            dxs_incl = sidis->GetXS_Inclusive();
-            dxs_hp = sidis->GetXS_HP();
-            dxs_hm = sidis->GetXS_HM();
-            dilute_hp = sidis->GetDilute_HP();
-            dilute_hm = sidis->GetDilute_HM();/*}}}*/
+                sidis->CalcXS();/*{{{*/
+                dxs_incl = sidis->GetXS_Inclusive();
+                dxs_hp = sidis->GetXS_HP();
+                dxs_hm = sidis->GetXS_HM();
+                dilute_hp = sidis->GetDilute_HP();
+                dilute_hm = sidis->GetDilute_HM();/*}}}*/
 
-            //to avoid some wired behavior in log scale/*{{{*/
-            if((dxs_incl)<1e-16) dxs_incl=1e-16;
-            if((dxs_hp)<1e-16) dxs_hp=1e-16;
-            if((dxs_hm)<1e-16) dxs_hm=1e-16;
-            if((dilute_hp)<1e-16) dilute_hp=1e-16;
-            if((dilute_hm)<1e-16) dilute_hm=1e-16;
+                //to avoid some wired behavior in log scale/*{{{*/
+                if((dxs_incl)<1e-16) dxs_incl=1e-16;
+                if((dxs_hp)<1e-16) dxs_hp=1e-16;
+                if((dxs_hm)<1e-16) dxs_hm=1e-16;
+                if((dilute_hp)<1e-16) dilute_hp=1e-16;
+                if((dilute_hm)<1e-16) dilute_hm=1e-16;
 
-            if(isnan(dxs_incl)) dxs_incl=1e-16;
-            if(isnan(dxs_hp)) dxs_hp=1e-16;
-            if(isnan(dxs_hm)) dxs_hm=1e-16;
-            if(isnan(dilute_hp)) dilute_hp=1e-16;
-            if(isnan(dilute_hm)) dilute_hm=1e-16;
-            if(isinf(dxs_incl)) dxs_incl=1e-16;
-            if(isinf(dxs_hp)) dxs_hp=1e-16;
-            if(isinf(dxs_hm)) dxs_hm=1e-16;
-            if(isinf(dilute_hp)) dilute_hp=1e-16;
-            if(isinf(dilute_hm)) dilute_hm=1e-16;
-            /*}}}*/
+                if(isnan(dxs_incl)) dxs_incl=1e-16;
+                if(isnan(dxs_hp)) dxs_hp=1e-16;
+                if(isnan(dxs_hm)) dxs_hm=1e-16;
+                if(isnan(dilute_hp)) dilute_hp=1e-16;
+                if(isnan(dilute_hm)) dilute_hm=1e-16;
+                if(isinf(dxs_incl)) dxs_incl=1e-16;
+                if(isinf(dxs_hp)) dxs_hp=1e-16;
+                if(isinf(dxs_hm)) dxs_hm=1e-16;
+                if(isinf(dilute_hp)) dilute_hp=1e-16;
+                if(isinf(dilute_hm)) dilute_hm=1e-16;
+                /*}}}*/
 
-            /*LUND For Positive Hadron{{{*/
-            //These section will save events based on their XS distributions
-            Double_t cdxs_max_rndm_hp = cdxs_max * gRandom->Uniform(0, 1);
-            if(bLUND&&dxs_hp > cdxs_max_rndm_hp){
-                //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
-                pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
-                        2, //ele+had
-                        x,
-                        z,
-                        pt,
-                        1.0, //pol = 1.0 for now
-                        Q2,
-                        W,
-                        phi_s,
-                        phi_h,
-                        dxs_hp						
-                        )<<endl;
+                /*LUND For Positive Hadron{{{*/
+                //These section will save events based on their XS distributions
+                Double_t cdxs_max_rndm_hp = cdxs_max * gRandom->Uniform(0, 1);
+                if(bLUND&&dxs_hp > cdxs_max_rndm_hp){
+                    //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
+                    pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
+                            2, //ele+had
+                            x,
+                            z,
+                            pt,
+                            1.0, //pol = 1.0 for now
+                            Q2,
+                            W,
+                            phi_s,
+                            phi_h,
+                            dxs_hp						
+                            )<<endl;
 
-                //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
-                pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
-                        1, //index
-                        -1.0,//charge
-                        1, //=1 for active 
-                        11,//pid
-                        0,// parent pid, not in used now
-                        0,// doughter for decay bookkeeping, not in used now
-                        px_ele,
-                        py_ele,
-                        pz_ele,
-                        E_ele,
-                        0.0005, //mass not in used	
-                        vx_ele, //vx
-                        vy_ele, //vx
-                        vz_ele  //vx
-                        )<<endl;
-                //hadron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
-                pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
-                        2, //index
-                        charge_pos,//charge
-                        1, //=1 for active 
-                        pid_pos,//pid
-                        0,// parent pid, not in used now
-                        0,// doughter for decay bookkeeping, not in used now
-                        px_had,
-                        py_had,
-                        pz_had,
-                        E_had, 
-                        mass_had, //mass not in used
-                        vx_had, //vx
-                        vy_had, //vx
-                        vz_had  //vx
-                        )<<endl;/*}}}*/
-            }
-            /*}}}*/
-
-            /*LUND For Negative Hadron{{{*/
-            //These section will save events based on their XS distributions
-            Double_t cdxs_max_rndm_hm = cdxs_max * gRandom->Uniform(0, 1);
-            if(bLUND&&dxs_hm > cdxs_max_rndm_hm){
-                //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
-                neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
-                        2, //ele+had
-                        x,
-                        z,
-                        pt,
-                        1.0, //pol = 1.0 for now
-                        Q2,
-                        W,
-                        phi_s,
-                        phi_h,
-                        dxs_hm						
-                        )<<endl;
-
-                //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
-                neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
-                        1, //index
-                        -1.0,//charge
-                        1, //=1 for active 
-                        11,//pid
-                        0,// parent pid, not in used now
-                        0,// doughter for decay bookkeeping, not in used now
-                        px_ele,
-                        py_ele,
-                        pz_ele,
-                        E_ele,
-                        0.0005, //mass not in used	
-                        vx_ele, //vx
-                        vy_ele, //vx
-                        vz_ele  //vx
-                        )<<endl;
-                //hadron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
-                neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
-                        2, //index
-                        charge_neg,//charge
-                        1, //=1 for active 
-                        pid_neg,//pid
-                        0,// parent pid, not in used now
-                        0,// doughter for decay bookkeeping, not in used now
-                        px_had,
-                        py_had,
-                        pz_had,
-                        E_had, 
-                        mass_had, //mass not in used
-                        vx_had, //vx
-                        vy_had, //vx
-                        vz_had  //vx
-                        )<<endl;/*}}}*/
-            }
-            /*}}}*/
-
-            /*Save PI+ ROOT file based on XS distribution{{{*/
-            if(bXSMode&&(dxs_hp > cdxs_max_rndm_hp)){
-                t1->Fill();
-
-                //Just save events in one root files in this case
-                count[0] ++;//cout << 0 << " " << count[0] << endl;
-                cout << count[0] <<"\r";
-                count[2] = number_of_events;
-                count[3] = number_of_events;
-                cout<<"**** TEST 1"<<endl;
-            }
-            /*}}}*/
-
-            /*Save PI- ROOT file based on XS distribution{{{*/
-            if(bXSMode&&(dxs_hm > cdxs_max_rndm_hm)){
-                t2->Fill();
-
-                //Just save events in one root files in this case
-                count[1] ++;//cout << 0 << " " << count[0] << endl;
-                cout << count[1] <<"\r";
-                count[2] = number_of_events;
-                count[3] = number_of_events;
-                cout<<"**** TEST 2"<<endl;
-            }
-            /*}}}*/
-
-            if(!bXSMode&&((dxs_hp+dxs_hm)>1e-33)){/*{{{*/
-                if(config=="SPECT"){
-                    t1->Fill();
-                    count[0] ++;//cout << 0 << " " << count[0] << endl;
-
-                    count[1] = number_of_events;
-                    count[2] = number_of_events;
-                    count[3] = number_of_events;
+                    //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            1, //index
+                            -1.0,//charge
+                            1, //=1 for active 
+                            11,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_ele,
+                            py_ele,
+                            pz_ele,
+                            E_ele,
+                            0.0005, //mass not in used	
+                            vx_ele, //vx
+                            vy_ele, //vx
+                            vz_ele  //vx
+                            )<<endl;
+                    //hadron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            2, //index
+                            charge_pos,//charge
+                            1, //=1 for active 
+                            pid_pos,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_had,
+                            py_had,
+                            pz_had,
+                            E_had, 
+                            mass_had, //mass not in used
+                            vx_had, //vx
+                            vy_had, //vx
+                            vz_had  //vx
+                            )<<endl;/*}}}*/
                 }
+                /*}}}*/
 
+                /*LUND For Negative Hadron{{{*/
+                //These section will save events based on their XS distributions
+                Double_t cdxs_max_rndm_hm = cdxs_max * gRandom->Uniform(0, 1);
+                if(bLUND&&dxs_hm > cdxs_max_rndm_hm){
+                    //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
+                    neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
+                            2, //ele+had
+                            x,
+                            z,
+                            pt,
+                            1.0, //pol = 1.0 for now
+                            Q2,
+                            W,
+                            phi_s,
+                            phi_h,
+                            dxs_hm						
+                            )<<endl;
+
+                    //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            1, //index
+                            -1.0,//charge
+                            1, //=1 for active 
+                            11,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_ele,
+                            py_ele,
+                            pz_ele,
+                            E_ele,
+                            0.0005, //mass not in used	
+                            vx_ele, //vx
+                            vy_ele, //vx
+                            vz_ele  //vx
+                            )<<endl;
+                    //hadron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            2, //index
+                            charge_neg,//charge
+                            1, //=1 for active 
+                            pid_neg,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_had,
+                            py_had,
+                            pz_had,
+                            E_had, 
+                            mass_had, //mass not in used
+                            vx_had, //vx
+                            vy_had, //vx
+                            vz_had  //vx
+                            )<<endl;/*}}}*/
+                }
+                /*}}}*/
+
+                /*Save PI+ ROOT file based on XS distribution{{{*/
+                if(dxs_hp > cdxs_max_rndm_hp){
+                    t1->Fill();
+                    //Just save events in one root files in this case
+                    count[0] ++;//cout << 0 << " " << count[0] << endl;
+                    cout << count[0] <<"\r";
+                    Nsim1 = nsim;
+                }
+                /*}}}*/
+
+                /*Save PI- ROOT file based on XS distribution{{{*/
+                if(dxs_hm > cdxs_max_rndm_hm){
+                    t2->Fill();
+                    //Just save events in one root files in this case
+                    count[1] ++;//cout << 0 << " " << count[0] << endl;
+                    cout << count[1] <<"\r";
+                    Nsim2 = nsim;
+                }
+                /*}}}*/
+                cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
+            }
+            //judging exitcondition/*{{{*/
+            if (config=="EIC"||config=="SoLID") {
+                if (count[0] < number_of_events || count[1] < number_of_events 
+                   ) exitcondition=true;
+                else exitcondition=false;
+            } 
+            else if(config=="SPECT") {
+                if (count[0] < number_of_events) exitcondition=true;
+                else exitcondition=false;
+            } /*}}}*/
+            /*}}}*/
+        }else{
+            /*Generate Events Uniformly{{{*/
+            if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
+            if ( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
+                        &&(   (count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
+                            ||(count[1]<number_of_events&&pt>1.0&&Q2<=10.)
+                            ||(count[2]<number_of_events&&pt<=1.0&&Q2>10.)
+                            ||(count[3]<number_of_events&&pt>1.0&&Q2>10.)))
+                    ||(config=="SoLID" && z>0.3&&z<0.7 
+                        &&(   (count[0]<number_of_events&&pt<=1.0)
+                            ||(count[1]<number_of_events&&pt>1.0)))
+                    ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events))
+            {
+
+                sidis->CalcXS();/*{{{*/
+                dxs_incl = sidis->GetXS_Inclusive();
+                dxs_hp = sidis->GetXS_HP();
+                dxs_hm = sidis->GetXS_HM();
+                dilute_hp = sidis->GetDilute_HP();
+                dilute_hm = sidis->GetDilute_HM();/*}}}*/
+
+                //to avoid some wired behavior in log scale/*{{{*/
+                if((dxs_incl)<1e-16) dxs_incl=1e-16;
+                if((dxs_hp)<1e-16) dxs_hp=1e-16;
+                if((dxs_hm)<1e-16) dxs_hm=1e-16;
+                if((dilute_hp)<1e-16) dilute_hp=1e-16;
+                if((dilute_hm)<1e-16) dilute_hm=1e-16;
+
+                if(isnan(dxs_incl)) dxs_incl=1e-16;
+                if(isnan(dxs_hp)) dxs_hp=1e-16;
+                if(isnan(dxs_hm)) dxs_hm=1e-16;
+                if(isnan(dilute_hp)) dilute_hp=1e-16;
+                if(isnan(dilute_hm)) dilute_hm=1e-16;
+                if(isinf(dxs_incl)) dxs_incl=1e-16;
+                if(isinf(dxs_hp)) dxs_hp=1e-16;
+                if(isinf(dxs_hm)) dxs_hm=1e-16;
+                if(isinf(dilute_hp)) dilute_hp=1e-16;
+                if(isinf(dilute_hm)) dilute_hm=1e-16;
+                /*}}}*/
+
+                /*LUND For Positive Hadron{{{*/
+                //These section will save events based on their XS distributions
+                Double_t cdxs_max_rndm_hp = cdxs_max * gRandom->Uniform(0, 1);
+                if(bLUND&&dxs_hp > cdxs_max_rndm_hp){
+                    //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
+                    pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
+                            2, //ele+had
+                            x,
+                            z,
+                            pt,
+                            1.0, //pol = 1.0 for now
+                            Q2,
+                            W,
+                            phi_s,
+                            phi_h,
+                            dxs_hp						
+                            )<<endl;
+
+                    //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            1, //index
+                            -1.0,//charge
+                            1, //=1 for active 
+                            11,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_ele,
+                            py_ele,
+                            pz_ele,
+                            E_ele,
+                            0.0005, //mass not in used	
+                            vx_ele, //vx
+                            vy_ele, //vx
+                            vz_ele  //vx
+                            )<<endl;
+                    //hadron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            2, //index
+                            charge_pos,//charge
+                            1, //=1 for active 
+                            pid_pos,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_had,
+                            py_had,
+                            pz_had,
+                            E_had, 
+                            mass_had, //mass not in used
+                            vx_had, //vx
+                            vy_had, //vx
+                            vz_had  //vx
+                            )<<endl;/*}}}*/
+                }
+                /*}}}*/
+
+                /*LUND For Negative Hadron{{{*/
+                //These section will save events based on their XS distributions
+                Double_t cdxs_max_rndm_hm = cdxs_max * gRandom->Uniform(0, 1);
+                if(bLUND&&dxs_hm > cdxs_max_rndm_hm){
+                    //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
+                    neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
+                            2, //ele+had
+                            x,
+                            z,
+                            pt,
+                            1.0, //pol = 1.0 for now
+                            Q2,
+                            W,
+                            phi_s,
+                            phi_h,
+                            dxs_hm						
+                            )<<endl;
+
+                    //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            1, //index
+                            -1.0,//charge
+                            1, //=1 for active 
+                            11,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_ele,
+                            py_ele,
+                            pz_ele,
+                            E_ele,
+                            0.0005, //mass not in used	
+                            vx_ele, //vx
+                            vy_ele, //vx
+                            vz_ele  //vx
+                            )<<endl;
+                    //hadron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
+                    neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
+                            2, //index
+                            charge_neg,//charge
+                            1, //=1 for active 
+                            pid_neg,//pid
+                            0,// parent pid, not in used now
+                            0,// doughter for decay bookkeeping, not in used now
+                            px_had,
+                            py_had,
+                            pz_had,
+                            E_had, 
+                            mass_had, //mass not in used
+                            vx_had, //vx
+                            vy_had, //vx
+                            vz_had  //vx
+                            )<<endl;/*}}}*/
+                }
+                /*}}}*/
+
+                /*Fill ROOT{{{*/
                 if(config=="SoLID"||config=="EIC"){
                     if(Q2<=10.&&pt<=1.0){
                         t1->Fill();
                         count[0] ++;//cout << 0 << " " << count[0] << endl;
+                        Nsim1 = nsim;
                     }
                     if (Q2<=10.&&pt>1.0){
                         t2->Fill();
                         count[1] ++;
+                        Nsim2 = nsim;
                     }
 
                     if (config=="EIC"&&Q2>10.&&pt<=1.0){
                         t3->Fill();
                         count[2] ++;//cout << 2 << " " << count[2] << endl;
+                        Nsim3 = nsim;
                     }
                     if (config=="EIC"&&Q2>10.&&pt>1.0){
                         t4->Fill();
                         count[3] ++;//cout << 3 << " " << count[3] <<  endl;
+                        Nsim4 = nsim;
                     }
                 }
-                //cout << nsim << endl;
+                if(config=="SPECT"){
+                    t1->Fill();
+                    count[0] ++;//cout << 0 << " " << count[0] << endl;
+                    Nsim1 = nsim;
+                }
+                /*}}}*/
+                cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
             }
-            /*}}}*/
-            cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
-        }
 
-        //judging exitcondition/*{{{*/
-        if (config=="EIC") {
-            if (count[0] < number_of_events || count[1] < number_of_events 
-                    || count[2] < number_of_events || count[3] < number_of_events) exitcondition=true;
-            else exitcondition=false;
-        } 
-        else if (config=="SoLID") {
-            if (count[0] < number_of_events || count[1] < number_of_events) exitcondition=true;
-            else exitcondition=false;
-        } 
-        else if(config=="SPECT") {
-            if (count[0] < number_of_events) exitcondition=true;
-            else exitcondition=false;
-        } /*}}}*/
-    }/*}}}*/
+            //judging exitcondition/*{{{*/
+            if (config=="EIC") {
+                if (count[0] < number_of_events || count[1] < number_of_events 
+                        || count[2] < number_of_events || count[3] < number_of_events) exitcondition=true;
+                else exitcondition=false;
+            } 
+            else if (config=="SoLID") {
+                if (count[0] < number_of_events || count[1] < number_of_events) exitcondition=true;
+                else exitcondition=false;
+            } 
+            else if(config=="SPECT") {
+                if (count[0] < number_of_events) exitcondition=true;
+                else exitcondition=false;
+            } /*}}}*/
+            /*}}}*/ 
+        }
+    }
     /*}}}*/
+
     cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << endl;
 
     file1->Write();/*{{{*/
@@ -695,12 +847,13 @@ int main(Int_t argc, char *argv[]){
         T1->SetBranchAddress("dxs_incl",&dxs_incl);
         T1->SetBranchAddress("nsim",&nsim);
         T1->GetEntry(N1-1);          //get nsim for this rootfile
-        int Nsim1=nsim;
+        ULong64_t Nsim11=nsim;
+        cout<<Form("--- N1 = %lld / %lld", Nsim1, Nsim11)<<endl;
 
         TBranch *branch_weight_in1=T1->Branch("weight_in",&weight_in,"weight_in/D");
         TBranch *branch_weight_hp1=T1->Branch("weight_hp",&weight_hp,"weight_hp/D");
         TBranch *branch_weight_hm1=T1->Branch("weight_hm",&weight_hm,"weight_hm/D");
-        cout<<Form("---Filling weights foor ROOT#1, Nsim=%d, Phase_space = %f", Nsim1, Phase_space)<<endl;
+        cout<<Form("---Filling weights foor ROOT#1, Nsim=%lld, Phase_space = %f", Nsim1, Phase_space)<<endl;
         for(Long64_t i=0;i<N1;i++){
             T1->GetEntry(i);
             //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
@@ -738,12 +891,13 @@ int main(Int_t argc, char *argv[]){
             T2->SetBranchAddress("dxs_hm",&dxs_hm);
             T2->SetBranchAddress("nsim",&nsim);
             T2->GetEntry(N2-1);          //get nsim for this rootfile
-            int Nsim2=nsim;
+            ULong64_t Nsim21=nsim;
+            cout<<Form("--- N2 = %lld / %lld", Nsim2, Nsim21)<<endl;
 
             TBranch *branch_weight_in2=T2->Branch("weight_in",&weight_in,"weight_in/D");
             TBranch *branch_weight_hp2=T2->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm2=T2->Branch("weight_hm",&weight_hm,"weight_hm/D");
-            cout<<Form("---Filling weights foor ROOT#2, Nsim=%d, Phase_space = %f", Nsim2, Phase_space)<<endl;
+            cout<<Form("---Filling weights foor ROOT#2, Nsim=%lld, Phase_space = %f", Nsim2, Phase_space)<<endl;
             for(Long64_t i=0;i<N2;i++){
                 T2->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
@@ -780,12 +934,14 @@ int main(Int_t argc, char *argv[]){
             T3->SetBranchAddress("dxs_hm",&dxs_hm);
             T3->SetBranchAddress("nsim",&nsim);
             T3->GetEntry(N3-1);          //get nsim for this rootfile
-            int Nsim3=nsim;
+            ULong64_t Nsim31=nsim;
+            cout<<Form("--- N3 = %lld / %lld", Nsim3, Nsim31)<<endl;
+
 
             TBranch *branch_weight_in3=T3->Branch("weight_in",&weight_in,"weight_in/D");
             TBranch *branch_weight_hp3=T3->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm3=T3->Branch("weight_hm",&weight_hm,"weight_hm/D");
-            cout<<Form("---Filling weights foor ROOT#3, Nsim=%d, Phase_space = %f", Nsim3, Phase_space)<<endl;
+            cout<<Form("---Filling weights foor ROOT#3, Nsim=%lld, Phase_space = %f", Nsim3, Phase_space)<<endl;
             for(Long64_t i=0;i<N3;i++){
                 T3->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
@@ -821,12 +977,14 @@ int main(Int_t argc, char *argv[]){
             T4->SetBranchAddress("dxs_hm",&dxs_hm);
             T4->SetBranchAddress("nsim",&nsim);
             T4->GetEntry(N4-1);          //get nsim for this rootfile
-            int Nsim4=nsim;
+            ULong64_t Nsim41=nsim;
+            cout<<Form("--- N4 = %lld / %lld", Nsim4, Nsim41)<<endl;
+
 
             TBranch *branch_weight_in4=T4->Branch("weight_in",&weight_in,"weight_in/D");
             TBranch *branch_weight_hp4=T4->Branch("weight_hp",&weight_hp,"weight_hp/D");
             TBranch *branch_weight_hm4=T4->Branch("weight_hm",&weight_hm,"weight_hm/D");
-            cout<<Form("---Filling weights foor ROOT#4, Nsim=%d, Phase_space = %f", Nsim4, Phase_space)<<endl;
+            cout<<Form("---Filling weights foor ROOT#4, Nsim=%lld, Phase_space = %f", Nsim4, Phase_space)<<endl;
             for(Long64_t i=0;i<N4;i++){
                 T4->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2

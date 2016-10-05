@@ -29,7 +29,7 @@
 ## 8), string, Configuration, "EIC" or "SoLID". Can add CLAS12 as well but not now
  SoLID
 ## 9), string, PDF Model Type, "LHAPDF" or "EPS09" or "CTEQPDF"
-LHAPDF
+CTEQPDF
 ## 10), Maximum Cross Section Value
 ##      0nly useful when generating LUND format or save root files based on XS distribution
  600.0
