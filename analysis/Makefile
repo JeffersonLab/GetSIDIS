@@ -1,29 +1,70 @@
-#-------------------------------------------
-# Makefile for any C program with ROOT lib
-# Zhihong Ye, 01/09/2009
-#-------------------------------------------
+# A Generic Makefile for compiling ROOT programs
+# R. Michaels, rom@jlab.org, Aug 2001  See also README !!
+# Version of this release
+# 
+ROOTLIBS      = $(shell root-config --libs)
+ROOTGLIBS     = $(shell root-config --glibs)
+ROOTINC       = $(shell root-config --incdir)
+CXXFLAGS      = -Wall -g -frtti -fexceptions -fPIC \
+                   -DLINUXVERS -O
 
-PROGRAM = makebin
+EPS09=../eps09_cxx/
+#CTEQPDF=../../../cteq-pdf-1.0.4
+CTEQPDF=../CTEQ6/cteq-pdf-1.0.4
 
-CFLAGS = $(shell $(ROOTSYS)/bin/root-config --cflags)
-LIBS   = $(shell $(ROOTSYS)/bin/root-config --libs)
-GLIBS  = $(shell $(ROOTSYS)/bin/root-config --glibs)
+O=makebin
 
-CFLAGS += -Wall
-INCLUDE := -I${ROOTSYS}/include
-RTLIBS := -L${ROOTSYS}/lib -lCore
-all: $(PROGRAM)
+# Linux with g++
+INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
+#CXX           = clang++
+CXX           = g++
+#LD            = clang++
+LD            = g++
+LDFLAGS       = 
 
-FFLAGS = -C -g -m64 -fbounds-check -finit-local-zero -fno-automatic
+LIBS          = $(ROOTLIBS)  -L/usr/lib/ -lcteqpdf -L$(CTEQPDF)/lib
+GLIBS         = $(ROOTGLIBS) -L/usr/X11/lib -L/usr/lib/ -lXpm -lX11 
 
+ALL_LIBS =  $(GLIBS) $(LIBS)
 
-$(PROGRAM): $(PROGRAM).o 
-	clang++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(RTLIBS) $(LIBS) $(GLIBS)
+# The following sources comprise the package of scaler classes by R. Michaels.
+SRC = $(O).C
 
+HEAD = $(SRC:.C=.h)
+DEPS = $(SRC:.C=.d)
+SCALER_OBJS = $(SRC:.C=.o)
 
-$(PROGRAM).o: $(PROGRAM).C
-	clang++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C  ${INCLUDE}
+# Test code executibles
+PROGS = $(O)
 
+$(O): $(EPS09)/eps09.h eps09.o $(O).o $(O).C
+	rm -f $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES)  -o $@ eps09.o $(O).o $(ALL_LIBS)
+
+         
 clean:
-#	rm -f *.o ${GFORTRAN_OBJ}
-	rm -f *.o
+	rm -f *.o core *~ *.d *.tar $(PROGS)
+
+realclean:  clean
+	rm -f *.d
+
+###
+
+.SUFFIXES:
+.SUFFIXES: .c .cc .cpp .C .o .d
+
+###Adding the EPS09 code
+eps09.o: $(EPS09)/eps09.cxx 
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(EPS09)/eps09.cxx
+
+%.o:	%.C
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $<
+
+%.d:	%.C
+	@echo Creating dependencies for $<
+	@$(SHELL) -ec '$(CXX) -MM $(CXXFLAGS) $(INCLUDES) -c $< \
+		| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
+		[ -s $@ ] || rm -f $@'
+
+-include $(DEPS)
+
