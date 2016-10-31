@@ -16,7 +16,7 @@
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
  0
 ## 6), int, Number of events. 
- 2000000
+ 100000
 ###  If events are generated based on XS, save total events in one ROOT file
 ###  If events are generated uniformly, multiple ROOT files are created:
 ###     SoLID+EIC:  1 -> Q2<10, pt<1

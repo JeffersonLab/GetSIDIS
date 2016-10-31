@@ -321,6 +321,8 @@ class SIDIS
             
             rapidity = 0.5 * log((mom_had + pz_had)/(mom_had - pz_had)  );
 
+            rapidity = 0.5 * log((mom_had + pz_had)/(mom_had - pz_had)  );
+
             //phi_ele *= 180/3.1415926; if(py_ele<0.) phi_ele+=360;
             //phi_had *= 180/3.1415926; if(py_had<0.) phi_had+=360;
             //cout<<Form("--Electron: phi_gen = %f,  phi=%f", ph_ele, phi_ele)<<endl;
@@ -796,9 +798,9 @@ class SIDIS
         void dxs_hpt(double pt_tmp, double* dxs_hp, double* dxs_hm,double* dxs_all){
 
             double alpha_s = 0.0;
-          /*  if(fOrder==0)*/
+            //if(fOrder==0)
                 //alpha_s = alphasPDF(sqrt(Q2));
-            /*else*/
+            //else
                 alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
 
 

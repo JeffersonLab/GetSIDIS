@@ -271,7 +271,7 @@ class SIDIS
             // //define the 4-momentum
             //define electron direction as +z assuming a proton/neutron for the ion mass now 
             // approximation for SIDIS
-            TLorentzVector *P4_ini_ele = new TLorentzVector(0.,0.,mom_beam_ele,sqrt(mom_beam_ele*mom_beam_ele + mass_e*mass_e));
+            TLorentzVector *P4_ini_ele = new TLorentzVector(0.,0., mom_beam_ele,sqrt(mom_beam_ele*mom_beam_ele + mass_e*mass_e));
             TLorentzVector *P4_ini_ion = new TLorentzVector(0.,0.,-mom_beam_ion,sqrt(mom_beam_ion*mom_beam_ion + mass_target*mass_target));
             TLorentzVector *P4_fin_had = new TLorentzVector(0.,0.,0.,1.);
             TLorentzVector *P4_fin_ele = new TLorentzVector(0.,0.,0.,1.);
@@ -297,29 +297,29 @@ class SIDIS
 
             /*Kinematics Quantities{{{*/
             //For electron
-            px_ele = p_ele*sin(th_ele/180.*3.1415926)*cos(ph_ele/180.*3.1415926);
-            py_ele = p_ele*sin(th_ele/180.*3.1415926)*sin(ph_ele/180.*3.1415926);
-            pz_ele = p_ele*cos(th_ele/180.*3.1415926);
+            px_ele = p_ele*sin(th_ele/DEG)*cos(ph_ele/DEG);
+            py_ele = p_ele*sin(th_ele/DEG)*sin(ph_ele/DEG);
+            pz_ele = p_ele*cos(th_ele/DEG);
             E_ele = sqrt(p_ele*p_ele+mass_e*mass_e);
-            P4_fin_ele->SetPxPyPzE(p_ele*sin(th_ele/180.*3.1415926)*cos(ph_ele/180.*3.1415926),
-                    p_ele*sin(th_ele/180.*3.1415926)*sin(ph_ele/180.*3.1415926),
-                    p_ele*cos(th_ele/180.*3.1415926)
+            P4_fin_ele->SetPxPyPzE(p_ele*sin(th_ele/DEG)*cos(ph_ele/DEG),
+                    p_ele*sin(th_ele/DEG)*sin(ph_ele/DEG),
+                    p_ele*cos(th_ele/DEG)
                     ,sqrt(p_ele*p_ele+mass_e*mass_e));
 
             //For hadron
-            px_had = p_had*sin(th_had/180.*3.1415926)*cos(ph_had/180.*3.1415926);
-            py_had = p_had*sin(th_had/180.*3.1415926)*sin(ph_had/180.*3.1415926);
-            pz_had = p_had*cos(th_had/180.*3.1415926);
+            px_had = p_had*sin(th_had/DEG)*cos(ph_had/DEG);
+            py_had = p_had*sin(th_had/DEG)*sin(ph_had/DEG);
+            pz_had = p_had*cos(th_had/DEG);
             E_had = sqrt(p_had*p_had+mass_hadron*mass_hadron);
-            P4_fin_had->SetPxPyPzE(p_had*sin(th_had/180.*3.1415926)*cos(ph_had/180.*3.1415926),
-                    p_had*sin(th_had/180.*3.1415926)*sin(ph_had/180.*3.1415926),
-                    p_had*cos(th_had/180.*3.1415926)
+            P4_fin_had->SetPxPyPzE(p_had*sin(th_had/DEG)*cos(ph_had/DEG),
+                    p_had*sin(th_had/DEG)*sin(ph_had/DEG),
+                    p_had*cos(th_had/DEG)
                     ,sqrt(p_had*p_had+mass_hadron*mass_hadron));
 
 
             *P4_q = *P4_ini_ele - *P4_fin_ele;
             Q2 = - (*P4_q)*(*P4_q);
-            W = (*P4_ini_ele + *P4_ini_ion - *P4_fin_ele)*(*P4_ini_ele + *P4_ini_ion - *P4_fin_ele);
+            W  = (*P4_ini_ele + *P4_ini_ion - *P4_fin_ele)*(*P4_ini_ele + *P4_ini_ion - *P4_fin_ele);
             Wp = (*P4_ini_ele + *P4_ini_ion - *P4_fin_ele - *P4_fin_had)*(*P4_ini_ele + *P4_ini_ion - *P4_fin_ele - *P4_fin_had);
 
             s = (*P4_ini_ele + *P4_ini_ion )*(*P4_ini_ele + *P4_ini_ion);
@@ -495,19 +495,19 @@ class SIDIS
             /*try to take care of the decay{{{*/
             double decay_part = 0.0;
             if (abs(particle_flag)==1){
-                if (theta_had>155./180.*3.1415926){
+                if (theta_had>155./DEG){
                     decay_part = exp(7./cos(theta_had)*mass_hadron/(2.6*mom_had*3.0));
-                }else if (theta_had<=155./180.*3.1415926&&theta_had>=140./180.*3.1415926){
+                }else if (theta_had<=155./DEG&&theta_had>=140./DEG){
                     decay_part = exp(4.5/cos(theta_had)*mass_hadron/(2.6*mom_had*3.0));
-                }else if (theta_had <140/180.*3.1415926){
+                }else if (theta_had <140/DEG){
                     decay_part = exp(-2.5/sin(theta_had)*mass_hadron/(2.6*mom_had*3.0));
                 }
             }else{
-                if (theta_had>155./180.*3.1415926){
+                if (theta_had>155./DEG){
                     decay_part = exp(7./cos(theta_had)*mass_hadron/(1.24*mom_had*3.0));
-                }else if (theta_had<=155./180.*3.1415926&&theta_had>=140./180.*3.1415926){
+                }else if (theta_had<=155./DEG&&theta_had>=140./DEG){
                     decay_part = exp(4.5/cos(theta_had)*mass_hadron/(1.24*mom_had*3.0));
-                }else if (theta_had <140/180.*3.1415926){
+                }else if (theta_had <140/DEG){
                     decay_part = exp(-2.5/sin(theta_had)*mass_hadron/(1.24*mom_had*3.0));
                 }
             }

@@ -65,7 +65,7 @@ build=x86_64-unknown-linux-gnu
 build_os=linux-gnu
 
 # A sed program that does not truncate output.
-SED="sed"
+SED="/bin/sed"
 
 # Sed that helps us avoid accidentally triggering echo(1) options like -n.
 Xsed="$SED -e 1s/^X//"
@@ -234,7 +234,7 @@ finish_eval=""
 hardcode_into_libs=yes
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/u/apps/gcc/4.8.2/lib64 /usr/local/lib64 /usr/lib64 /usr/lib/gcc/x86_64-redhat-linux/4.4.7 /lib64 /u/apps/root/5.34.13/root/lib /apps/cernlib/x86_64_rhel6/2005/lib /work/halla/e08014/disk1/yez/analyzer-1.5.31 /work/halla/solid/yez/cteq-pdf/lib /work/halla/solid/yez/TMDs/gsl-1.16/lib /work/halla/solid/yez/TMDs/hoppet-1.1.5/lib /work/halla/e08014/disk1/yez/mylib"
+sys_lib_search_path_spec="/usr/local/lib64 /usr/lib64 /usr/lib/gcc/x86_64-redhat-linux/4.4.7 /lib64 /work/halla/e08014/disk1/yez/mylib /u/apps/root/5.34.13/root/lib /apps/cernlib/x86_64_rhel6/2005/lib /work/halla/e08014/disk1/yez/analyzer /work/halla/solid/yez/lhapdf/lib /work/halla/solid/yez/TMDs/hoppet-1.1.5/lib /work/halla/solid/yez/TMDs/gsl-1.16/lib /work/halla/solid/yez/HEPGenPlusPlus/install/lib /work/halla/solid/yez/boost_1_61_0/stage /work/halla/solid/yez/SIDIS_Generator/CTEQ6/cteq-pdf-1.0.4/lib"
 
 # Run-time system search path for libraries.
 sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib64/atlas /usr/lib64/cernlib/2006-g77/lib /usr/local/cuda/lib64 /usr/local/cuda/lib /usr/lib64/mysql /usr/lib64/qt-3.3/lib /usr/lib64/xulrunner "
@@ -302,11 +302,11 @@ old_archive_from_new_cmds=""
 old_archive_from_expsyms_cmds=""
 
 # Commands used to build a shared archive.
-archive_cmds="\$CC -shared \$libobjs \$deplibs \$compiler_flags \${wl}-dynamiclib \$wl\$soname -o \$lib"
+archive_cmds="\$CC -shared \$libobjs \$deplibs \$compiler_flags \${wl}-soname \$wl\$soname -o \$lib"
 archive_expsym_cmds="echo \\\"{ global:\\\" > \$output_objdir/\$libname.ver~
 	    cat \$export_symbols | sed -e \\\"s/\\\\(.*\\\\)/\\\\1;/\\\" >> \$output_objdir/\$libname.ver~
 	    echo \\\"local: *; };\\\" >> \$output_objdir/\$libname.ver~
-	    \$CC -shared \$libobjs \$deplibs \$compiler_flags \${wl}-dynamiclib \$wl\$soname \${wl}-version-script \${wl}\$output_objdir/\$libname.ver -o \$lib"
+	    \$CC -shared \$libobjs \$deplibs \$compiler_flags \${wl}-soname \$wl\$soname \${wl}-version-script \${wl}\$output_objdir/\$libname.ver -o \$lib"
 
 # Commands used to build a loadable module if different from building
 # a shared archive.

@@ -1,0 +1,86 @@
+#!/bin/sh
+
+# Usage: farm_list
+#
+# This script creates batch_krun and jscript_krun in batch_files directory
+# and submits the job to the farms
+#
+# Feb. 22, 2011 Zhihong Ye
+#
+
+home=/work/halla/solid/yez/SIDIS_Generator/test
+# home=$(PWD)     
+# The directory where replay_script is
+# Event you want to start with,gtotal=-1 means to replay all
+username=${USER}@jlab.org    # email which will be notify when the job is done
+#
+# Check whether the raw data are in cache or not
+#
+
+#
+# Function to check if input is an integer
+#
+is_integer() {
+ case $1 in
+  *[!0-9]*) return 1;;
+  *) return 0;;
+ esac
+}
+
+INPUT=$1
+NO=$2
+
+if ! [ -d batch_files ]
+	then 
+	echo "----------------------------------------------------------------"
+	echo "I need batch_files directory. I am going to create it"
+	echo  
+	mkdir batch_files
+    fi
+    
+#
+    echo
+#
+# Write file batch_krun
+#
+    rm -f batch_files/batch_${INPUT}_${NO}
+    echo "#!/bin/sh" > batch_files/batch_${INPUT}_${NO}
+    echo "cd "${home}"/" >>batch_files/batch_${INPUT}_${NO}
+    echo " ">>batch_files/batch_${INPUT}_${NO}
+    echo "./GetSIDIS "${INPUT} ${NO}>>batch_files/batch_${INPUT}_${NO}
+#  
+    chmod +x batch_files/batch_${INPUT}_${NO}
+
+    
+    echo "batch_files/batch_"${INPUT}_${NO}" has been created!"
+    echo " "
+    
+#
+# Write the jsub script
+#
+    rm -f batch_files/jscript_${INPUT}_${NO}
+    echo "PROJECT     solid" > batch_files/jscript_${INPUT}_${NO}
+    echo "COMMAND     "$home"/batch_files/batch_"${INPUT}_${NO} >>batch_files/jscript_${INPUT}_${NO}
+    echo "JOBNAME     sidis_"${INPUT}_${NO} >>batch_files/jscript_${INPUT}_${NO}
+    echo "TRACK       analysis" >> batch_files/jscript_${INPUT}_${NO}
+    echo "TIME        4000" >>batch_files/jscript_${INPUT}_${NO}
+    echo "MEMORY      1000 MB" >>batch_files/jscript_${INPUT}_${NO}
+    echo "OS          centos65" >>batch_files/jscript_${INPUT}_${NO}
+    
+    echo "batch_files/jscript_"${INPUT}_${NO}" has been created."
+    echo " " 
+    echo "Now, let us wait for the farms..."
+    echo " "
+#
+# Submit job to the farm
+   #jsub batch_files/jscript_${INPUT}_${NO}
+   swif add-jsub -workflow sidis_analysis -create -script ./batch_files/jscript_${INPUT}_${NO}
+   #swif run -workflow sidis_analysis
+#
+#
+    echo "Job "${INPUT}_${NO} "has been submited!"
+    echo
+    echo
+#
+    sleep 0.5
+    

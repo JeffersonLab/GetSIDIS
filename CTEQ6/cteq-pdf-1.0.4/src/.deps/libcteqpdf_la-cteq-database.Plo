@@ -1,50 +1,44 @@
 libcteqpdf_la-cteq-database.lo: cteq-database.c /usr/include/string.h \
- /usr/include/_types.h /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
- /usr/include/sys/_symbol_aliasing.h \
- /usr/include/sys/_posix_availability.h /usr/include/machine/_types.h \
- /usr/include/i386/_types.h /usr/include/sys/_pthread/_pthread_types.h \
- /usr/include/Availability.h /usr/include/AvailabilityInternal.h \
- /usr/include/sys/_types/_size_t.h /usr/include/sys/_types/_null.h \
- /usr/include/sys/_types/_rsize_t.h /usr/include/sys/_types/_errno_t.h \
- /usr/include/sys/_types/_ssize_t.h /usr/include/strings.h \
- /usr/include/secure/_string.h /usr/include/secure/_common.h cteqpdf.h
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h \
+ /usr/include/xlocale.h /usr/include/bits/string.h \
+ /usr/include/bits/string2.h /usr/include/endian.h \
+ /usr/include/bits/endian.h /usr/include/bits/byteswap.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/stdlib.h cteqpdf.h
 
 /usr/include/string.h:
 
-/usr/include/_types.h:
-
-/usr/include/sys/_types.h:
+/usr/include/features.h:
 
 /usr/include/sys/cdefs.h:
 
-/usr/include/sys/_symbol_aliasing.h:
+/usr/include/bits/wordsize.h:
 
-/usr/include/sys/_posix_availability.h:
+/usr/include/gnu/stubs.h:
 
-/usr/include/machine/_types.h:
+/usr/include/gnu/stubs-64.h:
 
-/usr/include/i386/_types.h:
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h:
 
-/usr/include/sys/_pthread/_pthread_types.h:
+/usr/include/xlocale.h:
 
-/usr/include/Availability.h:
+/usr/include/bits/string.h:
 
-/usr/include/AvailabilityInternal.h:
+/usr/include/bits/string2.h:
 
-/usr/include/sys/_types/_size_t.h:
+/usr/include/endian.h:
 
-/usr/include/sys/_types/_null.h:
+/usr/include/bits/endian.h:
 
-/usr/include/sys/_types/_rsize_t.h:
+/usr/include/bits/byteswap.h:
 
-/usr/include/sys/_types/_errno_t.h:
+/usr/include/bits/types.h:
 
-/usr/include/sys/_types/_ssize_t.h:
+/usr/include/bits/typesizes.h:
 
-/usr/include/strings.h:
-
-/usr/include/secure/_string.h:
-
-/usr/include/secure/_common.h:
+/usr/include/stdlib.h:
 
 cteqpdf.h:
