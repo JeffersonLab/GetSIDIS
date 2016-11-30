@@ -5,6 +5,8 @@
 //   the cross section parts and coded it into a C++ class which can be    //
 //   easily embeded by other programs.                                     //
 //                                                                         //
+// ------------                                                            //
+// In this version, I used only LO PDF and remove s, sbar and g  --11/30/16//
 /////////////////////////////////////////////////////////////////////////////
 /*C/C++ Includes{{{*/
 #include <stdio.h>
@@ -74,12 +76,14 @@ class SIDIS
             fModel = kModel;
             if(fModel=="EPS09"){
                 //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, 
-                fOrder = 2;
+                //fOrder = 2;
+                fOrder = 1;
                 SetEPS09();
             }
             else if(fModel=="CTEQPDF"){
                 //3->free L0 CTEQ6L1 PDF, 4->free NL0 CTEQ6.1M PDF
-                fOrder = 4;
+                //fOrder = 4;
+                fOrder = 3;
                 SetCTEQ();
             }
             //else if(fModel=="LHAPDF") {
@@ -794,9 +798,13 @@ class SIDIS
             ubarquark = fubar;
             dquark = fdA;
             dbarquark = fdbar;
-            squark = fs;
-            sbarquark = fsbar;
+            //squark = fs;
+            //sbarquark = fsbar;
+            //Temperately block this contribution
+            squark = 0.0;
+            sbarquark = 0.0;
 
+ 
             
             ////Test: see the different of nuclear-PDF and free-PDF in the same (Q2,x)
             //if(x>0.&&x<1.0){
@@ -949,9 +957,13 @@ class SIDIS
                 ubarquark = fubar;
                 dquark = fdA;
                 dbarquark = fdbar;
-                squark = fs;
-                sbarquark = fsbar;
-                gluon = fg;
+                //squark = fs;
+                //sbarquark = fsbar;
+                //gluon = fg;
+                //Temperately block these contribution 11/30/16
+                squark = 0.0;
+                sbarquark = 0.0;
+                gluon = 0.0;
 
                 if (fabs(particle_flag)==1){
                     //pion fragmentation function

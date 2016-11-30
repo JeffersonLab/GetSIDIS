@@ -554,6 +554,79 @@ class SIDIS
         } 
         /*}}}*/
         
+        /*viod Run_LHAPDF(double x,double Q2){{{*/          
+        double Run_LHAPDF(double x,double Q2)          
+        {
+            double result = 0;
+            double Q = sqrt(Q2);
+
+            ///////////////
+            //LHAPDF6
+            ///////////////
+            //Note that LHAPDF6 use PDG scheme ID as the PID
+            // u quark
+            fuA = lhapdfs->xfxQ(2, x, Q);
+            // d quark
+            fdA = lhapdfs->xfxQ(1, x, Q);
+            // \bar{u} quark
+            fubar = lhapdfs->xfxQ(-2, x, Q);
+            // \bar{d} quark
+            fdbar= lhapdfs->xfxQ(-1, x, Q);
+            // strange quark
+            fs = lhapdfs->xfxQ(3, x, Q);
+            // \bar{s} quark
+            fsbar= lhapdfs->xfxQ(-3, x, Q);
+            //gluon
+            fg = lhapdfs->xfxQ(21, x,Q);
+        }
+        /*}}}*/
+        
+        /*void Run_CTEQPDF(double x,double Q2){{{*/          
+        void Run_CTEQPDF(double ix,double iQ2)          
+        {
+            fubar = Get_CTEQPDF(-1, ix, iQ2);
+            fdbar = Get_CTEQPDF(-2, ix, iQ2);
+            fsbar = Get_CTEQPDF(-3, ix, iQ2);
+            fuA = Get_CTEQPDF(1, ix, iQ2);
+            fdA = Get_CTEQPDF(2, ix, iQ2);
+            fs = Get_CTEQPDF(3, ix, iQ2);
+            fg = Get_CTEQPDF(0, ix, iQ2);
+
+        }
+        /*}}}*/
+
+        void RunEPS09(int iOrder, int iErrSet,int iA,int iZ, double ix, double iQ2){/*{{{*/
+
+            double iR_uv = 0.0, iR_dv = 0.0, iR_u = 0.0, iR_d = 0.0, iR_s = 0.0, iR_c = 0.0, iR_b = 0.0, iR_g = 0.0; 
+            //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
+            //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
+            eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
+
+            double ubar = Get_CTEQPDF(-1, ix, iQ2);
+            double dbar = Get_CTEQPDF(-2, ix, iQ2);
+            double sbar = Get_CTEQPDF(-3, ix, iQ2);
+            double u = Get_CTEQPDF(1, ix, iQ2);
+            double d = Get_CTEQPDF(2, ix, iQ2);
+            double s = Get_CTEQPDF(3, ix, iQ2);
+            double uv = u-ubar;//uv = u - usea
+            double dv = d-ubar;//dv = d - dsea
+            double g = Get_CTEQPDF(0, ix, iQ2);
+
+            fuA = (double)iZ/(double)iA * ( iR_uv * uv + iR_u * ubar)
+                + (double)(iA-iZ)/(double)iA * (iR_dv * dv + iR_d * dbar);
+
+            fdA = (double)iZ/(double)iA * ( iR_dv * dv + iR_d * dbar)
+                + (double)(iA-iZ)/(double)iA * (iR_uv * uv + iR_u * ubar);
+
+            fubar =  iR_u * ubar;
+            fdbar =  iR_d * dbar;
+
+            fs =  iR_s * s;
+            fsbar =  iR_s *sbar;
+
+            fg =  iR_g * g;
+        }/*}}}*/
+
         /*Return Values{{{*/
 
         double GetXS_Inclusive(){
@@ -580,7 +653,7 @@ class SIDIS
         double get_dbar(){ return fdbar; }//return the average d
         double get_sbar(){ return fsbar; }//return the average s
         /*}}}*/
-        
+
     private:
         /*double Azimuthalphi(double vx, double vy){{{*/
         double Azimuthalphi(double vx, double vy){
@@ -760,35 +833,49 @@ class SIDIS
 
             double uquark=0.0,dquark=0.0,squark=0.0,ubarquark=0.0,dbarquark=0.0,sbarquark=0.0;
             if(fOrder==0){
-                uquark = Get_LHAPDF(1,x,Q2);
-                dquark = Get_LHAPDF(2,x,Q2);
-                squark = Get_LHAPDF(3,x,Q2);
-                ubarquark = Get_LHAPDF(-1,x,Q2);
-                dbarquark = Get_LHAPDF(-2,x,Q2);
-                sbarquark = Get_LHAPDF(-3,x,Q2);
+                Run_LHAPDF(x, Q2);         
+
+                //uquark = Get_LHAPDF(1,x,Q2);
+                //dquark = Get_LHAPDF(2,x,Q2);
+                //squark = Get_LHAPDF(3,x,Q2);
+                //ubarquark = Get_LHAPDF(-1,x,Q2);
+                //dbarquark = Get_LHAPDF(-2,x,Q2);
+                //sbarquark = Get_LHAPDF(-3,x,Q2);
+
             }
             else if(fOrder==1 || fOrder==2){/*{{{*/
                 //Calculate medium modified PDFs:
                 RunEPS09(fOrder, fErrSet, fA, fZ, x, Q2);
 
-                uquark = get_uA();
-                dquark = get_dA();
-                squark = get_s();
-                ubarquark = get_ubar();
-                dbarquark = get_dbar();
-                sbarquark = get_sbar();
+                //uquark = get_uA();
+                //dquark = get_dA();
+                //squark = get_s();
+                //ubarquark = get_ubar();
+                //dbarquark = get_dbar();
+                //sbarquark = get_sbar();
             }
             else if(fOrder==3 || fOrder==4){
                 //free PDF from CTEQ
-                uquark = Get_CTEQPDF(1,x,Q2);
-                dquark = Get_CTEQPDF(2,x,Q2);
-                squark = Get_CTEQPDF(3,x,Q2);
-                ubarquark = Get_CTEQPDF(-1,x,Q2);
-                dbarquark = Get_CTEQPDF(-2,x,Q2);
-                sbarquark = Get_CTEQPDF(-3,x,Q2);
+                Run_CTEQPDF(x, Q2);         
+                
+                //uquark = Get_CTEQPDF(1,x,Q2);
+                //dquark = Get_CTEQPDF(2,x,Q2);
+                //squark = Get_CTEQPDF(3,x,Q2);
+                //ubarquark = Get_CTEQPDF(-1,x,Q2);
+                //dbarquark = Get_CTEQPDF(-2,x,Q2);
+                //sbarquark = Get_CTEQPDF(-3,x,Q2);
+                
             }else{
                 cerr<<"***, in dxs(....), I don't know the type of fOrder"<<endl;
             }
+
+            uquark = fuA;
+            dquark = fdA;
+            squark = fs;
+            ubarquark = fubar;
+            dbarquark = fdbar;
+            sbarquark = fsbar;
+
             ////Test: see the different of nuclear-PDF and free-PDF in the same (Q2,x)
             //if(x>0.&&x<1.0){
             //double u1 = Get_LHAPDF(1,x,Q2);
@@ -902,39 +989,51 @@ class SIDIS
 
                 if(fOrder==0){
                     // PDF from LHAPDF
-                    uquark = Get_LHAPDF(1,x/xp,Q2);
-                    dquark = Get_LHAPDF(2,x/xp,Q2);
-                    squark = Get_LHAPDF(3,x/xp,Q2);
-                    ubarquark = Get_LHAPDF(-1,x/xp,Q2);
-                    dbarquark = Get_LHAPDF(-2,x/xp,Q2);
-                    sbarquark = Get_LHAPDF(-3,x/xp,Q2);
-                    gluon = Get_LHAPDF(0,x/xp,Q2);
+                    Run_LHAPDF(x, Q2);         
+                    
+                    //uquark = Get_LHAPDF(1,x/xp,Q2);
+                    //dquark = Get_LHAPDF(2,x/xp,Q2);
+                    //squark = Get_LHAPDF(3,x/xp,Q2);
+                    //ubarquark = Get_LHAPDF(-1,x/xp,Q2);
+                    //dbarquark = Get_LHAPDF(-2,x/xp,Q2);
+                    //sbarquark = Get_LHAPDF(-3,x/xp,Q2);
+                    //gluon = Get_LHAPDF(0,x/xp,Q2);
+                
                 }
                 else if(fOrder==1 || fOrder==2){
                     //Calculate medium modified PDFs:
                     RunEPS09(fOrder, fErrSet, fA, fZ, x/xp, Q2);
 
-                    uquark = get_uA();
-                    dquark = get_dA();
-                    squark = get_s();
-                    ubarquark = get_ubar();
-                    dbarquark = get_dbar();
-                    sbarquark = get_sbar();
-                    gluon = get_g();
+                    //uquark = get_uA();
+                    //dquark = get_dA();
+                    //squark = get_s();
+                    //ubarquark = get_ubar();
+                    //dbarquark = get_dbar();
+                    //sbarquark = get_sbar();
+                    //gluon = get_g();
                 }
                 else if(fOrder==3 || fOrder==4){
                     //free PDF from CTEQ
-                    uquark = Get_CTEQPDF(1,x/xp,Q2);
-                    dquark = Get_CTEQPDF(2,x/xp,Q2);
-                    squark = Get_CTEQPDF(3,x/xp,Q2);
-                    ubarquark = Get_CTEQPDF(-1,x/xp,Q2);
-                    dbarquark = Get_CTEQPDF(-2,x/xp,Q2);
-                    sbarquark = Get_CTEQPDF(-3,x/xp,Q2);
-                    gluon = Get_CTEQPDF(0,x/xp,Q2);
+                    Run_CTEQPDF(x, Q2);         
+                    
+                    //uquark = Get_CTEQPDF(1,x/xp,Q2);
+                    //dquark = Get_CTEQPDF(2,x/xp,Q2);
+                    //squark = Get_CTEQPDF(3,x/xp,Q2);
+                    //ubarquark = Get_CTEQPDF(-1,x/xp,Q2);
+                    //dbarquark = Get_CTEQPDF(-2,x/xp,Q2);
+                    //sbarquark = Get_CTEQPDF(-3,x/xp,Q2);
+                    //gluon = Get_CTEQPDF(0,x/xp,Q2);
                 }
                 else{
                     cerr<<"***, in dxs(....), I don't know the type of fOrder"<<endl;
                 }
+
+                uquark = fuA;
+                dquark = fdA;
+                squark = fs;
+                ubarquark = fubar;
+                dbarquark = fdbar;
+                sbarquark = fsbar;
 
                 if (fabs(particle_flag)==1){
                     //pion fragmentation function
@@ -1121,38 +1220,6 @@ class SIDIS
             return(result*ix);//return xf(x) instead of f(x)
         }
         /*}}}*/
-
-        void RunEPS09(int iOrder, int iErrSet,int iA,int iZ, double ix, double iQ2){/*{{{*/
-
-            double iR_uv = 0.0, iR_dv = 0.0, iR_u = 0.0, iR_d = 0.0, iR_s = 0.0, iR_c = 0.0, iR_b = 0.0, iR_g = 0.0; 
-            //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
-            //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
-            eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
-
-            double ubar = Get_CTEQPDF(-1, ix, iQ2);
-            double dbar = Get_CTEQPDF(-2, ix, iQ2);
-            double sbar = Get_CTEQPDF(-3, ix, iQ2);
-            double u = Get_CTEQPDF(1, ix, iQ2);
-            double d = Get_CTEQPDF(2, ix, iQ2);
-            double s = Get_CTEQPDF(3, ix, iQ2);
-            double uv = u-ubar;//uv = u - usea
-            double dv = d-ubar;//dv = d - dsea
-            double g = Get_CTEQPDF(0, ix, iQ2);
-
-            fuA = (double)iZ/(double)iA * ( iR_uv * uv + iR_u * ubar)
-                + (double)(iA-iZ)/(double)iA * (iR_dv * dv + iR_d * dbar);
-
-            fdA = (double)iZ/(double)iA * ( iR_dv * dv + iR_d * dbar)
-                + (double)(iA-iZ)/(double)iA * (iR_uv * uv + iR_u * ubar);
-
-            fubar =  iR_u * ubar;
-            fdbar =  iR_d * dbar;
-
-            fs =  iR_s * s;
-            fsbar =  iR_s *sbar;
-
-            fg =  iR_g * g;
-        }/*}}}*/
 
         /*Kinematic Quantties{{{*/
     private:

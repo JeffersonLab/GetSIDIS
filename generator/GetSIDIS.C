@@ -7,7 +7,8 @@
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
 //#include "SIDIS.h"
-#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+//#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
@@ -74,6 +75,7 @@ int main(Int_t argc, char *argv[]){
     Double_t theta_q, theta_s,phi_h,phi_s,mom_ele,mom_had,theta_ele, theta_had,phi_ele,phi_had;
     Double_t dxs_incl,dxs_hm,dxs_hp,dilute_hp,dilute_hm;
     Double_t px_ele, py_ele,pz_ele, px_had, py_had, pz_had, E_ele,E_had;
+    Double_t u_pdf, d_pdf, s_pdf, g_pdf, ubar_pdf, dbar_pdf, sbar_pdf;
     ULong64_t nsim = 0, Nsim1 = 0, Nsim2 = 0, Nsim3 = 0,Nsim4 = 0;
     //For Beam Position and Vertex info
     Double_t vx_ele, vy_ele, vz_ele, vx_had, vy_had, vz_had;
@@ -196,7 +198,16 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("vz_ele",&vz_ele, "vz_ele/D");
     t1->Branch("vx_had",&vx_had, "vx_had/D");
     t1->Branch("vy_had",&vy_had, "vy_had/D");
-    t1->Branch("vz_had",&vz_had, "vz_had/D");/*}}}*/
+    t1->Branch("vz_had",&vz_had, "vz_had/D");
+    
+    t1->Branch("u_pdf", &u_pdf, "u_pdf/D");
+    t1->Branch("d_pdf", &d_pdf, "d_pdf/D");
+    t1->Branch("s_pdf", &s_pdf, "s_pdf/D");
+    t1->Branch("g_pdf", &g_pdf, "g_pdf/D");
+    t1->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
+    t1->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
+    t1->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
+    /*}}}*/
 
     TString filename2 = Form("%s_2_%d.root",filename0.Data(), Int_t(FileNo));
     if(bXSMode)
@@ -246,6 +257,13 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("vx_had",&vx_had, "vx_had/D");
         t2->Branch("vy_had",&vy_had, "vy_had/D");
         t2->Branch("vz_had",&vz_had, "vz_had/D");
+        t2->Branch("u_pdf", &u_pdf, "u_pdf/D");
+        t2->Branch("d_pdf", &d_pdf, "d_pdf/D");
+        t2->Branch("s_pdf", &s_pdf, "s_pdf/D");
+        t2->Branch("g_pdf", &g_pdf, "g_pdf/D");
+        t2->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
+        t2->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
+        t2->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
         /*}}}*/
     }
 
@@ -301,6 +319,13 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("vx_had",&vx_had, "vx_had/D");
         t3->Branch("vy_had",&vy_had, "vy_had/D");
         t3->Branch("vz_had",&vz_had, "vz_had/D");
+        t3->Branch("u_pdf", &u_pdf, "u_pdf/D");
+        t3->Branch("d_pdf", &d_pdf, "d_pdf/D");
+        t3->Branch("s_pdf", &s_pdf, "s_pdf/D");
+        t3->Branch("g_pdf", &g_pdf, "g_pdf/D");
+        t3->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
+        t3->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
+        t3->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
         /*}}}*/
 
         t4->Branch("Q2",&Q2,"data/D");/*{{{*/
@@ -343,7 +368,15 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("vz_ele",&vz_ele, "vz_ele/D");
         t4->Branch("vx_had",&vx_had, "vx_had/D");
         t4->Branch("vy_had",&vy_had, "vy_had/D");
-        t4->Branch("vz_had",&vz_had, "vz_had/D");/*}}}*/
+        t4->Branch("vz_had",&vz_had, "vz_had/D");
+        t4->Branch("u_pdf", &u_pdf, "u_pdf/D");
+        t4->Branch("d_pdf", &d_pdf, "d_pdf/D");
+        t4->Branch("s_pdf", &s_pdf, "s_pdf/D");
+        t4->Branch("g_pdf", &g_pdf, "g_pdf/D");
+        t4->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
+        t4->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
+        t4->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
+        /*}}}*/
     }
 
     /*}}}*/
@@ -445,7 +478,16 @@ int main(Int_t argc, char *argv[]){
                 dxs_hp = sidis->GetXS_HP();
                 dxs_hm = sidis->GetXS_HM();
                 dilute_hp = sidis->GetDilute_HP();
-                dilute_hm = sidis->GetDilute_HM();/*}}}*/
+                dilute_hm = sidis->GetDilute_HM();
+                
+                u_pdf = sidis->get_uA();
+                d_pdf = sidis->get_dA();
+                s_pdf = sidis->get_s();
+                g_pdf = sidis->get_g();
+                ubar_pdf = sidis->get_ubar();
+                dbar_pdf = sidis->get_dbar();
+                sbar_pdf = sidis->get_sbar();
+                /*}}}*/
 
                 //to avoid some wired behavior in log scale/*{{{*/
                 if((dxs_incl)<1e-16) dxs_incl=1e-16;
@@ -627,7 +669,16 @@ int main(Int_t argc, char *argv[]){
                 dxs_hp = sidis->GetXS_HP();
                 dxs_hm = sidis->GetXS_HM();
                 dilute_hp = sidis->GetDilute_HP();
-                dilute_hm = sidis->GetDilute_HM();/*}}}*/
+                dilute_hm = sidis->GetDilute_HM();
+                
+                u_pdf = sidis->get_uA();
+                d_pdf = sidis->get_dA();
+                s_pdf = sidis->get_s();
+                g_pdf = sidis->get_g();
+                ubar_pdf = sidis->get_ubar();
+                dbar_pdf = sidis->get_dbar();
+                sbar_pdf = sidis->get_sbar();
+                /*}}}*/
 
                 //to avoid some wired behavior in log scale/*{{{*/
                 if((dxs_incl)<1e-16) dxs_incl=1e-16;
