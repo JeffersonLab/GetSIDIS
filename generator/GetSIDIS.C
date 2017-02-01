@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////
-// SIDIS Events Generators for SoLID or EIC         //
+// SIDIS Events Generators for SoLID, CLAS12 or EIC //
 //                                                  //
 //Note: Basically the same as Xin Qian's "collider" //
 //      but the model is coded in "SIDIS.h"         //
@@ -7,13 +7,13 @@
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
 //#include "SIDIS.h"
-//#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
-#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
+#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+//#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
-    cout<<"oO0 SIDIS Events Generators for SoLID or EIC or Spectrometer  0Oo//"<<endl;
+    cout<<"oO0 SIDIS Events Generators for SoLID, CLAS12 or EIC or Spectrometer  0Oo//"<<endl;
     cout<<"oO0  with nPDF (EPS09) and free-PDF (LHDAPDF) implemented.    0Oo//"<<endl;
     cout<<"oO0  -- Zhihong Ye, updated in 08/12/2016                     0Oo//"<<endl;
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
@@ -34,7 +34,7 @@ int main(Int_t argc, char *argv[]){
 
     Double_t Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon,rapidity, jacoF;
 
-    if (config != "EIC" && config != "SoLID" && config != "SPECT"){
+    if (config != "EIC" && config != "SoLID" && config != "CLAS12" && config != "SPECT"){
         cout << "not supported config = "<<config.Data() << endl;
         return -1;
     }    
@@ -100,7 +100,23 @@ int main(Int_t argc, char *argv[]){
         vertex_center = SoLID_Target_Center;
 
     }/*}}}*/
+  
+    if(config=="CLAS12" ){/*{{{*/
+        Mom_Min_e = CLAS12_Mom_Min_e;  Mom_Max_e = momentum_ele; 
+        Mom_Min_h = CLAS12_Mom_Min_h;  Mom_Max_h = CLAS12_Mom_Max_h;
+        Th_Min_e = CLAS12_Th_Min_e; Th_Max_e = CLAS12_Th_Max_e; 
+        Th_Min_h = CLAS12_Th_Min_h; Th_Max_h = CLAS12_Th_Max_h;
+        Ph_Min_e = CLAS12_Ph_Min_e; Ph_Max_e = CLAS12_Ph_Max_e; 
+        Ph_Min_h = CLAS12_Ph_Min_h; Ph_Max_h = CLAS12_Ph_Max_h;
+
+        beamsize_x_ele = CLAS12_BeamSizeX_ele;
+        beamsize_y_ele = CLAS12_BeamSizeY_ele;
+        vertex_length = CLAS12_Target_Length;
+        vertex_center = CLAS12_Target_Center;
+
+    }/*}}}*/
    
+ 
     //A rough guess but people claim EIC to be a full-acceptance device!
     else if(config=="EIC" ){/*{{{*/
         Mom_Min_e = EIC_Mom_Min_e;  Mom_Max_e =  momentum_ele * 3.0; 
@@ -137,6 +153,11 @@ int main(Int_t argc, char *argv[]){
     cout<<" -- For Config="<<config<<" Phase_space: "<<electron_phase_space<<"	"<<hadron_phase_space<<"	"<<Phase_space<<endl;
 
     /*}}}*/
+
+    /*TMD and FF{{{*/ 
+    double Asym_Cos2Phi_p_hp,Asym_BM_p_hp,Asym_Cahn_p_hp,Asym_Cos2Phi_p_hm,Asym_BM_p_hm, Asym_Cahn_p_hm;
+    double Asym_Cos2Phi_n_hp, Asym_BM_n_hp, Asym_Cahn_n_hp,Asym_Cos2Phi_n_hm,Asym_BM_n_hm,Asym_Cahn_n_hm;
+    double Asym_Cos2Phi_hp,Asym_BM_hp, Asym_Cahn_hp, Asym_Cos2Phi_hm, Asym_BM_hm, Asym_Cahn_hm;/*}}}*/
 
     /*New ROOT files, Trees and  Branches{{{*/
     //create filename
@@ -207,7 +228,29 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
     t1->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
     t1->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
+
+    t1->Branch("Asym_Cos2Phi_p_hp", &Asym_Cos2Phi_p_hp, "data/D");
+    t1->Branch("Asym_Cahn_p_hp",    &Asym_Cahn_p_hp,    "data/D");
+    t1->Branch("Asym_BM_p_hp",      &Asym_BM_p_hp,      "data/D");
+    t1->Branch("Asym_Cos2Phi_p_hm", &Asym_Cos2Phi_p_hm, "data/D");
+    t1->Branch("Asym_Cahn_p_hm",    &Asym_Cahn_p_hm,    "data/D");
+    t1->Branch("Asym_BM_p_hm",      &Asym_BM_p_hm,      "data/D");
+ 
+    t1->Branch("Asym_Cos2Phi_n_hp", &Asym_Cos2Phi_n_hp, "data/D");
+    t1->Branch("Asym_Cahn_n_hp",    &Asym_Cahn_n_hp,    "data/D");
+    t1->Branch("Asym_BM_n_hp",      &Asym_BM_n_hp,      "data/D");
+    t1->Branch("Asym_Cos2Phi_n_hm", &Asym_Cos2Phi_n_hm, "data/D");
+    t1->Branch("Asym_Cahn_n_hm",    &Asym_Cahn_n_hm,    "data/D");
+    t1->Branch("Asym_BM_n_hm",      &Asym_BM_n_hm,      "data/D");
+
+    t1->Branch("Asym_Cos2Phi_hp", &Asym_Cos2Phi_hp, "data/D");
+    t1->Branch("Asym_Cahn_hp",    &Asym_Cahn_hp,    "data/D");
+    t1->Branch("Asym_BM_hp",      &Asym_BM_hp,      "data/D");
+    t1->Branch("Asym_Cos2Phi_hm", &Asym_Cos2Phi_hm, "data/D");
+    t1->Branch("Asym_Cahn_hm",    &Asym_Cahn_hm,    "data/D");
+    t1->Branch("Asym_BM_hm",      &Asym_BM_hm,      "data/D");
     /*}}}*/
+
 
     TString filename2 = Form("%s_2_%d.root",filename0.Data(), Int_t(FileNo));
     if(bXSMode)
@@ -215,7 +258,7 @@ int main(Int_t argc, char *argv[]){
     TFile *file2 = new TFile(filename2,"RECREATE");
     TTree *t2 = new TTree("T","T");
     t2->SetDirectory(file2);
-    if(config=="SoLID" || config=="EIC" || bXSMode ){ //If it is in bXSModle, t1 save hp events and t2 save hm events
+    if(config=="SoLID" || config=="CLAS12" || config=="EIC" || bXSMode ){ //If it is in bXSModle, t1 save hp events and t2 save hm events
         t2->Branch("Q2",&Q2,"data/D");/*{{{*/
         t2->Branch("W",&W,"data/D");
         t2->Branch("Wp",&Wp,"data/D");
@@ -264,7 +307,27 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
         t2->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
         t2->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-        /*}}}*/
+
+        t2->Branch("Asym_Cos2Phi_p_hp", &Asym_Cos2Phi_p_hp, "data/D");
+        t2->Branch("Asym_Cahn_p_hp",    &Asym_Cahn_p_hp,    "data/D");
+        t2->Branch("Asym_BM_p_hp",      &Asym_BM_p_hp,      "data/D");
+        t2->Branch("Asym_Cos2Phi_p_hm", &Asym_Cos2Phi_p_hm, "data/D");
+        t2->Branch("Asym_Cahn_p_hm",    &Asym_Cahn_p_hm,    "data/D");
+        t2->Branch("Asym_BM_p_hm",      &Asym_BM_p_hm,      "data/D");
+
+        t2->Branch("Asym_Cos2Phi_n_hp", &Asym_Cos2Phi_n_hp, "data/D");
+        t2->Branch("Asym_Cahn_n_hp",    &Asym_Cahn_n_hp,    "data/D");
+        t2->Branch("Asym_BM_n_hp",      &Asym_BM_n_hp,      "data/D");
+        t2->Branch("Asym_Cos2Phi_n_hm", &Asym_Cos2Phi_n_hm, "data/D");
+        t2->Branch("Asym_Cahn_n_hm",    &Asym_Cahn_n_hm,    "data/D");
+        t2->Branch("Asym_BM_n_hm",      &Asym_BM_n_hm,      "data/D");
+
+        t2->Branch("Asym_Cos2Phi_hp", &Asym_Cos2Phi_hp, "data/D");
+        t2->Branch("Asym_Cahn_hp",    &Asym_Cahn_hp,    "data/D");
+        t2->Branch("Asym_BM_hp",      &Asym_BM_hp,      "data/D");
+        t2->Branch("Asym_Cos2Phi_hm", &Asym_Cos2Phi_hm, "data/D");
+        t2->Branch("Asym_Cahn_hm",    &Asym_Cahn_hm,    "data/D");
+        t2->Branch("Asym_BM_hm",      &Asym_BM_hm,      "data/D");        /*}}}*/
     }
 
     TString filename3 = Form("%s_3_%d.root",filename0.Data(), Int_t(FileNo));
@@ -326,7 +389,27 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
         t3->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
         t3->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-        /*}}}*/
+
+        t3->Branch("Asym_Cos2Phi_p_hp", &Asym_Cos2Phi_p_hp, "data/D");
+        t3->Branch("Asym_Cahn_p_hp",    &Asym_Cahn_p_hp,    "data/D");
+        t3->Branch("Asym_BM_p_hp",      &Asym_BM_p_hp,      "data/D");
+        t3->Branch("Asym_Cos2Phi_p_hm", &Asym_Cos2Phi_p_hm, "data/D");
+        t3->Branch("Asym_Cahn_p_hm",    &Asym_Cahn_p_hm,    "data/D");
+        t3->Branch("Asym_BM_p_hm",      &Asym_BM_p_hm,      "data/D");
+
+        t3->Branch("Asym_Cos2Phi_n_hp", &Asym_Cos2Phi_n_hp, "data/D");
+        t3->Branch("Asym_Cahn_n_hp",    &Asym_Cahn_n_hp,    "data/D");
+        t3->Branch("Asym_BM_n_hp",      &Asym_BM_n_hp,      "data/D");
+        t3->Branch("Asym_Cos2Phi_n_hm", &Asym_Cos2Phi_n_hm, "data/D");
+        t3->Branch("Asym_Cahn_n_hm",    &Asym_Cahn_n_hm,    "data/D");
+        t3->Branch("Asym_BM_n_hm",      &Asym_BM_n_hm,      "data/D");
+
+        t3->Branch("Asym_Cos2Phi_hp", &Asym_Cos2Phi_hp, "data/D");
+        t3->Branch("Asym_Cahn_hp",    &Asym_Cahn_hp,    "data/D");
+        t3->Branch("Asym_BM_hp",      &Asym_BM_hp,      "data/D");
+        t3->Branch("Asym_Cos2Phi_hm", &Asym_Cos2Phi_hm, "data/D");
+        t3->Branch("Asym_Cahn_hm",    &Asym_Cahn_hm,    "data/D");
+        t3->Branch("Asym_BM_hm",      &Asym_BM_hm,      "data/D");            /*}}}*/
 
         t4->Branch("Q2",&Q2,"data/D");/*{{{*/
         t4->Branch("W",&W,"data/D");
@@ -376,7 +459,27 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
         t4->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
         t4->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-        /*}}}*/
+        
+        t4->Branch("Asym_Cos2Phi_p_hp", &Asym_Cos2Phi_p_hp, "data/D");
+        t4->Branch("Asym_Cahn_p_hp",    &Asym_Cahn_p_hp,    "data/D");
+        t4->Branch("Asym_BM_p_hp",      &Asym_BM_p_hp,      "data/D");
+        t4->Branch("Asym_Cos2Phi_p_hm", &Asym_Cos2Phi_p_hm, "data/D");
+        t4->Branch("Asym_Cahn_p_hm",    &Asym_Cahn_p_hm,    "data/D");
+        t4->Branch("Asym_BM_p_hm",      &Asym_BM_p_hm,      "data/D");
+
+        t4->Branch("Asym_Cos2Phi_n_hp", &Asym_Cos2Phi_n_hp, "data/D");
+        t4->Branch("Asym_Cahn_n_hp",    &Asym_Cahn_n_hp,    "data/D");
+        t4->Branch("Asym_BM_n_hp",      &Asym_BM_n_hp,      "data/D");
+        t4->Branch("Asym_Cos2Phi_n_hm", &Asym_Cos2Phi_n_hm, "data/D");
+        t4->Branch("Asym_Cahn_n_hm",    &Asym_Cahn_n_hm,    "data/D");
+        t4->Branch("Asym_BM_n_hm",      &Asym_BM_n_hm,      "data/D");
+
+        t4->Branch("Asym_Cos2Phi_hp", &Asym_Cos2Phi_hp, "data/D");
+        t4->Branch("Asym_Cahn_hp",    &Asym_Cahn_hp,    "data/D");
+        t4->Branch("Asym_BM_hp",      &Asym_BM_hp,      "data/D");
+        t4->Branch("Asym_Cos2Phi_hm", &Asym_Cos2Phi_hm, "data/D");
+        t4->Branch("Asym_Cahn_hm",    &Asym_Cahn_hm,    "data/D");
+        t4->Branch("Asym_BM_hm",      &Asym_BM_hm,      "data/D");    /*}}}*/
     }
 
     /*}}}*/
@@ -469,7 +572,7 @@ int main(Int_t argc, char *argv[]){
             //For EIC  
             if( (config=="EIC" && z>0.2&&z<0.9
                         &&((count[0]<number_of_events)|| (count[1]<number_of_events)))
-                    ||(config=="SoLID" && z>0.3&&z<0.7 
+                    ||((config=="SoLID"||config=="CLAS12") && z>0.3&&z<0.7 
                         &&((count[0]<number_of_events)|| (count[1]<number_of_events)))
                     ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events)){
 
@@ -479,7 +582,28 @@ int main(Int_t argc, char *argv[]){
                 dxs_hm = sidis->GetXS_HM();
                 dilute_hp = sidis->GetDilute_HP();
                 dilute_hm = sidis->GetDilute_HM();
-                
+
+                Asym_Cos2Phi_hp = sidis->Asym_Cos2Phi_hp;
+                Asym_Cahn_hp = sidis->Asym_Cahn_hp;
+                Asym_BM_hp = sidis->Asym_BM_hp;
+                Asym_Cos2Phi_hm = sidis->Asym_Cos2Phi_hm;
+                Asym_Cahn_hm = sidis->Asym_Cahn_hm;
+                Asym_BM_hm = sidis->Asym_BM_hm;
+
+                Asym_Cos2Phi_p_hp = sidis->Asym_Cos2Phi_p_hp;
+                Asym_Cahn_p_hp = sidis->Asym_Cahn_p_hp;
+                Asym_BM_p_hp = sidis->Asym_BM_p_hp;
+                Asym_Cos2Phi_p_hm = sidis->Asym_Cos2Phi_p_hm;
+                Asym_Cahn_p_hm = sidis->Asym_Cahn_p_hm;
+                Asym_BM_p_hm = sidis->Asym_BM_p_hm;
+
+                Asym_Cos2Phi_n_hp = sidis->Asym_Cos2Phi_n_hp;
+                Asym_Cahn_n_hp = sidis->Asym_Cahn_n_hp;
+                Asym_BM_n_hp = sidis->Asym_BM_n_hp;
+                Asym_Cos2Phi_n_hm = sidis->Asym_Cos2Phi_n_hm;
+                Asym_Cahn_n_hm = sidis->Asym_Cahn_n_hm;
+                Asym_BM_n_hm = sidis->Asym_BM_n_hm;
+
                 u_pdf = sidis->get_uA();
                 d_pdf = sidis->get_dA();
                 s_pdf = sidis->get_s();
@@ -640,7 +764,7 @@ int main(Int_t argc, char *argv[]){
                 cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
             }
             //judging exitcondition/*{{{*/
-            if (config=="EIC"||config=="SoLID") {
+            if (config=="EIC"||config=="SoLID"||config=="CLAS12") {
                 if (count[0] < number_of_events || count[1] < number_of_events 
                    ) exitcondition=true;
                 else exitcondition=false;
@@ -658,7 +782,7 @@ int main(Int_t argc, char *argv[]){
                             ||(count[1]<number_of_events&&pt>1.0&&Q2<=10.)
                             ||(count[2]<number_of_events&&pt<=1.0&&Q2>10.)
                             ||(count[3]<number_of_events&&pt>1.0&&Q2>10.)))
-                    ||(config=="SoLID" && z>0.3&&z<0.7 
+                    ||((config=="SoLID"||config=="CLAS12") && z>0.3&&z<0.7 
                         &&(   (count[0]<number_of_events&&pt<=1.0)
                             ||(count[1]<number_of_events&&pt>1.0)))
                     ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events))
@@ -671,6 +795,27 @@ int main(Int_t argc, char *argv[]){
                 dilute_hp = sidis->GetDilute_HP();
                 dilute_hm = sidis->GetDilute_HM();
                 
+                Asym_Cos2Phi_hp = sidis->Asym_Cos2Phi_hp;
+                Asym_Cahn_hp = sidis->Asym_Cahn_hp;
+                Asym_BM_hp = sidis->Asym_BM_hp;
+                Asym_Cos2Phi_hm = sidis->Asym_Cos2Phi_hm;
+                Asym_Cahn_hm = sidis->Asym_Cahn_hm;
+                Asym_BM_hm = sidis->Asym_BM_hm;
+
+                Asym_Cos2Phi_p_hp = sidis->Asym_Cos2Phi_p_hp;
+                Asym_Cahn_p_hp = sidis->Asym_Cahn_p_hp;
+                Asym_BM_p_hp = sidis->Asym_BM_p_hp;
+                Asym_Cos2Phi_p_hm = sidis->Asym_Cos2Phi_p_hm;
+                Asym_Cahn_p_hm = sidis->Asym_Cahn_p_hm;
+                Asym_BM_p_hm = sidis->Asym_BM_p_hm;
+
+                Asym_Cos2Phi_n_hp = sidis->Asym_Cos2Phi_n_hp;
+                Asym_Cahn_n_hp = sidis->Asym_Cahn_n_hp;
+                Asym_BM_n_hp = sidis->Asym_BM_n_hp;
+                Asym_Cos2Phi_n_hm = sidis->Asym_Cos2Phi_n_hm;
+                Asym_Cahn_n_hm = sidis->Asym_Cahn_n_hm;
+                Asym_BM_n_hm = sidis->Asym_BM_n_hm;
+
                 u_pdf = sidis->get_uA();
                 d_pdf = sidis->get_dA();
                 s_pdf = sidis->get_s();
@@ -810,7 +955,7 @@ int main(Int_t argc, char *argv[]){
                 /*}}}*/
 
                 /*Fill ROOT{{{*/
-                if(config=="SoLID"||config=="EIC"){
+                if(config=="SoLID"||config=="CLAS12"||config=="EIC"){
                     if(Q2<=10.&&pt<=1.0){
                         t1->Fill();
                         count[0] ++;//cout << 0 << " " << count[0] << endl;
@@ -848,7 +993,7 @@ int main(Int_t argc, char *argv[]){
                         || count[2] < number_of_events || count[3] < number_of_events) exitcondition=true;
                 else exitcondition=false;
             } 
-            else if (config=="SoLID") {
+            else if (config=="SoLID"||config=="CLAS12") {
                 if (count[0] < number_of_events || count[1] < number_of_events) exitcondition=true;
                 else exitcondition=false;
             } 
@@ -865,7 +1010,7 @@ int main(Int_t argc, char *argv[]){
 
     file1->Write();/*{{{*/
     file1->Close();
-    if(config=="SoLID" || config=="EIC" ){
+    if(config=="SoLID" || config=="CLAS12" || config=="EIC" ){
         file2->Write();
         file2->Close();
     }
@@ -931,7 +1076,7 @@ int main(Int_t argc, char *argv[]){
         f1->Close();
         /*}}}*/
 
-        if(config=="SoLID" || config=="EIC" ){
+        if(config=="SoLID" || config=="CLAS12" || config=="EIC" ){
             /*Generate weights for file2{{{*/
             cout<<"--- Now insert weights to Root-file #2"<<filename2.Data()<<endl;
             TFile *f2 = new TFile(filename2.Data(), "update");
@@ -1062,6 +1207,11 @@ int main(Int_t argc, char *argv[]){
         }
     }
     /*}}}*/
+	
+    if(!(config=="EIC") ){
+        gSystem->Exec(Form("rm -f %s" , filename3.Data()));
+        gSystem->Exec(Form("rm -f %s" , filename4.Data()));
+    }
 
     return 0;
     }

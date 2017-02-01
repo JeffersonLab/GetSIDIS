@@ -119,5 +119,4 @@ GetSIDIS.o GetSIDIS.d : GetSIDIS.C GetSIDIS.h \
  /u/apps/root/5.34.13/root/include/TApplicationImp.h \
  /u/apps/root/5.34.13/root/include/Rtypes.h \
  /u/apps/root/5.34.13/root/include/TTree.h \
- /home/yez/work/cteq-pdf-1.0.4/include/cteq/cteqpdf.h \
- ../eps09_cxx//eps09.h
+ ../CTEQ6/cteq-pdf-1.0.4/include/cteq/cteqpdf.h ../eps09_cxx//eps09.h

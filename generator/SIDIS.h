@@ -65,6 +65,7 @@ using namespace LHAPDF;
 //char *LHAPDF_Dir = std::getenv("LHAPDF");
 const double DEG=180./3.1415926;
 const double PI=3.1415926;
+const double EXP = exp(1.);
 const double GeV2_to_nbarn = 0.3894 * 1e6; //GeV^2 to nbarn
 //ofstream outlog("pdf_check.dat");
 class SIDIS
@@ -492,6 +493,12 @@ class SIDIS
             }
             /*}}}*/
 
+            //Caculate Boer-Mulder TMD Asymmetry (A= dXS*cos2phi/dXS
+            double Asym_BM_hp, Asym_BM_hm;
+            double Asym_BM_all[4];
+            pt_tmp = pt;
+            int kErrBM = GetAsym_Cos2Phi(x, y, z, Q2, pt_tmp, phi_h, &Asym_BM_hp, &Asym_BM_hm, &Asym_BM_all[0]);
+
             /*try to take care of the decay{{{*/
             double decay_part = 0.0;
             if (abs(particle_flag)==1){
@@ -626,6 +633,234 @@ class SIDIS
 
             fg =  iR_g * g;
         }/*}}}*/
+        
+        /*GetAsym_Cos2Phi(){{{*/
+        //The unpolarized SIDIS XS is already a six-fold differential function of (x,y,z, pT, phi_S, phi_h)
+        //while the pT dependence is modeled by Gaussian Ansetz, while the smearing is given by:
+        //
+        //   //first method 	 
+        //        bpt_p = 1./(0.2+z*z*0.25);// 
+        //        bpt_m = bpt_p; 
+        //   where the intial values in Xin's old code
+        //        <pt^2> = 0.2 GeV^2 (quark internal momentum)
+        //        <kt^2> = 0.25 GeV^2 (struck quark internal momentum)
+        //   Using Anselmino 2014 Fit, JHEP 04 (2014)005
+        //        <pt^2> = 0.57+/-0.08 GeV^2 (quark internal momentum)
+        //        <kt^2> = 0.12+/-0.01 GeV^2 (struck quark internal momentum)
+        //
+        //   //or, second method  use the original value
+        //        // bpt_m=4.694; // HERMES parameterization
+        //        // bpt_p=4.661;
+        //pT Broadening has been considered for nuclear targets
+        //And the SIDIS cross section is:
+        //  *dxs_hp = (*dxs_hp)*bpt_p/PI*exp(-bpt_p*pt_tmp*pt_tmp)*x;
+        //  *dxs_hm = (*dxs_hm)*bpt_m/PI*exp(-bpt_m*pt_tmp*pt_tmp)*x;
+        //
+        //Now, add the Boer-Mulder Amplitude which is the convolution of the BM-TMD and Collins FF.
+        //Besides, the Twist-4 effect, e.g. Cahn effect,can also be added 
+        //And, we also need to take into account if the target is a nucleus instead of free nucleon.
+        //
+        int GetAsym_Cos2Phi(double kXb, double kY, double kZ, double kQ2, double kPt, double kPhi, double* kA_hp, double* kA_hm, double *kA_all){
+        //Barone et. al., PRD 81, 114026 2010.
+            /*f1 and D1 {{{*/
+            const double qu=2./3.;
+            const double qd=-1./3.;
+            const double qs=-1./3.;
+            const double kMKtSQ = 0.25;//GeV^2
+            const double kMPtSQ = 0.20;//GeV^2
+            const double kMass_Proton= 0.938272;
+
+            double kD_fav=0.0, kD_unfav=0.0, kD_s = 0.0, kD_g=0.0;
+            double kMass_Hadron=0.0;
+            double kPtSQ = pow(kPt,2); 
+
+            double kA1_p_hp=0.0, kA1_n_hp =0.0;
+            double kA1_p_hm=0.0, kA1_n_hm =0.0;
+            if (fabs(particle_flag)==1) {/*{{{*/
+                kMass_Hadron = 0.13957;
+                //pion fragmentation functions
+                Unpol_FF(1,z,Q2,&kD_fav,&kD_unfav,&kD_s,&kD_g);
+
+                //proton
+                kA1_p_hp = qu*qu*fuA*kD_fav + qu*qu*fubar*kD_unfav + qd*qd*fdA*kD_unfav + qd*qd*fdbar*kD_fav + qs*qs*fs*kD_s + qs*qs*fsbar*kD_s;
+                kA1_p_hm = qu*qu*fuA*kD_unfav + qu*qu*fubar*kD_fav + qd*qd*fdA*kD_fav + qd*qd*fdbar*kD_unfav + qs*qs*fs*kD_s + qs*qs*fsbar*kD_s;
+
+                //neutron
+                //u->d, d->u, ubar->dbar, dbar->ubar
+                kA1_n_hp = qu*qu*fdA*kD_fav + qu*qu*fdbar*kD_unfav + qd*qd*fuA*kD_unfav + qd*qd*fubar*kD_fav + qs*qs*fs*kD_s + qs*qs*fsbar*kD_s;
+                kA1_n_hm = qu*qu*fdA*kD_unfav + qu*qu*fdbar*kD_fav + qd*qd*fuA*kD_fav + qd*qd*fubar*kD_unfav + qs*qs*fs*kD_s + qs*qs*fsbar*kD_s;
+            }else{
+                kMass_Hadron = 0.493667;
+                //kaon, fragmentation functions
+                Unpol_FF(2,z,Q2,&kD_fav,&kD_unfav,&kD_s,&kD_g);
+
+                //proton
+                kA1_p_hp = qu*qu*fuA*kD_fav + qu*qu*fubar*kD_unfav + qd*qd*fdA*kD_s + qd*qd*fdbar*kD_s + qs*qs *fs * kD_unfav + qs*qs*fsbar*kD_fav;
+                kA1_p_hm = qu*qu*fuA*kD_unfav + qu*qu*fubar*kD_fav + qd*qd*fdA*kD_s + qd*qd*fdbar*kD_s + qs*qs *fs * kD_fav + qs*qs*fsbar*kD_unfav;
+
+                //neutron
+                //u->d, d->u, ubar->dbar, dbar->ubar
+                kA1_n_hp = qu*qu*fdA*kD_fav   + qu*qu*fdbar*kD_unfav + qd*qd*fuA*kD_s + qd*qd*fubar*kD_s + qs*qs *fs * kD_unfav + qs*qs*fsbar*kD_fav;
+                kA1_n_hm = qu*qu*fdA*kD_unfav + qu*qu*fdbar*kD_fav   + qd*qd*fuA*kD_s + qd*qd*fubar*kD_s + qs*qs *fs * kD_fav   + qs*qs*fsbar*kD_unfav;
+            }/*}}}*/
+
+            double kA2 = (PI*PI*kMKtSQ*kMPtSQ);
+            double kA3 = (pow(kMKtSQ,3)*kMPtSQ*PI*kPtSQ*pow(kZ,2))/(pow(EXP,kPtSQ/(kMPtSQ + kMKtSQ*pow(kZ,2)))*kQ2*pow(kMPtSQ + kMKtSQ*pow(kZ,2),3));
+            double kA_p_hp = kA1_p_hp/kA2 * kA3;
+            double kA_p_hm = kA1_p_hm/kA2 * kA3;
+            double kA_n_hp = kA1_n_hp/kA2 * kA3;
+            double kA_n_hm = kA1_n_hm/kA2 * kA3;
+
+            double kC3 = (kMKtSQ*kMPtSQ*PI)/(pow(EXP,kPtSQ/(kMPtSQ + kMKtSQ*pow(kZ,2)))*(kMPtSQ + kMKtSQ*pow(kZ,2)));
+            double kC_p_hp = kA1_p_hp/kA2 * kC3;
+            double kC_p_hm = kA1_p_hm/kA2 * kC3;
+            double kC_n_hp = kA1_n_hp/kA2 * kC3;
+            double kC_n_hm = kA1_n_hm/kA2 * kC3;
+
+            //cout<<Form("A: 1 = %f, 2 = %f, 3 = %f, C=%f", kA1_p_hp, kA2, kA3, kC3)<<endl;
+            
+            /*}}}*/
+
+            /*Boer Mulder TMD and Collins FF{{{*/
+            /*BM-TMD: Fitting from Barone et. al., PRD 81, 114026 2010{{{*/
+            const double kAu = -0.35;
+            const double kAd = 0.90;
+            const double kAs = 0.24;
+            //const double kAubar = -0.04;
+            //const double kAdbar = 0.40;
+            //const double kAsbar = -1.0;
+            const double kAlphaU = 0.73; 
+            const double kAlphaD = 1.08; 
+            const double kAlphaSea = 0.79; 
+            const double kBeta = 3.46; 
+            const double kM1SQ = 0.34; // (GeV/c)^2
+            const double kLambdaU = 2.0;
+            const double kLambdaD = -1.111;
+            const double kLambdaSea = 0.0; //Set to zero so far
+
+            double kEta = sqrt(2.0*EXP) * kMass_Proton/sqrt(kM1SQ);//move this term into the integral (kB3) exp(-kKt*kKt/kMcSQ);
+            double kRhoU = kAu*pow(kXb,kAlphaU)*pow((1-kXb),kBeta)
+                *pow((kAlphaU+kBeta),(kAlphaU+kBeta))/pow(kAlphaU, kAlphaU)/pow(kBeta, kBeta);
+            double kRhoD = kAd*pow(kXb,kAlphaD)*pow((1-kXb),kBeta)
+                *pow((kAlphaD+kBeta),(kAlphaD+kBeta))/pow(kAlphaD, kAlphaD)/pow(kBeta, kBeta);
+            double kRhoSea = kAs*pow(kXb,kAlphaSea)*pow((1-kXb),kBeta)
+                *pow((kAlphaSea+kBeta),(kAlphaSea+kBeta))/pow(kAlphaSea, kAlphaSea)/pow(kBeta, kBeta);
+            
+            //Now constract h1_perp (BM) for different quark:
+            double kU_BM = kLambdaU * kRhoU * kEta * fuA;
+            double kD_BM = kLambdaD * kRhoD * kEta * fdA;
+            double kUbar_BM = kLambdaSea * kRhoSea * kEta * fubar;
+            double kDbar_BM = kLambdaSea * kRhoSea * kEta * fdbar;
+            double kS_BM = kLambdaSea * kRhoSea * kEta * fs;
+            double kSbar_BM = kLambdaSea * kRhoSea * kEta * fsbar;
+            /*}}}*/
+
+            /*Collins FF(){{{*/
+            //BM-TMD: Fitting from Barone et. al., PRD 81, 114026 2010.
+            const double kAc_fav = 0.44;
+            const double kAc_unfav = -1.00;
+            const double kGamma = 0.96;
+            const double kDelta = 0.01;
+            const double kMcSQ = 0.91; //GeV^2/c
+
+            const double kRhoC = pow(kZ,kGamma)*pow((1-kZ),kDelta)
+                *pow((kGamma+kDelta),(kGamma+kDelta))/pow(kGamma, kGamma)/pow(kDelta, kDelta);
+            const double kEtaC = sqrt(2.0*EXP) * kZ * kMass_Hadron/sqrt(kMcSQ);//moving into the integral in B3: * exp(-kP_perp*kP_perp/kMcSQ);
+
+            double kH_fav = kAc_fav * kRhoC * kEtaC * kD_fav;
+            double kH_unfav = kAc_unfav * kRhoC * kEtaC * kD_unfav;
+            double kH_s = 0.0; //set to zero temperately
+            //double kH_g = 0.0; //set to zero temperately
+            /*}}}*/
+
+            double kB1_p_hp=0.0, kB1_n_hp =0.0;
+            double kB1_p_hm=0.0, kB1_n_hm =0.0;
+            if (fabs(particle_flag)==1) {/*{{{*/
+                //proton
+                kB1_p_hp = qu*qu*kU_BM*kH_fav + qu*qu*kUbar_BM*kH_unfav + qd*qd*kD_BM*kH_unfav + qd*qd*kDbar_BM*kH_fav + qs*qs*kS_BM*kH_s + qs*qs*kSbar_BM*kH_s;
+                kB1_p_hm = qu*qu*kU_BM*kH_unfav + qu*qu*kUbar_BM*kH_fav + qd*qd*kD_BM*kH_fav + qd*qd*kDbar_BM*kH_unfav + qs*qs*kS_BM*kH_s + qs*qs*kSbar_BM*kH_s;
+
+                //neutron
+                //u->d, d->u, ubar->dbar, dbar->ubar
+                kB1_n_hp = qu*qu*kD_BM*kH_fav + qu*qu*kDbar_BM*kH_unfav + qd*qd*kU_BM*kH_unfav + qd*qd*kUbar_BM*kH_fav + qs*qs*kS_BM*kH_s + qs*qs*kSbar_BM*kH_s;
+                kB1_n_hm = qu*qu*kD_BM*kH_unfav + qu*qu*kDbar_BM*kH_fav + qd*qd*kU_BM*kH_fav + qd*qd*kUbar_BM*kH_unfav + qs*qs*kS_BM*kH_s + qs*qs*kSbar_BM*kH_s;
+            }else{
+                //proton
+                kB1_p_hp = qu*qu*kU_BM*kH_fav + qu*qu*kUbar_BM*kH_unfav + qd*qd*kD_BM*kH_s + qd*qd*kDbar_BM*kH_s + qs*qs *kS_BM * kH_unfav + qs*qs*kSbar_BM*kH_fav;
+                kB1_p_hm = qu*qu*kU_BM*kH_unfav + qu*qu*kUbar_BM*kH_fav + qd*qd*kD_BM*kH_s + qd*qd*kDbar_BM*kH_s + qs*qs *kS_BM * kH_fav + qs*qs*kSbar_BM*kH_unfav;
+
+                //neutron
+                //u->d, d->u, ubar->dbar, dbar->ubar
+                kB1_n_hp = qu*qu*kD_BM*kH_fav   + qu*qu*kDbar_BM*kH_unfav + qd*qd*kU_BM*kH_s + qd*qd*kUbar_BM*kH_s + qs*qs *kS_BM * kH_unfav + qs*qs*kSbar_BM*kH_fav;
+                kB1_n_hm = qu*qu*kD_BM*kH_unfav + qu*qu*kDbar_BM*kH_fav   + qd*qd*kU_BM*kH_s + qd*qd*kUbar_BM*kH_s + qs*qs *kS_BM * kH_fav   + qs*qs*kSbar_BM*kH_unfav;
+            }/*}}}*/
+
+            double kB2 = PI*PI*kMKtSQ*kMPtSQ;
+            double kB3 = (pow(kM1SQ,2)*kMcSQ*pow(kMKtSQ,2)*kMPtSQ*PI*sqrt(kPtSQ)
+                    *(pow(kMcSQ,2)*kMKtSQ*pow(kMPtSQ,2)*sqrt((pow(kMcSQ + kMPtSQ,2)*kPtSQ*pow(kZ,2))/(pow(kMcSQ,2)*pow(kMPtSQ,2))) 
+                        - kM1SQ*(kMKtSQ*pow(kMPtSQ,2)*sqrt(kPtSQ)*pow(kZ,3) 
+                            - kMcSQ*kMKtSQ*kMPtSQ*pow(kZ,2)*(-2*sqrt(kPtSQ)*kZ + kMPtSQ*sqrt((pow(kMcSQ + kMPtSQ,2)*kPtSQ*pow(kZ,2))/(pow(kMcSQ,2)*pow(kMPtSQ,2)))) 
+                            + pow(kMcSQ,2)*(-(pow(kMPtSQ,2)*sqrt((pow(kMcSQ + kMPtSQ,2)*kPtSQ*pow(kZ,2))/(pow(kMcSQ,2)*pow(kMPtSQ,2)))) 
+                                + kMKtSQ*pow(kZ,2)*(sqrt(kPtSQ)*kZ - kMPtSQ*sqrt((pow(kMcSQ + kMPtSQ,2)*kPtSQ*pow(kZ,2))/(pow(kMcSQ,2)*pow(kMPtSQ,2))))))))
+                /(pow(EXP,((kM1SQ + kMKtSQ)*(kMcSQ + kMPtSQ)*kPtSQ)/(kMcSQ*kMKtSQ*kMPtSQ + kM1SQ*(kMKtSQ*kMPtSQ*pow(kZ,2) + kMcSQ*(kMPtSQ + kMKtSQ*pow(kZ,2)))))
+                        *kMass_Proton*kMass_Hadron*kZ*pow(kMcSQ*kMKtSQ*kMPtSQ + kM1SQ*(kMKtSQ*kMPtSQ*pow(kZ,2) + kMcSQ*(kMPtSQ + kMKtSQ*pow(kZ,2))),3));
+
+            double kB_p_hp = kB1_p_hp / kB2 * kB3;
+            double kB_p_hm = kB1_p_hm / kB2 * kB3;
+            double kB_n_hp = kB1_n_hp / kB2 * kB3;
+            double kB_n_hm = kB1_n_hm / kB2 * kB3;
+
+            //cout<<Form("B: 1 = %f, 2 = %f, 3 = %f", kB1_p_hp, kB2, kB3)<<endl;
+            /*}}}*/
+
+            double kNorm = 4.0*(1.0-kY)/(1.0+pow((1.0+kY), 2));
+
+            double kACos2Phi_p_hp = kNorm*(kA_p_hp + kB_p_hp/2.0)/kC_p_hp;
+            double kACos2Phi_n_hp = kNorm*(kA_n_hp + kB_n_hp/2.0)/kC_n_hp;
+            double kACos2Phi_p_hm = kNorm*(kA_p_hm + kB_p_hm/2.0)/kC_p_hm;
+            double kACos2Phi_n_hm = kNorm*(kA_n_hm + kB_n_hm/2.0)/kC_n_hp;
+
+            Asym_Cos2Phi_p_hp = kNorm*(kA_p_hp + kB_p_hp/2.0)/kC_p_hp;
+            Asym_Cos2Phi_p_hm = kNorm*(kA_p_hm + kB_p_hm/2.0)/kC_p_hm;
+            Asym_Cos2Phi_n_hp = kNorm*(kA_n_hp + kB_n_hp/2.0)/kC_n_hp;
+            Asym_Cos2Phi_n_hm = kNorm*(kA_n_hm + kB_n_hm/2.0)/kC_n_hm;
+            
+            Asym_Cahn_p_hp = kNorm*(kA_p_hp)/kC_p_hp;
+            Asym_Cahn_p_hm = kNorm*(kA_p_hm)/kC_p_hm;
+            Asym_Cahn_n_hp = kNorm*(kA_n_hp)/kC_n_hp;
+            Asym_Cahn_n_hm = kNorm*(kA_n_hm)/kC_n_hm;
+
+            Asym_BM_p_hp = kNorm*(kB_p_hp/2.0)/kC_p_hp;
+            Asym_BM_p_hm = kNorm*(kB_p_hm/2.0)/kC_p_hm;
+            Asym_BM_n_hp = kNorm*(kB_n_hp/2.0)/kC_n_hp;
+            Asym_BM_n_hm = kNorm*(kB_n_hm/2.0)/kC_n_hm;
+
+            *(kA_all+0) = kACos2Phi_p_hp;
+            *(kA_all+1) = kACos2Phi_n_hp;
+            *(kA_all+2) = kACos2Phi_p_hm;
+            *(kA_all+3) = kACos2Phi_n_hm;
+
+            //*kA_hp = (kACos2Phi_p_hp*fZ+kACos2Phi_n_hp*(fA-fZ));
+            //*kA_hp = (kACos2Phi_p_hm*fZ+kACos2Phi_n_hm*(fA-fZ));
+
+            *kA_hp = kNorm*( (kA_p_hp*fA+kA_n_hp*(fA-fZ)) + (kB_p_hp*fA+kB_n_hp*(fA-fZ))/2.0 )/( kC_p_hp*fA+kC_n_hp*(fA-fZ) );
+            *kA_hm = kNorm*( (kA_p_hm*fA+kA_n_hm*(fA-fZ)) + (kB_p_hm*fA+kB_n_hm*(fA-fZ))/2.0 )/( kC_p_hm*fA+kC_n_hm*(fA-fZ) );
+
+            Asym_Cos2Phi_hp = kNorm*( (kA_p_hp*fA+kA_n_hp*(fA-fZ)) + (kB_p_hp*fA+kB_n_hp*(fA-fZ))/2.0 )/( kC_p_hp*fA+kC_n_hp*(fA-fZ) );
+            Asym_Cos2Phi_hm = kNorm*( (kA_p_hm*fA+kA_n_hm*(fA-fZ)) + (kB_p_hm*fA+kB_n_hm*(fA-fZ))/2.0 )/( kC_p_hm*fA+kC_n_hm*(fA-fZ) );
+
+            Asym_Cahn_hp = kNorm*( (kA_p_hp*fA+kA_n_hp*(fA-fZ)) )/( kC_p_hp*fA+kC_n_hp*(fA-fZ) );
+            Asym_Cahn_hm = kNorm*( (kA_p_hm*fA+kA_n_hm*(fA-fZ)) )/( kC_p_hm*fA+kC_n_hm*(fA-fZ) );
+
+            Asym_BM_hp = kNorm*( (kB_p_hp*fA+kB_n_hp*(fA-fZ))/2.0 )/( kC_p_hp*fA+kC_n_hp*(fA-fZ) );
+            Asym_BM_hm = kNorm*( (kB_p_hm*fA+kB_n_hm*(fA-fZ))/2.0 )/( kC_p_hm*fA+kC_n_hm*(fA-fZ) );
+
+            if(isnan(*kA_hp) || isnan(*kA_hp))
+                return -1;
+            else
+                return 0;
+        }
+        /*}}}*/
 
         /*Return Values{{{*/
 
@@ -891,7 +1126,7 @@ class SIDIS
             double D_fav,D_unfav,D_s,D_g;
             if (fabs(particle_flag)==1) {
                 //pion fragmentation functions
-                un_ff(1,z,Q2,&D_fav,&D_unfav,&D_s,&D_g);
+                Unpol_FF(1,z,Q2,&D_fav,&D_unfav,&D_s,&D_g);
 
                 //proton
                 df_p_hp = qu*qu*uquark*D_fav + qu*qu*ubarquark*D_unfav + qd*qd*dquark*D_unfav + qd*qd*dbarquark*D_fav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s;
@@ -903,7 +1138,7 @@ class SIDIS
                 df_n_hm = qu*qu*dquark*D_unfav + qu*qu*dbarquark*D_fav + qd*qd*uquark*D_fav + qd*qd*ubarquark*D_unfav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s;
             }else{
                 //kaon, fragmentation functions
-                un_ff(2,z,Q2,&D_fav,&D_unfav,&D_s,&D_g);
+                Unpol_FF(2,z,Q2,&D_fav,&D_unfav,&D_s,&D_g);
 
                 //proton
                 df_p_hp = qu*qu*uquark*D_fav + qu*qu*ubarquark*D_unfav + qd*qd*dquark*D_s + qd*qd*dbarquark*D_s + qs*qs *squark * D_unfav + qs*qs*sbarquark*D_fav;
@@ -1037,7 +1272,7 @@ class SIDIS
 
                 if (fabs(particle_flag)==1){
                     //pion fragmentation function
-                    un_ff(1,z/zp,Q2,&D_fav,&D_unfav,&D_s,&D_g);
+                    Unpol_FF(1,z/zp,Q2,&D_fav,&D_unfav,&D_s,&D_g);
                     //proton
                     df_p_hp += Pqq*(qu*qu*uquark*D_fav + qu*qu*ubarquark*D_unfav + qd*qd*dquark*D_unfav + qd*qd*dbarquark*D_fav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s) + Pqg*(qu*qu*uquark + qu*qu*ubarquark + qd*qd*dquark + qd*qd*dbarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_fav + qu*qu*D_unfav + qd*qd*D_unfav + qd*qd*D_fav + qs*qs*D_s + qs*qs*D_s);
                     df_p_hm += Pqq*(qu*qu*uquark*D_unfav + qu*qu*ubarquark*D_fav + qd*qd*dquark*D_fav + qd*qd*dbarquark*D_unfav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s) + Pqg*(qu*qu*uquark + qu*qu*ubarquark + qd*qd*dquark + qd*qd*dbarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_fav + qd*qd*D_unfav + qs*qs*D_s + qs*qs*D_s);
@@ -1048,7 +1283,7 @@ class SIDIS
                     df_n_hm += Pqq*(qu*qu*dquark*D_unfav + qu*qu*dbarquark*D_fav + qd*qd*uquark*D_fav + qd*qd*ubarquark*D_unfav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s) + Pqg*(qu*qu*dquark + qu*qu*dbarquark + qd*qd*uquark + qd*qd*ubarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_fav + qd*qd*D_unfav + qs*qs*D_s + qs*qs*D_s);
                 }else{
                     //kaon fragmentation functions
-                    un_ff(2,z/zp,Q2,&D_fav,&D_unfav,&D_s,&D_g);
+                    Unpol_FF(2,z/zp,Q2,&D_fav,&D_unfav,&D_s,&D_g);
 
                     //proton
                     df_p_hp += Pqq*(qu*qu*uquark*D_fav + qu*qu*ubarquark*D_unfav + qd*qd*dquark*D_s + qd*qd*dbarquark*D_s + qs*qs *squark * D_unfav + qs*qs*sbarquark*D_fav) + Pqg*(qu*qu*uquark + qu*qu*ubarquark + qd*qd*dquark + qd*qd*dbarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_s + qd*qd*D_s + qs*qs*D_fav + qs*qs*D_unfav);
@@ -1070,12 +1305,12 @@ class SIDIS
             *(dxs_all+3) = *dxs_hm * df_n_hm/x;
 
             *dxs_hp = *dxs_hp * (df_p_hp*fZ+df_n_hp*(fA-fZ))/x;
-            *dxs_hm = *dxs_hm * (df_p_hm*fZ+df_n_hp*(fA-fZ))/x;
+            *dxs_hm = *dxs_hm * (df_p_hm*fZ+df_n_hm*(fA-fZ))/x;
         }
         /*}}}*/
 
-        /*double un_ff(int flag, double z, double Q2, double* D_fav, double* D_unfav, double* D_s, double* D_g){{{*/
-        double un_ff(int flag, double z, double Q2, double* D_fav, double* D_unfav, double* D_s, double* D_g){
+        /*double Unpol_FF(int flag, double z, double Q2, double* D_fav, double* D_unfav, double* D_s, double* D_g){{{*/
+        double Unpol_FF(int flag, double z, double Q2, double* D_fav, double* D_unfav, double* D_s, double* D_g){
             //flag ==1 for pion, flag==2 for kaon
             double Q2zero=2.0;
             double lambda=0.227;
@@ -1286,5 +1521,25 @@ class SIDIS
         double dilute_hp;
         double dilute_hm;
 
+        double Asym_Cos2Phi_p_hp;
+        double Asym_BM_p_hp;
+        double Asym_Cahn_p_hp;
+        double Asym_Cos2Phi_p_hm;
+        double Asym_BM_p_hm;
+        double Asym_Cahn_p_hm;
+
+        double Asym_Cos2Phi_n_hp;
+        double Asym_BM_n_hp;
+        double Asym_Cahn_n_hp;
+        double Asym_Cos2Phi_n_hm;
+        double Asym_BM_n_hm;
+        double Asym_Cahn_n_hm;
+
+        double Asym_Cos2Phi_hp;
+        double Asym_BM_hp;
+        double Asym_Cahn_hp;
+        double Asym_Cos2Phi_hm;
+        double Asym_BM_hm;
+        double Asym_Cahn_hm;
         /*}}}*/
 };
