@@ -4,7 +4,9 @@
 //   This model is developed by Xin in his "collider" code. I extracted    //
 //   the cross section parts and coded it into a C++ class which can be    //
 //   easily embeded by other programs.                                     //
-//   --- Zhihong Ye, 06/09/2014                                            //
+//                                                                         //
+// ------------                                                            //
+// In this version, I used only LO PDF and remove s, sbar and g  --11/30/16//
 /////////////////////////////////////////////////////////////////////////////
 /*C/C++ Includes{{{*/
 #include <stdio.h>
@@ -53,14 +55,14 @@
 #include <TApplication.h>
 #include <Rtypes.h>
 #include <TTree.h>
-#include "LHAPDF/LHAPDF.h"
+//#include "LHAPDF/LHAPDF.h"
 //#include <TMatrix.h>
 /*}}}*/
 #include "cteqpdf.h"
 #include "eps09.h"
 
 using namespace std;
-using namespace LHAPDF;
+//using namespace LHAPDF;
 
 //char *LHAPDF_Dir = std::getenv("LHAPDF");
 const double DEG=180./3.1415926;
@@ -75,18 +77,20 @@ class SIDIS
             fModel = kModel;
             if(fModel=="EPS09"){
                 //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, 
-                fOrder = 2;
+                //fOrder = 2;
+                fOrder = 1;
                 SetEPS09();
             }
             else if(fModel=="CTEQPDF"){
                 //3->free L0 CTEQ6L1 PDF, 4->free NL0 CTEQ6.1M PDF
-                fOrder = 4;
+                //fOrder = 4;
+                fOrder = 3;
                 SetCTEQ();
             }
-            else if(fModel=="LHAPDF") {
-                SetLHAPDF();
-                fOrder = 0;
-            }
+            //else if(fModel=="LHAPDF") {
+                //SetLHAPDF();
+                //fOrder = 0;
+            //}
             else{
                 cerr<<"*** ERROR, I don't understand the XS model (not EPS09) :"<<fModel.Data()<<endl;
                 exit(-2);
@@ -96,7 +100,6 @@ class SIDIS
         virtual ~SIDIS(){/*{{{*/
             if(fModel=="CTEQPDF"||fModel=="EPS09") 
                 cteq_pdf_free(fPDF);
-            delete lhapdfs;
         }/*}}}*/
 
         /*void Print(){{{*/
@@ -119,88 +122,31 @@ class SIDIS
         /*}}}*/
 
         /*SetLHAPDF{{{*/
-        void SetLHAPDF(){
+ /*       void SetLHAPDF(){*/
             //const int SUBSET = 1;
-            //const string SETNAME = "CT10nlo";
-
-            /////////////
-            //LHAPDF5.8
-            ////////////
+            ////const string NAME = "CT10nlo";
             //const string NAME = "cteq6m";
+
             //TString LHAPDF_path=Form("%s/share/lhapdf",LHAPDF_Dir);
             //setPDFPath(LHAPDF_path.Data());
             //LHAPDF::initPDFSet(NAME, LHAPDF::LHPDF, SUBSET);
-
-            ////////////
-            //LHAPDF6
-            ///////////
-            //also: cteq6, cteq6l1,CT10nlo,nCTEQ15 etc., see https://lhapdf.hepforge.org/pdfsets.html 
-            lhapdfs = LHAPDF::mkPDF("CT10nlo");
-
-        }
+        /*}*/
         /*}}}*/
-        
-        /*SetLHAPDF(const TString& kName){{{*/
-        void SetLHAPDF(const TString& kName){
-            ////////////
-            //LHAPDF6
-            ///////////
-            //Directly tell the name of the PDF set
-            //also: cteq6, cteq6l1,CT10nlo,nCTEQ15 etc., see https://lhapdf.hepforge.org/pdfsets.html 
-            if(fModel=="LHAPDF"){
-                lhapdfs = LHAPDF::mkPDF(kName.Data());
-            }
-            else{
-                cerr<<"*** ERROR, I don't understand the XS model (not LHAPDF) :"<<fModel.Data()<<endl;
-                exit(-2);
-            }
-
-        }
-        /*}}}*/
-        
-        /*SetLHAPDF(const int kA, const int kZ){{{*/
-        void SetLHAPDF(const int kA, const int kZ){
-            ////////////
-            //LHAPDF6
-            ///////////
-            //also: cteq6, cteq6l1,CT10nlo,nCTEQ15 etc., see https://lhapdf.hepforge.org/pdfsets.html 
-            
-            //To call nCTEQ PDF based on the specified target
-            //Must have download the associated PDF sets for this target
-            if(fModel=="LHAPDF"){
-                lhapdfs = LHAPDF::mkPDF(Form("nCTEQ15_%d_%d", kA, kZ));
-            }
-                else{
-                cerr<<"*** ERROR, I don't understand the XS model (not LHAPDF) :"<<fModel.Data()<<endl;
-                exit(-2);
-                }
-                    
-            }
-        /*}}}*/
-
-        void SetCTEQ(){/*{{{*/
-            int mode = 0;
-            if(fOrder==1||fOrder==3)
-                //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, 
-                mode = 4; //CTEQ6L1, see JHEP04 (2009) 065
-            else if(fOrder==2||fOrder==4)
-                //3->free L0 CTEQ6L1 PDF, 4->free NL0 CTEQ6.1M PDF
-                mode = 200; //CTEQ6.1M, see JHEP04 (2009) 065
-
-            //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
-            fPDF = cteq_pdf_alloc_id(mode);
-        }/*}}}*/
 
         void SetCTEQ(int mode){/*{{{*/
             //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
-            if(fModel=="EPS09"||fModel=="CTEQPDF"){
             fPDF = cteq_pdf_alloc_id(mode);
-            }
-            else{
-                cerr<<"*** ERROR, I don't understand the XS model (not EPS09 or CTEQPDF) :"<<fModel.Data()<<endl;
-                exit(-2);
-            }
+        }/*}}}*/
+        
+        void SetCTEQ(){/*{{{*/
+            int mode = 0;
+            if(fOrder==1||fOrder==3)
+                mode = 4; //CTEQ6L1, see JHEP04 (2009) 065
+            else if(fOrder==2||fOrder==4)
+                mode = 200; //CTEQ6.1M, see JHEP04 (2009) 065
 
+             //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
+            fPDF = cteq_pdf_alloc_id(mode);
         }/*}}}*/
 
         void SetEPS09(){/*{{{*/
@@ -208,15 +154,18 @@ class SIDIS
             SetCTEQ();
         }/*}}}*/
 
-        void SetEPS09(int kOrder){/*{{{*/
+        void SetCTEQOrder(int kOrder){/*{{{*/
             fOrder = kOrder;
 
             //Reinitialize:
             if(fModel=="EPS09"){
                 if(fOrder!=1 && fOrder!=2)
-                    //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, 
                     fOrder = 2;//default is 2 if neither 1 or 2
-                fErrSet = 1;
+                SetEPS09();
+            }
+            else if(fModel=="CTEQPDF"){
+                if(fOrder!=3 && fOrder!=4)
+                    fOrder = 4;//default is 4 if neither 3 or 4
                 SetCTEQ();
             }
             else{
@@ -269,10 +218,13 @@ class SIDIS
                 cout << "particle_flag is wrong +-1 and +-2" << endl;
             }	
 
+            E0_beam_ele = mom_beam_ele;
+            E0_beam_ion = mom_beam_ion;
+
             // //define the 4-momentum
             //define electron direction as +z assuming a proton/neutron for the ion mass now 
             // approximation for SIDIS
-            TLorentzVector *P4_ini_ele = new TLorentzVector(0.,0., mom_beam_ele,sqrt(mom_beam_ele*mom_beam_ele + mass_e*mass_e));
+            TLorentzVector *P4_ini_ele = new TLorentzVector(0.,0.,mom_beam_ele,sqrt(mom_beam_ele*mom_beam_ele + mass_e*mass_e));
             TLorentzVector *P4_ini_ion = new TLorentzVector(0.,0.,-mom_beam_ion,sqrt(mom_beam_ion*mom_beam_ion + mass_target*mass_target));
             TLorentzVector *P4_fin_had = new TLorentzVector(0.,0.,0.,1.);
             TLorentzVector *P4_fin_ele = new TLorentzVector(0.,0.,0.,1.);
@@ -298,29 +250,29 @@ class SIDIS
 
             /*Kinematics Quantities{{{*/
             //For electron
-            px_ele = p_ele*sin(th_ele/DEG)*cos(ph_ele/DEG);
-            py_ele = p_ele*sin(th_ele/DEG)*sin(ph_ele/DEG);
-            pz_ele = p_ele*cos(th_ele/DEG);
+            px_ele = p_ele*sin(th_ele/180.*3.1415926)*cos(ph_ele/180.*3.1415926);
+            py_ele = p_ele*sin(th_ele/180.*3.1415926)*sin(ph_ele/180.*3.1415926);
+            pz_ele = p_ele*cos(th_ele/180.*3.1415926);
             E_ele = sqrt(p_ele*p_ele+mass_e*mass_e);
-            P4_fin_ele->SetPxPyPzE(p_ele*sin(th_ele/DEG)*cos(ph_ele/DEG),
-                    p_ele*sin(th_ele/DEG)*sin(ph_ele/DEG),
-                    p_ele*cos(th_ele/DEG)
+            P4_fin_ele->SetPxPyPzE(p_ele*sin(th_ele/180.*3.1415926)*cos(ph_ele/180.*3.1415926),
+                    p_ele*sin(th_ele/180.*3.1415926)*sin(ph_ele/180.*3.1415926),
+                    p_ele*cos(th_ele/180.*3.1415926)
                     ,sqrt(p_ele*p_ele+mass_e*mass_e));
 
             //For hadron
-            px_had = p_had*sin(th_had/DEG)*cos(ph_had/DEG);
-            py_had = p_had*sin(th_had/DEG)*sin(ph_had/DEG);
-            pz_had = p_had*cos(th_had/DEG);
+            px_had = p_had*sin(th_had/180.*3.1415926)*cos(ph_had/180.*3.1415926);
+            py_had = p_had*sin(th_had/180.*3.1415926)*sin(ph_had/180.*3.1415926);
+            pz_had = p_had*cos(th_had/180.*3.1415926);
             E_had = sqrt(p_had*p_had+mass_hadron*mass_hadron);
-            P4_fin_had->SetPxPyPzE(p_had*sin(th_had/DEG)*cos(ph_had/DEG),
-                    p_had*sin(th_had/DEG)*sin(ph_had/DEG),
-                    p_had*cos(th_had/DEG)
+            P4_fin_had->SetPxPyPzE(p_had*sin(th_had/180.*3.1415926)*cos(ph_had/180.*3.1415926),
+                    p_had*sin(th_had/180.*3.1415926)*sin(ph_had/180.*3.1415926),
+                    p_had*cos(th_had/180.*3.1415926)
                     ,sqrt(p_had*p_had+mass_hadron*mass_hadron));
 
 
             *P4_q = *P4_ini_ele - *P4_fin_ele;
             Q2 = - (*P4_q)*(*P4_q);
-            W  = (*P4_ini_ele + *P4_ini_ion - *P4_fin_ele)*(*P4_ini_ele + *P4_ini_ion - *P4_fin_ele);
+            W = (*P4_ini_ele + *P4_ini_ion - *P4_fin_ele)*(*P4_ini_ele + *P4_ini_ion - *P4_fin_ele);
             Wp = (*P4_ini_ele + *P4_ini_ion - *P4_fin_ele - *P4_fin_had)*(*P4_ini_ele + *P4_ini_ion - *P4_fin_ele - *P4_fin_had);
 
             s = (*P4_ini_ele + *P4_ini_ion )*(*P4_ini_ele + *P4_ini_ion);
@@ -374,14 +326,14 @@ class SIDIS
             
             rapidity = 0.5 * log((mom_had + pz_had)/(mom_had - pz_had)  );
 
+            rapidity = 0.5 * log((mom_had + pz_had)/(mom_had - pz_had)  );
+
             //phi_ele *= 180/3.1415926; if(py_ele<0.) phi_ele+=360;
             //phi_had *= 180/3.1415926; if(py_had<0.) phi_had+=360;
             //cout<<Form("--Electron: phi_gen = %f,  phi=%f", ph_ele, phi_ele)<<endl;
             //cout<<Form("--  Hadron: phi_gen = %f,  phi=%f", ph_had, phi_had)<<endl;
 
             jacoF = Jacobian(mom_ele,theta_ele,phi_ele,mom_had,theta_had,phi_had,mom_ion,energy_ion,mom_beam_ele);
-            //jacoF = 1.0;
-
             /*}}}*/
 
             delete P4_ini_ele; delete P4_ini_ion;  
@@ -404,17 +356,25 @@ class SIDIS
             double mass_n = 0.939566;
             double kSinSQ = pow( sin(theta_ele*0.5),2);
             double kCosSQ = pow( cos(theta_ele*0.5),2);
-            double xs_p = 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
+
+            ////This definition is in the CM frame, i.e. dSigma/dx/dy
+            //double xs_p = 2.0*PI*pow(1/137.036,2)*s/Q2/Q2*(1+pow(1-y, 2)) * fF2p * GeV2_to_nbarn;
+            //double xs_n = 2.0*PI*pow(1/137.036,2)*s/Q2/Q2*(1+pow(1-y, 2)) * fF2n * GeV2_to_nbarn;
+            //double Trans = 2.*mass_p*E0_beam_ele/mom_ele * PI *y; 
+
+            ////This definition is in the lab frame, e.g. dSigma/dE'dOmega, where dE'dOmega = 2.*M*E0/E'*PI*y*dxdy
+            double xs_p= 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
                 * (1./nu *kCosSQ + 1/mass_p/x * kSinSQ) * fF2p * GeV2_to_nbarn;
-
-            double xs_n = 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
+            double xs_n= 4.0*pow(1/137.036,2) * mom_ele*mom_ele/Q2/Q2
                 * (1./nu *kCosSQ + 1/mass_n/x * kSinSQ) * fF2n * GeV2_to_nbarn;
-            XS_Inclusive = fZ * xs_p + (fA-fZ)*xs_n;//nbarn
 
+            XS_Inclusive = fZ * xs_p + (fA-fZ)*xs_n;//nbarn
 
             if (pt<0.8){
                 //first method 	 
-                bpt_p = 1./(0.2+z*z*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
+                //bpt_p = 1./(0.2+z*z*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
+                //Disable the TMD feature temparately, 02/01/2017
+                bpt_p = 1./(0.2);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
                 bpt_m = bpt_p; // <kt^2> = 0.25 GeV^2 (struck quark internal momentum)
 
                 //second method  use the original value
@@ -433,7 +393,9 @@ class SIDIS
                 //make sure the DXS is the same at PT= 0.8 GeV
                 //calculating the TMD part
                 double K[2],dxs_temp[10];
-                bpt_p = 1./(0.2+z*z*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
+                //bpt_p = 1./(0.2+z*z*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
+                //Disable the TMD feature temparately, 02/01/2017
+                bpt_p = 1./(0.2);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
                 bpt_m = bpt_p; // <kt^2> = 0.25 GeV^2 (struck quark internal momentum)
 
                 //second method  use the original value
@@ -444,7 +406,9 @@ class SIDIS
                 dxs(pt_tmp, bpt_m, bpt_p, &dxs_temp[0], &dxs_temp[1],dxs_all[0]);	   
 
                 //calculating the TMD parts using the new vpt_p values
-                bpt_p = 1./(0.25+z*z*0.28);// <pt^2> = 0.25 GeV^2 (quark internal momentum)
+                //bpt_p = 1./(0.25+z*z*0.28);// <pt^2> = 0.25 GeV^2 (quark internal momentum)
+                //Disable the TMD feature temparately, 02/01/2017
+                bpt_p = 1./(0.25);// <pt^2> = 0.25 GeV^2 (quark internal momentum)
                 bpt_m = bpt_p; // <kt^2> = 0.28 GeV^2 (struck quark internal momentum)
 
                 //taking into account the NLO etc
@@ -492,7 +456,7 @@ class SIDIS
                 }
             }
             /*}}}*/
-
+ 
             //Caculate Boer-Mulder TMD Asymmetry (A= dXS*cos2phi/dXS
             double Asym_BM_hp, Asym_BM_hm;
             double Asym_BM_all[4];
@@ -502,19 +466,19 @@ class SIDIS
             /*try to take care of the decay{{{*/
             double decay_part = 0.0;
             if (abs(particle_flag)==1){
-                if (theta_had>155./DEG){
+                if (theta_had>155./180.*3.1415926){
                     decay_part = exp(7./cos(theta_had)*mass_hadron/(2.6*mom_had*3.0));
-                }else if (theta_had<=155./DEG&&theta_had>=140./DEG){
+                }else if (theta_had<=155./180.*3.1415926&&theta_had>=140./180.*3.1415926){
                     decay_part = exp(4.5/cos(theta_had)*mass_hadron/(2.6*mom_had*3.0));
-                }else if (theta_had <140/DEG){
+                }else if (theta_had <140/180.*3.1415926){
                     decay_part = exp(-2.5/sin(theta_had)*mass_hadron/(2.6*mom_had*3.0));
                 }
             }else{
-                if (theta_had>155./DEG){
+                if (theta_had>155./180.*3.1415926){
                     decay_part = exp(7./cos(theta_had)*mass_hadron/(1.24*mom_had*3.0));
-                }else if (theta_had<=155./DEG&&theta_had>=140./DEG){
+                }else if (theta_had<=155./180.*3.1415926&&theta_had>=140./180.*3.1415926){
                     decay_part = exp(4.5/cos(theta_had)*mass_hadron/(1.24*mom_had*3.0));
-                }else if (theta_had <140/DEG){
+                }else if (theta_had <140/180.*3.1415926){
                     decay_part = exp(-2.5/sin(theta_had)*mass_hadron/(1.24*mom_had*3.0));
                 }
             }
@@ -525,8 +489,6 @@ class SIDIS
             /*Save&Return{{{*/
             dxs_hp = decay_part * dxs_hp; 
             dxs_hm = decay_part * dxs_hm;
-
-
 
             int err_hp = -1, err_hm=-1;
             if (dxs_hp>0.&& dxs_hp<10000.){
@@ -540,7 +502,6 @@ class SIDIS
             XS_HP = dxs_hp;
             XS_HM = dxs_hm;
 
-            
             if (dxs_hm>0.&& dxs_hm<10000.){
                 err_hm = 0;
             }
@@ -560,35 +521,35 @@ class SIDIS
             /*}}}*/
         } 
         /*}}}*/
-        
-        /*viod Run_LHAPDF(double x,double Q2){{{*/          
-        double Run_LHAPDF(double x,double Q2)          
-        {
-            double result = 0;
-            double Q = sqrt(Q2);
 
-            ///////////////
-            //LHAPDF6
-            ///////////////
-            //Note that LHAPDF6 use PDG scheme ID as the PID
-            // u quark
-            fuA = lhapdfs->xfxQ(2, x, Q);
-            // d quark
-            fdA = lhapdfs->xfxQ(1, x, Q);
-            // \bar{u} quark
-            fubar = lhapdfs->xfxQ(-2, x, Q);
-            // \bar{d} quark
-            fdbar= lhapdfs->xfxQ(-1, x, Q);
-            // strange quark
-            fs = lhapdfs->xfxQ(3, x, Q);
-            // \bar{s} quark
-            fsbar= lhapdfs->xfxQ(-3, x, Q);
-            //gluon
-            fg = lhapdfs->xfxQ(21, x,Q);
+        /*Return Values{{{*/
+
+        double GetXS_Inclusive(){
+            return XS_Inclusive;
         }
+
+        double GetXS_HP(){
+            return XS_HP;
+        }
+        double GetXS_HM(){
+            return XS_HM;
+        }
+        double GetDilute_HP(){
+            return dilute_hp;
+        }
+        double GetDilute_HM(){
+            return dilute_hm;
+        }
+        double get_uA(){ return fuA; }//return the average u
+        double get_dA(){ return fdA; }//return the average d
+        double get_s(){ return fs; }//return the average s
+        double get_g(){ return fg; }//return the average g
+        double get_ubar(){ return fubar; }//return the average u
+        double get_dbar(){ return fdbar; }//return the average d
+        double get_sbar(){ return fsbar; }//return the average s
         /*}}}*/
         
-        /*void Run_CTEQPDF(double x,double Q2){{{*/          
+        /*double Run_CTEQPDF(double x,double Q2){{{*/          
         void Run_CTEQPDF(double ix,double iQ2)          
         {
             fubar = Get_CTEQPDF(-1, ix, iQ2);
@@ -599,6 +560,10 @@ class SIDIS
             fs = Get_CTEQPDF(3, ix, iQ2);
             fg = Get_CTEQPDF(0, ix, iQ2);
 
+            //Temperately set to zero, 02/01/2017
+            fs =0.0;
+            fsbar=0.0;
+            fg = 0.0;
         }
         /*}}}*/
 
@@ -632,6 +597,12 @@ class SIDIS
             fsbar =  iR_s *sbar;
 
             fg =  iR_g * g;
+
+
+            //Temperately set to zero, 02/01/2017
+            fs =0.0;
+            fsbar=0.0;
+            fg = 0.0;
         }/*}}}*/
         
         /*GetAsym_Cos2Phi(){{{*/
@@ -862,33 +833,6 @@ class SIDIS
         }
         /*}}}*/
 
-        /*Return Values{{{*/
-
-        double GetXS_Inclusive(){
-            return XS_Inclusive;
-        }
-
-        double GetXS_HP(){
-            return XS_HP;
-        }
-        double GetXS_HM(){
-            return XS_HM;
-        }
-        double GetDilute_HP(){
-            return dilute_hp;
-        }
-        double GetDilute_HM(){
-            return dilute_hm;
-        }
-        double get_uA(){ return fuA; }//return the average u
-        double get_dA(){ return fdA; }//return the average d
-        double get_s(){ return fs; }//return the average s
-        double get_g(){ return fg; }//return the average g
-        double get_ubar(){ return fubar; }//return the average u
-        double get_dbar(){ return fdbar; }//return the average d
-        double get_sbar(){ return fsbar; }//return the average s
-        /*}}}*/
-
     private:
         /*double Azimuthalphi(double vx, double vy){{{*/
         double Azimuthalphi(double vx, double vy){
@@ -1057,7 +1001,7 @@ class SIDIS
             double qd=-1./3.;
             double qs=-1./3.;
 
-            *dxs_hp = 1./137.035/137.035/x/y/Q2/1000000. *y*y/(2*(1-epsilon))*(1+gamma*gamma/2./x)*(197.3*197.3/100.*1.0e9);
+            *dxs_hp = 1./137.035/137.035/x/y/Q2 *y*y/(2*(1-epsilon))*(1+gamma*gamma/2./x)*GeV2_to_nbarn;
             *dxs_hm = *dxs_hp;
 
             *dxs_hp = (*dxs_hp)*bpt_p/PI*exp(-bpt_p*pt_tmp*pt_tmp)*x;
@@ -1067,48 +1011,45 @@ class SIDIS
             double df_n_hp=0,df_n_hm=0;
 
             double uquark=0.0,dquark=0.0,squark=0.0,ubarquark=0.0,dbarquark=0.0,sbarquark=0.0;
-            if(fOrder==0){
-                Run_LHAPDF(x, Q2);         
-
+            //if(fOrder==0){
                 //uquark = Get_LHAPDF(1,x,Q2);
                 //dquark = Get_LHAPDF(2,x,Q2);
                 //squark = Get_LHAPDF(3,x,Q2);
                 //ubarquark = Get_LHAPDF(-1,x,Q2);
                 //dbarquark = Get_LHAPDF(-2,x,Q2);
                 //sbarquark = Get_LHAPDF(-3,x,Q2);
-
-            }
-            else if(fOrder==1 || fOrder==2){/*{{{*/
+            //}
+            //else 
+            if(fOrder==1 || fOrder==2){/*{{{*/
                 //Calculate medium modified PDFs:
                 RunEPS09(fOrder, fErrSet, fA, fZ, x, Q2);
 
                 //uquark = get_uA();
-                //dquark = get_dA();
-                //squark = get_s();
                 //ubarquark = get_ubar();
+                //dquark = get_dA();
                 //dbarquark = get_dbar();
+                //squark = get_s();
                 //sbarquark = get_sbar();
             }
             else if(fOrder==3 || fOrder==4){
-                //free PDF from CTEQ
+               //free PDF from CTEQ
                 Run_CTEQPDF(x, Q2);         
                 
                 //uquark = Get_CTEQPDF(1,x,Q2);
-                //dquark = Get_CTEQPDF(2,x,Q2);
-                //squark = Get_CTEQPDF(3,x,Q2);
                 //ubarquark = Get_CTEQPDF(-1,x,Q2);
+                //dquark = Get_CTEQPDF(2,x,Q2);
                 //dbarquark = Get_CTEQPDF(-2,x,Q2);
+                //squark = Get_CTEQPDF(3,x,Q2);
                 //sbarquark = Get_CTEQPDF(-3,x,Q2);
-                
             }else{
                 cerr<<"***, in dxs(....), I don't know the type of fOrder"<<endl;
             }
 
             uquark = fuA;
-            dquark = fdA;
-            squark = fs;
             ubarquark = fubar;
+            dquark = fdA;
             dbarquark = fdbar;
+            squark = fs;
             sbarquark = fsbar;
 
             ////Test: see the different of nuclear-PDF and free-PDF in the same (Q2,x)
@@ -1120,8 +1061,8 @@ class SIDIS
             //}/*}}}*/
 
             //calculate F2p and F2n for inclusive XS calculations
-            fF2p = pow( 2./3.,2) * (uquark+ubarquark) + pow(-1./3.,2)*(dquark+dbarquark) + pow(-1./3.,2)*(squark+sbarquark); 
-            fF2n = pow(-1./3.,2) * (uquark+ubarquark) + pow( 2./3.,2)*(dquark+dbarquark) + pow(-1./3.,2)*(squark+sbarquark); //u-->d, d-->u, 
+            fF2p = pow(qu,2) * (uquark+ubarquark) + pow(qd,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); 
+            fF2n = pow(qd,2) * (uquark+ubarquark) + pow(qu,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); //u-->d, d-->u, 
 
             double D_fav,D_unfav,D_s,D_g;
             if (fabs(particle_flag)==1) {
@@ -1161,9 +1102,6 @@ class SIDIS
             *dxs_hp *= (df_p_hp*fZ+df_n_hp*(fA-fZ))/x;
             *dxs_hm *= (df_p_hm*fZ+df_n_hm*(fA-fZ))/x;
 
-/*            if(pt>1&&Q2<10.)*/
-                //cout << Form("dxs_hp = %e", *dxs_hp)<<endl; 
-
         }
         /*}}}*/
 
@@ -1171,11 +1109,11 @@ class SIDIS
         void dxs_hpt(double pt_tmp, double* dxs_hp, double* dxs_hm,double* dxs_all){
 
             double alpha_s = 0.0;
-            if(fOrder==0)
-                //alpha_s = alphasPDF(sqrt(Q2));//LHAPDF5
-                alpha_s = lhapdfs->alphasQ(sqrt(Q2));
-            else//Use CTEQ    
+            //if(fOrder==0)
+                //alpha_s = alphasPDF(sqrt(Q2));
+            //else
                 alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
+
 
             //cout << y << "\t" << Q2 << endl;
             //cout << alpha_s << endl;
@@ -1222,10 +1160,8 @@ class SIDIS
                 //     Pgq = 0.;
 
 
-                if(fOrder==0){
-                    // PDF from LHAPDF
-                    Run_LHAPDF(x, Q2);         
-                    
+                //if(fOrder==0){
+                    ////free PDF from LHAPDF
                     //uquark = Get_LHAPDF(1,x/xp,Q2);
                     //dquark = Get_LHAPDF(2,x/xp,Q2);
                     //squark = Get_LHAPDF(3,x/xp,Q2);
@@ -1233,9 +1169,9 @@ class SIDIS
                     //dbarquark = Get_LHAPDF(-2,x/xp,Q2);
                     //sbarquark = Get_LHAPDF(-3,x/xp,Q2);
                     //gluon = Get_LHAPDF(0,x/xp,Q2);
-                
-                }
-                else if(fOrder==1 || fOrder==2){
+                //}
+                //else
+                if(fOrder==1 || fOrder==2){
                     //Calculate medium modified PDFs:
                     RunEPS09(fOrder, fErrSet, fA, fZ, x/xp, Q2);
 
@@ -1250,7 +1186,7 @@ class SIDIS
                 else if(fOrder==3 || fOrder==4){
                     //free PDF from CTEQ
                     Run_CTEQPDF(x, Q2);         
-                    
+
                     //uquark = Get_CTEQPDF(1,x/xp,Q2);
                     //dquark = Get_CTEQPDF(2,x/xp,Q2);
                     //squark = Get_CTEQPDF(3,x/xp,Q2);
@@ -1264,11 +1200,12 @@ class SIDIS
                 }
 
                 uquark = fuA;
-                dquark = fdA;
-                squark = fs;
                 ubarquark = fubar;
+                dquark = fdA;
                 dbarquark = fdbar;
+                squark = fs;
                 sbarquark = fsbar;
+                gluon = fg;
 
                 if (fabs(particle_flag)==1){
                     //pion fragmentation function
@@ -1319,7 +1256,7 @@ class SIDIS
 
             double sv = log(log(Q2/lambda/lambda)/log(Q2zero/lambda/lambda));
 
-            if (flag == 1){
+            if (flag == 1){//pion
                 double N = 1.150 - 1.522*sv + 1.378*pow(sv,2) - 0.527*pow(sv,3);
                 double a1 = -0.740 - 1.680*sv + 1.546*pow(sv,2) - 0.596*pow(sv,3);
                 double a2 = 1.430 + 0.543*sv - 0.023*pow(sv,2);
@@ -1340,7 +1277,7 @@ class SIDIS
                 *D_s = D_sum_s/2.0;
                 *D_g = Ng * pow(z,a1g) *pow(1-z,a2g)*(1+a3g/z)/2.;
 
-            }else{
+            }else{//kaon
                 double N = 0.310 - 0.038*sv - 0.042*pow(sv,2);
                 double a1 = -0.980 - 0.260*sv + 0.008*pow(sv,2);
                 double a2 = 0.970 + 0.978*sv - 0.229*pow(sv,2);
@@ -1367,67 +1304,42 @@ class SIDIS
         /*}}}*/
 
         /*double Get_LHAPDF(int iparton,double x,double Q2){{{*/          
-        double Get_LHAPDF(int iparton,double x,double Q2)          
-        {
-            double result = 0;
-            double Q = sqrt(Q2);
+/*        double Get_LHAPDF(int iparton,double x,double Q2)          */
+        //{
+            //double Q = sqrt(Q2);
+            //double result = 0;
 
-            ///LHAPDF5////////////in LHAPDF->xfx(): /*{{{*/
-            // 1->d, 2->u, 3->s, 4->c, 5->b, 6->t, 21->g 
-            //-1->dbar, -2->ubar,-3->sbar,-4->cbar,-5->bbar,-6->tbar
-            //For valance quarks:
-            //  dv-> d-dbar, u->u-ubar
-            /*            if (iparton==1){*/
-            //// u quark
-            //result = xfx(x, Q, 2);
+            /////////////////in LHAPDF->xfx(): 
+            //// 1->d, 2->u, 3->s, 4->c, 5->b, 6->t, 21->g 
+            ////-1->dbar, -2->ubar,-3->sbar,-4->cbar,-5->bbar,-6->tbar
+            ////For valance quarks:
+            ////  dv-> d-dbar, u->u-ubar
+
+
+            //if (iparton==1){
+                //// u quark
+                //result = xfx(x, Q, 2);
             //}else if (iparton==2){
-            //// d quark
-            //result = xfx(x, Q, 1);
+                //// d quark
+                //result = xfx(x, Q, 1);
             //}else if (iparton==-1){
-            //// \bar{u} quark
-            //result = xfx(x, Q, -2);
+                //// \bar{u} quark
+                //result = xfx(x, Q, -2);
             //}else if (iparton==-2){
-            //// \bar{d} quark
-            //result = xfx(x, Q, -1);
+                //// \bar{d} quark
+                //result = xfx(x, Q, -1);
             //}else if (iparton==3){
-            //// strange quark
-            //result = xfx(x, Q, 3);
+                //// strange quark
+                //result = xfx(x, Q, 3);
             //}else if (iparton==-3){
-            //// \bar{s} quark
-            //result = xfx(x, Q, -3);
+                //// \bar{s} quark
+                //result = xfx(x, Q, -3);
             //}else if (iparton==0){
-            //result = xfx(x,Q,0);
+                //result = xfx(x,Q,0);
             //}
-            /*}}}*/
-            ///////////////
-            //LHAPDF6
-            ///////////////
-            //Note that LHAPDF6 use PDG scheme ID as the PID
-            if (iparton==1){
-                // u quark
-                result = lhapdfs->xfxQ(2, x, Q);
-            }else if (iparton==2){
-                // d quark
-                result = lhapdfs->xfxQ(1, x, Q);
-            }else if (iparton==-1){
-                // \bar{u} quark
-                result = lhapdfs->xfxQ(-2, x, Q);
-            }else if (iparton==-2){
-                // \bar{d} quark
-                result = lhapdfs->xfxQ(-1, x, Q);
-            }else if (iparton==3){
-                // strange quark
-                result = lhapdfs->xfxQ(3, x, Q);
-            }else if (iparton==-3){
-                // \bar{s} quark
-                result = lhapdfs->xfxQ(-3, x, Q);
-            }else if (iparton==0){
-                //gluon
-                result = lhapdfs->xfxQ(21, x,Q);
-            }
 
-            return(result);
-        }
+            //return(result);
+        /*}*/
         /*}}}*/
 
         /*double Get_CTEQPDF(int iparton,double x,double Q2){{{*/          
@@ -1478,8 +1390,9 @@ class SIDIS
         int fOrder;
         int fErrSet;
 
-        LHAPDF::PDF* lhapdfs;
     public:
+        double E0_beam_ele;
+        double E0_beam_ion;
         double mom_ele;
         double theta_ele; 
         double phi_ele; 

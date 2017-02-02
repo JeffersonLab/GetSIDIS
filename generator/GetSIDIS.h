@@ -61,9 +61,9 @@ const Double_t SoLID_Mom_Max_e = 11.0;//not in use
 const Double_t SoLID_Mom_Min_h = 0.5;  
 const Double_t SoLID_Mom_Max_h = 6.0;
 
-const Double_t SoLID_Th_Min_e  = 7.0;  
+const Double_t SoLID_Th_Min_e  = 5.0;  
 const Double_t SoLID_Th_Max_e = 30.0; 
-const Double_t SoLID_Th_Min_h  =  7.0; 
+const Double_t SoLID_Th_Min_h  =  5.0; 
 const Double_t SoLID_Th_Max_h =  30.0;
 
 const Double_t SoLID_Ph_Min_e  = 0.0;  
@@ -78,6 +78,33 @@ const Double_t SoLID_BeamSizeY_ele = 0.5 * cm;
 //const Double_t SoLID_BeamSizeY_ion = 0.5 * cm;
 const Double_t SoLID_Target_Center = -350.0 * cm;
 const Double_t SoLID_Target_Length = 40.0 *cm;
+////////////////////////
+
+////////////////////////
+//CLAS12 Acceptance
+////////////////////////
+const Double_t CLAS12_Mom_Min_e = 0.5;  
+const Double_t CLAS12_Mom_Max_e = 11.0;//not in use 
+const Double_t CLAS12_Mom_Min_h = 0.5;  
+const Double_t CLAS12_Mom_Max_h = 6.0;
+
+const Double_t CLAS12_Th_Min_e  = 2.0;  
+const Double_t CLAS12_Th_Max_e = 60.0; 
+const Double_t CLAS12_Th_Min_h  =  2.0; 
+const Double_t CLAS12_Th_Max_h =  60.0;
+
+const Double_t CLAS12_Ph_Min_e  = 0.0;  
+const Double_t CLAS12_Ph_Max_e = 360.0; 
+const Double_t CLAS12_Ph_Min_h  =  0.0; 
+const Double_t CLAS12_Ph_Max_h =  360.0;
+
+//CLAS12 BeamSize Info
+const Double_t CLAS12_BeamSizeX_ele = 0.5 * cm;
+const Double_t CLAS12_BeamSizeY_ele = 0.5 * cm;
+//const Double_t CLAS12_BeamSizeX_ion = 0.5 * cm;
+//const Double_t CLAS12_BeamSizeY_ion = 0.5 * cm;
+const Double_t CLAS12_Target_Center = -350.0 * cm;
+const Double_t CLAS12_Target_Length = 40.0 *cm;
 ////////////////////////
 
 ////////////////////////

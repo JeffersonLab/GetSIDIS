@@ -8,8 +8,8 @@
 # Feb. 22, 2011 Zhihong Ye
 #
 
-home=/work/halla/solid/yez/SIDIS_Generator/test
-# home=$(PWD)     
+#home=/work/halla/solid/yez/SIDIS_Generator/test2
+home=${PWD}
 # The directory where replay_script is
 # Event you want to start with,gtotal=-1 means to replay all
 username=${USER}@jlab.org    # email which will be notify when the job is done
@@ -73,8 +73,8 @@ if ! [ -d batch_files ]
     echo " "
 #
 # Submit job to the farm
-   #jsub batch_files/jscript_${INPUT}_${NO}
-   swif add-jsub -workflow sidis_analysis -create -script ./batch_files/jscript_${INPUT}_${NO}
+   jsub batch_files/jscript_${INPUT}_${NO}
+   #swif add-jsub -workflow sidis_analysis -create -script ./batch_files/jscript_${INPUT}_${NO}
    #swif run -workflow sidis_analysis
 #
 #

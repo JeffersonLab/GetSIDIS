@@ -49,25 +49,35 @@ int main(){
     gStyle->SetOptStat(0);
    
     SIDIS *sidis = new SIDIS("EPS09");
-    const int fOrder = 2;
-    const int fErrSet = 1;
-    const int fA = 2;
-    const int fZ = 1;
     sidis->SetEPS09();
+  
+    const int fOrder = 1; //for EPS09, 1->LO, 2->NLO
+    const int fErrSet = 1;
+    int fA = 2; cout<<"-- A = "; cin >> fA;
+    int fZ = 1; //cout<<"-- Z = "; cin >> fZ;
+    if( fA==1) fZ = 1; 
+    if( fA==2) fZ = 1; 
+    if( fA==12) fZ = 6; 
 
-    TChain *t1 = new TChain("T");
+     TChain *t1 = new TChain("T");
     for(int i=0;i<10;i++){
-        for(int j=1;j<=4;j++)
-            //t1->Add(Form("./c12_pion/EIC_A12_pion_10_600_%d_%d.root", j, i));
-            //t1->Add(Form("./prot_pion/EIC_A1_pion_10_100_%d_%d.root", j, i));
-            t1->Add(Form("./d2_pion/EIC_A2_pion_10_100_%d_%d.root", j, i));
+        for(int j=1;j<=4;j++){
+            if(fA ==12)
+                t1->Add(Form("./c12_pion_LO/EIC_A12_pion_10_600_%d_%d.root", j, i));
+            if(fA ==2)
+                t1->Add(Form("./d2_pion_LO/EIC_A2_pion_10_100_%d_%d.root", j, i));
+            if(fA ==1)
+                t1->Add(Form("./prot_pion/EIC_A1_pion_10_100_%d_%d.root", j, i));
+        }
     }
-
-    const double Lumi = 1.0e33/12.0;/*{{{*/
+   
+    const double Lumi = 1.0e33/fA;/*{{{*/
     const double nBcm2 = 1e-33;
     const double one_day = 24*60*60.0;
     TString xbj_cut = "(x>0.008 && x<=0.012)";
     //TString xbj_cut = "(x>0.4 && x<0.5)";
+    const double xbj_center = 0.01;
+
     TString cut_dif= Form("(weight_hp-weight_hm)*%f", Lumi*nBcm2*one_day);
     TString cut_sum= Form("(weight_hp+weight_hm)*%f", Lumi*nBcm2*one_day);
     TString cut_pip= Form("(weight_hp)*%f", Lumi*nBcm2*one_day);
@@ -92,6 +102,20 @@ int main(){
     TH1F *h1z_sum = new TH1F("h1z_sum","h1z_sum",500,0.,1.);
     TH1F *h1z_dif = new TH1F("h1z_dif","h1z_dif",500,0.,1.);
     
+    TH1F *h1u_pip = new TH1F("h1u_pip","h1u_pip",500,0.,1.);
+    TH1F *h1ubar_pip = new TH1F("h1ubar_pip","h1ubar_pip",500,0.,1.);
+    TH1F *h1d_pip = new TH1F("h1d_pip","h1d_pip",500,0.,1.);
+    TH1F *h1dbar_pip = new TH1F("h1dbar_pip","h1dbar_pip",500,0.,1.);
+    //TH1F *h1s_pip = new TH1F("h1s_pip","h1s_pip",500,0.,1.);
+    //TH1F *h1sbar_pip = new TH1F("h1sbar_pip","h1sbar_pip",500,0.,1.);
+    
+    TH1F *h1u_pim = new TH1F("h1u_pim","h1u_pim",500,0.,1.);
+    TH1F *h1ubar_pim = new TH1F("h1ubar_pim","h1ubar_pim",500,0.,1.);
+    TH1F *h1d_pim = new TH1F("h1d_pim","h1d_pim",500,0.,1.);
+    TH1F *h1dbar_pim = new TH1F("h1dbar_pim","h1dbar_pim",500,0.,1.);
+    //TH1F *h1s_pim = new TH1F("h1s_pim","h1s_pim",500,0.,1.);
+    //TH1F *h1sbar_pim = new TH1F("h1sbar_pim","h1sbar_pim",500,0.,1.);
+      
     //Sigma
     TH1F *h1XS_pip = new TH1F("h1XS_pip","h1XS_pip (log10)",500,-12.0,6.);
     //Sigma
@@ -106,7 +130,7 @@ int main(){
 
     TString histoname;
     double N_inc=0.0, N_pip=0.0,N_pim=0.0, N_dif=0.0, N_sum=0.0;
-    TString  CUT_pip, CUT_pim, CUT_dif, CUT_sum, CUT_inc;
+    TString  CUT_bin, CUT_pip, CUT_pim, CUT_dif, CUT_sum, CUT_inc;
 
     double z_min = 0.0, z_max = 0.0;
     const int zbin = 7;
@@ -118,14 +142,22 @@ int main(){
     for (Int_t j=0;j<Q2bin;j++){
         Q2log_min = Q2_log[j];
         Q2log_max = Q2_log[j+1];
+
         TString Q2_cut = Form(" log10(Q2)>%f&&log10(Q2)<=%f", Q2log_min, Q2log_max);
+
+        double Q2_center = pow(10., 0.5*(Q2log_max+Q2log_min));
   
-        //ofstream outf(Form("c12_output_Q2_%d.dat",j));
-        //ofstream outf(Form("prot_output_Q2_%d.dat",j));
-        ofstream outf(Form("d2_output_Q2_%d.dat",j));
-        outf<<Form("%4s %10s %10s %10s %10s %10s %10s %10s %10s %12s %12s %12s %12s %12s %12s %12s %12s",
+        ofstream outf;
+        if(fA ==12)
+            outf.open(Form("c12_output_Q2_%d_lo.dat",j));
+        if(fA ==2)
+            outf.open(Form("d2_output_Q2_%d_lo.dat",j));
+        if(fA ==1)
+            outf.open(Form("prot_output_Q2_%d_lo.dat",j));
+
+        outf<<Form("%4s %10s %10s %10s %10s %10s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s %12s",
                 "#bin","Q2","x", "W", "z", "pt", "xs_inc","xs_pip","xs_pim","N_inc","N_pip","N_pim",
-            "mulp_pip","mulp_pim","Asym","Astat", "Ax")<<endl;
+            "mulp_pip","mulp_pim","Asym","Astat", "Ax", "u", "d", "ubar","dbar","s","sbar","g")<<endl;
 
     for (Int_t i=0;i<zbin;i++){
         z_min = z_cut[i];
@@ -147,6 +179,7 @@ int main(){
         h1XS_pip->Reset();
         h1XS_pim->Reset();
 
+        CUT_bin=Form("(%s &&%s && z>%f && z<=%f)", xbj_cut.Data(), Q2_cut.Data(),z_min,z_max); 
         CUT_inc = cut_inc+"*"+Form("(%s &&%s && z>%f && z<=%f)", xbj_cut.Data(), Q2_cut.Data(),z_min,z_max); 
         CUT_pip = cut_pip+"*"+Form("(%s &&%s && z>%f && z<=%f)", xbj_cut.Data(), Q2_cut.Data(),z_min,z_max); 
         CUT_pim = cut_pim+"*"+Form("(%s &&%s && z>%f && z<=%f)", xbj_cut.Data(), Q2_cut.Data(),z_min,z_max); 
@@ -184,15 +217,50 @@ int main(){
         t1->Project("h1z_sum","z",TCut(CUT_sum));
         t1->Project("h1z_dif","z",TCut(CUT_dif));
         
-        t1->Project("h1XS_inc","log10(dxs_incl)",TCut(CUT_inc));
-        t1->Project("h1XS_pip","log10(dxs_hp)",TCut(CUT_pip));
-        t1->Project("h1XS_pim","log10(dxs_hm)",TCut(CUT_pim));
+        t1->Project("h1XS_inc","log10(dxs_incl)",TCut(CUT_bin));
+        t1->Project("h1XS_pip","log10(dxs_hp)",TCut(CUT_bin));
+        t1->Project("h1XS_pim","log10(dxs_hm)",TCut(CUT_bin));
 
-        sidis->RunEPS09(fOrder, fErrSet, fA, fZ, h1x->GetMean(), h1Q2->GetMean());
+        t1->Project("h1u_pip","u_pdf",TCut(CUT_pip));
+        t1->Project("h1d_pip","d_pdf",TCut(CUT_pip));
+        //t1->Project("h1s_pip","s_pdf",TCut(CUT_pip));
+        t1->Project("h1ubar_pip","ubar_pdf",TCut(CUT_pip));
+        t1->Project("h1dbar_pip","dbar_pdf",TCut(CUT_pip));
+        //t1->Project("h1sbar_pip","sbar_pdf",TCut(CUT_pip));
+        
+        t1->Project("h1u_pim","u_pdf",TCut(CUT_pim));
+        t1->Project("h1d_pim","d_pdf",TCut(CUT_pim));
+        //t1->Project("h1s_pim","s_pdf",TCut(CUT_pim));
+        t1->Project("h1ubar_pim","ubar_pdf",TCut(CUT_pim));
+        t1->Project("h1dbar_pim","dbar_pdf",TCut(CUT_pim));
+        //t1->Project("h1sbar_pim","sbar_pdf",TCut(CUT_pim));
+        
+        if(fA==12)
+            //sidis->RunEPS09(fOrder, fErrSet, fA, fZ, h1x->GetMean(), h1Q2->GetMean());
+            sidis->RunEPS09(fOrder, fErrSet, fA, fZ, xbj_center, Q2_center);
+        else
+            //sidis->Run_CTEQPDF( h1x->GetMean(), h1Q2->GetMean());         
+            sidis->Run_CTEQPDF( xbj_center, Q2_center);         
+
         double u = sidis->get_uA();
         double d = sidis->get_dA();
         double ubar = sidis->get_ubar();
         double dbar = sidis->get_dbar();
+        double s= sidis->get_s();
+        double sbar = sidis->get_sbar();
+        double g= sidis->get_g();
+
+
+        double u_pip = h1u_pip->GetMean();
+        double d_pip = h1d_pip->GetMean();
+        double ubar_pip = h1ubar_pip->GetMean();
+        double dbar_pip = h1dbar_pip->GetMean();
+
+        double u_pim = h1u_pim->GetMean();
+        double d_pim = h1d_pim->GetMean();
+        double ubar_pim = h1ubar_pim->GetMean();
+        double dbar_pim = h1dbar_pim->GetMean();
+
 
         Ax[i] = 3./5. * (u-ubar + d-dbar) / (u+ubar + d+dbar);
 
@@ -216,7 +284,7 @@ int main(){
         mlpt_pip[i] = N_pip / N_inc;
         mlpt_pim[i] = N_pim / N_inc;
         
-        outf<<Form("%4d %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %10.4f %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e",
+        outf<<Form("%4d %10.4f %10.4f %10.4f %10.4f %10.4f %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e %12.4e",
                 i,
                 h1Q2->GetMean(),
                 h1x->GetMean(),
@@ -233,7 +301,14 @@ int main(){
                 mlpt_pim[i],
                 Asym[i],
                 Astat[i],
-                Ax[i]
+                Ax[i],
+                u,
+                d,
+                ubar,
+                dbar,
+                s,
+                sbar,
+                g
                 )
             <<endl;
         /*}}}*/
