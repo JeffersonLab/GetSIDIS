@@ -9,7 +9,6 @@ CXXFLAGS      = -Wall -g -frtti -fexceptions -fPIC \
                    -DLINUXVERS -O
 
 EPS09=../eps09_cxx/
-#CTEQPDF=/home/yez/work/cteq-pdf-1.0.4
 CTEQPDF=../CTEQ6/cteq-pdf-1.0.4
 
 O=GetSIDIS
