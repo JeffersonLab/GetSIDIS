@@ -9,10 +9,12 @@ CXXFLAGS      = -Wall -g -frtti -fexceptions -fPIC \
                    -DLINUXVERS -O
 
 EPS09=../eps09_cxx/
-#CTEQPDF=../../../cteq-pdf-1.0.4
+#CTEQPDF=/home/yez/work/cteq-pdf-1.0.4
 CTEQPDF=../CTEQ6/cteq-pdf-1.0.4
 
-O=makebin
+#O=skim
+O=makebin_free
+#O=makebin_lo
 
 # Linux with g++
 INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
