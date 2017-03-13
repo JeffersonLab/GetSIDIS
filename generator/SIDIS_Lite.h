@@ -367,11 +367,9 @@ class SIDIS
 
             XS_Inclusive = fZ * xs_p + (fA-fZ)*xs_n;//nbarn
 
-            //if (pt<0.8){
-            if (1){//donot applyt high-PT corretion yet, 03/03/2017, ZYE
+            if (pt<0.8){
                 //first method 	 
                 bpt_p = 1./(0.2+z*z*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
-                //bpt_p = 1./(0.2);// <pt^2> = 0.2 GeV^2 (quark internal momentum)//Disable the TMD feature temparately, 02/01/2017
                 bpt_m = bpt_p; // <kt^2> = 0.25 GeV^2 (struck quark internal momentum)
 
                 //second method  use the original value
@@ -391,7 +389,6 @@ class SIDIS
                 //calculating the TMD part
                 double K[2],dxs_temp[10];
                 bpt_p = 1./(0.2+z*z*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
-                //bpt_p = 1./(0.2);// <pt^2> = 0.2 GeV^2 (quark internal momentum)//Disable the TMD feature temparately, 02/01/2017
                 bpt_m = bpt_p; // <kt^2> = 0.25 GeV^2 (struck quark internal momentum)
 
                 //second method  use the original value
@@ -403,7 +400,6 @@ class SIDIS
 
                 //calculating the TMD parts using the new vpt_p values
                 bpt_p = 1./(0.25+z*z*0.28);// <pt^2> = 0.25 GeV^2 (quark internal momentum)
-                //bpt_p = 1./(0.25);// <pt^2> = 0.25 GeV^2 (quark internal momentum)//Disable the TMD feature temparately, 02/01/2017
                 bpt_m = bpt_p; // <kt^2> = 0.28 GeV^2 (struck quark internal momentum)
 
                 //taking into account the NLO etc
@@ -553,11 +549,6 @@ class SIDIS
             fdA = Get_CTEQPDF(2, ix, iQ2);
             fs = Get_CTEQPDF(3, ix, iQ2);
             fg = Get_CTEQPDF(0, ix, iQ2);
-
-            //Temperately set to zero, 02/01/2017
-            fs =0.0;
-            fsbar=0.0;
-            fg = 0.0;
         }
         /*}}}*/
 
@@ -597,18 +588,8 @@ class SIDIS
 
             fs =  iR_s * s;
             fsbar =  iR_s *sbar;
-
             fg =  iR_g * g;
 
-            u=0.5*(u+d);
-            d=u;
-
-            //cerr<<Form("--- A=%d, Z=%d, Ruv=%f, Rdv=%f, Rubar=%f, Rdbar=%f, Rs=%f, Rg=%f",A,Z, fuA/u, fdA/d, iR_u, iR_d, iR_s,iR_g)<<endl;
-
-            //Temperately set to zero, 02/01/2017
-            fs =0.0;
-            fsbar=0.0;
-            fg = 0.0;
         }/*}}}*/
 
     private:
@@ -785,10 +766,6 @@ class SIDIS
             *dxs_hp = (*dxs_hp)*bpt_p/PI*exp(-bpt_p*pt_tmp*pt_tmp)*x;
             *dxs_hm = (*dxs_hm)*bpt_m/PI*exp(-bpt_m*pt_tmp*pt_tmp)*x;
 
-            //Temparetly set to zero, 02/10/2017
-            //*dxs_hp = (*dxs_hp)*x;
-            //*dxs_hm = (*dxs_hm)*x; 
-
             double df_p_hp=0,df_p_hm=0;
             double df_n_hp=0,df_n_hm=0;
 
@@ -881,9 +858,9 @@ class SIDIS
         void dxs_hpt(double pt_tmp, double* dxs_hp, double* dxs_hm,double* dxs_all){
 
             double alpha_s = 0.0;
-            //if(fOrder==0)
-                //alpha_s = alphasPDF(sqrt(Q2));
-            //else
+            if(fOrder==0)
+                alpha_s = alphasPDF(sqrt(Q2));
+            else
                 alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
 
 
