@@ -15,10 +15,10 @@ O=GetSIDIS
 
 # Linux with g++
 INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
-#CXX           = clang++
-CXX           = g++
-#LD            = clang++
-LD            = g++
+CXX           = clang++
+#CXX           = g++
+LD            = clang++
+#LD            = g++
 LDFLAGS       = 
 
 LIBS          = $(ROOTLIBS)  -L/usr/lib/ -lcteqpdf -L$(CTEQPDF)/lib

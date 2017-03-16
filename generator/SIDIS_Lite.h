@@ -858,9 +858,9 @@ class SIDIS
         void dxs_hpt(double pt_tmp, double* dxs_hp, double* dxs_hm,double* dxs_all){
 
             double alpha_s = 0.0;
-            if(fOrder==0)
-                alpha_s = alphasPDF(sqrt(Q2));
-            else
+            //if(fOrder==0)
+                //alpha_s = alphasPDF(sqrt(Q2));
+            //else
                 alpha_s = cteq_pdf_evolveas(fPDF, sqrt(Q2) );
 
 
