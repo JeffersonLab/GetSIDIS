@@ -6,9 +6,9 @@
 //  -- Zhihong Ye, 06/10/2014                       //
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
-//#include "SIDIS.h"
-#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
-//#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g are forced to zero, and only LO PDF
+#include "SIDIS.h"
+//#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+//#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
@@ -162,6 +162,8 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("nu",&nu,"data/D");
     t1->Branch("s",&s,"data/D");
     t1->Branch("pt",&pt,"data/D");
+    t1->Branch("gamma",&gamma,"data/D");
+    t1->Branch("epsilon", &epsilon,"data/D");
     t1->Branch("rapidity",&rapidity,"data/D");
     t1->Branch("theta_q",&theta_q,"data/D");
     t1->Branch("theta_s",&theta_s,"data/D");
@@ -231,6 +233,8 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("nu",&nu,"data/D");
         t2->Branch("s",&s,"data/D");
         t2->Branch("pt",&pt,"data/D");
+        t2->Branch("gamma",&gamma,"data/D");
+        t2->Branch("epsilon", &epsilon,"data/D");
         t2->Branch("rapidity",&rapidity,"data/D");
         t2->Branch("theta_q",&theta_q,"data/D");
         t2->Branch("theta_s",&theta_s,"data/D");
@@ -297,6 +301,8 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("nu",&nu,"data/D");
         t3->Branch("s",&s,"data/D");
         t3->Branch("pt",&pt,"data/D");
+        t3->Branch("gamma",&gamma,"data/D");
+        t3->Branch("epsilon", &epsilon,"data/D");
         t3->Branch("rapidity",&rapidity,"data/D");
         t3->Branch("theta_q",&theta_q,"data/D");
         t3->Branch("theta_s",&theta_s,"data/D");
@@ -351,6 +357,8 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("nu",&nu,"data/D");
         t4->Branch("s",&s,"data/D");
         t4->Branch("pt",&pt,"data/D");
+        t4->Branch("gamma",&gamma,"data/D");
+        t4->Branch("epsilon", &epsilon,"data/D");
         t4->Branch("rapidity",&rapidity,"data/D");
         t4->Branch("theta_q",&theta_q,"data/D");
         t4->Branch("theta_s",&theta_s,"data/D");
@@ -470,16 +478,16 @@ int main(Int_t argc, char *argv[]){
                 mom_gen_had, theta_gen_had, phi_gen_had,
                 ion_mass, A, Z, particle_flag);
 
-        mom_ele = sidis->mom_ele; theta_ele = sidis->theta_ele; phi_ele = sidis->phi_ele;
-        mom_had = sidis->mom_had; theta_had = sidis->theta_had; phi_had = sidis->phi_had;
-        theta_q=sidis->theta_q;  theta_s=sidis->theta_s; phi_s= sidis->phi_s; phi_h = sidis->phi_h;
-        px_ele = sidis->px_ele;	py_ele = sidis->py_ele;	pz_ele = sidis->pz_ele; E_ele = sidis->E_ele;
-        px_had = sidis->px_had;	py_had = sidis->py_had;	pz_had = sidis->pz_had; E_had = sidis->E_had;
+        mom_ele = sidis->fMom_ele; theta_ele = sidis->fTheta_ele; phi_ele = sidis->fPhi_ele;
+        mom_had = sidis->fMom_had; theta_had = sidis->fTheta_had; phi_had = sidis->fPhi_had;
+        theta_q=sidis->fTheta_q;  theta_s=sidis->fTheta_s; phi_s= sidis->fPhi_s; phi_h = sidis->fPhi_h;
+        px_ele = sidis->fPx_ele;	py_ele = sidis->fPy_ele;	pz_ele = sidis->fPz_ele; E_ele = sidis->fE_ele;
+        px_had = sidis->fPx_had;	py_had = sidis->fPy_had;	pz_had = sidis->fPz_had; E_had = sidis->fE_had;
 
-        x=sidis->x; y=sidis->y; z=sidis->z; Q2=sidis->Q2; W=sidis->W; Wp=sidis->Wp;
-        s=sidis->s; nu=sidis->nu; pt=sidis->pt; gamma=sidis->gamma; epsilon=sidis->epsilon;
-        rapidity = sidis->rapidity;
-        jacoF=sidis->jacoF;/*}}}*/
+        x=sidis->fXb; y=sidis->fY; z=sidis->fZ_h; Q2=sidis->fQ2; W=sidis->fW; Wp=sidis->fWp;
+        s=sidis->fS; nu=sidis->fNu; pt=sidis->fPt; gamma=sidis->fGamma; epsilon=sidis->fEpsilon;
+        rapidity = sidis->fRapidity;
+        jacoF=sidis->fJacobF;/*}}}*/
 
         if(bXSMode){
             /*Generate Events based on XS and also for LUND output{{{*/
@@ -510,25 +518,6 @@ int main(Int_t argc, char *argv[]){
                 D_unfav = sidis->get_Dunfav();
                 D_s = sidis->get_Ds();
                 D_g = sidis->get_Dg();
-                /*}}}*/
-
-                //to avoid some wired behavior in log scale/*{{{*/
-                if((dxs_incl)<1e-16) dxs_incl=1e-16;
-                if((dxs_hp)<1e-16) dxs_hp=1e-16;
-                if((dxs_hm)<1e-16) dxs_hm=1e-16;
-                if((dilute_hp)<1e-16) dilute_hp=1e-16;
-                if((dilute_hm)<1e-16) dilute_hm=1e-16;
-
-                if(isnan(dxs_incl)) dxs_incl=1e-16;
-                if(isnan(dxs_hp)) dxs_hp=1e-16;
-                if(isnan(dxs_hm)) dxs_hm=1e-16;
-                if(isnan(dilute_hp)) dilute_hp=1e-16;
-                if(isnan(dilute_hm)) dilute_hm=1e-16;
-                if(isinf(dxs_incl)) dxs_incl=1e-16;
-                if(isinf(dxs_hp)) dxs_hp=1e-16;
-                if(isinf(dxs_hm)) dxs_hm=1e-16;
-                if(isinf(dilute_hp)) dilute_hp=1e-16;
-                if(isinf(dilute_hm)) dilute_hm=1e-16;
                 /*}}}*/
 
                 /*LUND For Positive Hadron{{{*/
@@ -706,25 +695,6 @@ int main(Int_t argc, char *argv[]){
                 D_unfav = sidis->get_Dunfav();
                 D_s = sidis->get_Ds();
                 D_g = sidis->get_Dg();
-                /*}}}*/
-
-                //to avoid some wired behavior in log scale/*{{{*/
-                if((dxs_incl)<1e-16) dxs_incl=1e-16;
-                if((dxs_hp)<1e-16) dxs_hp=1e-16;
-                if((dxs_hm)<1e-16) dxs_hm=1e-16;
-                if((dilute_hp)<1e-16) dilute_hp=1e-16;
-                if((dilute_hm)<1e-16) dilute_hm=1e-16;
-
-                if(isnan(dxs_incl)) dxs_incl=1e-16;
-                if(isnan(dxs_hp)) dxs_hp=1e-16;
-                if(isnan(dxs_hm)) dxs_hm=1e-16;
-                if(isnan(dilute_hp)) dilute_hp=1e-16;
-                if(isnan(dilute_hm)) dilute_hm=1e-16;
-                if(isinf(dxs_incl)) dxs_incl=1e-16;
-                if(isinf(dxs_hp)) dxs_hp=1e-16;
-                if(isinf(dxs_hm)) dxs_hm=1e-16;
-                if(isinf(dilute_hp)) dilute_hp=1e-16;
-                if(isinf(dilute_hm)) dilute_hm=1e-16;
                 /*}}}*/
 
                 /*LUND For Positive Hadron{{{*/
@@ -913,9 +883,9 @@ int main(Int_t argc, char *argv[]){
 
     //Generate weights for uniform distributed events
     if(!bXSMode){/*{{{*/
-        double weight_hp=1.0e-16;
-        double weight_hm=1.0e-16;
-        double weight_in=1.0e-16;
+        double weight_hp=1.0e-34;
+        double weight_hm=1.0e-34;
+        double weight_in=1.0e-34;
         /*Generate weights for file1{{{*/
         cout<<"--- Now insert weights to Root-file #1"<<filename1.Data()<<endl;
         TFile *f1 = new TFile(filename1.Data(), "update");
@@ -924,10 +894,11 @@ int main(Int_t argc, char *argv[]){
         T1->SetBranchAddress("dxs_hp",&dxs_hp);
         T1->SetBranchAddress("dxs_hm",&dxs_hm);
         T1->SetBranchAddress("dxs_incl",&dxs_incl);
-        //ULong64_t nsim1; 
-        //T1->SetBranchAddress("nsim",&nsim1);
-        //T1->GetEntry(N1-1);          //get nsim for this rootfile
-        //ULong64_t Nsim1=nsim1;
+        ULong64_t nsim1; 
+        T1->SetBranchAddress("nsim",&nsim1);
+        T1->GetEntry(N1-1);          //get nsim for this rootfile
+        ULong64_t Nsim10=nsim1;
+        cout<<Form("--- Root#1: Nsim = %lld / %lld", Nsim1, Nsim10)<<endl;
 
         TBranch *branch_weight_in1=T1->Branch("weight_in",&weight_in,"weight_in/D");
         TBranch *branch_weight_hp1=T1->Branch("weight_hp",&weight_hp,"weight_hp/D");
@@ -940,15 +911,15 @@ int main(Int_t argc, char *argv[]){
             weight_hp=dxs_hp*Phase_space/Nsim1;   
             weight_hm=dxs_hm*Phase_space/Nsim1;
 
-            if((weight_in)<1e-16) weight_in=1e-16;
-            if((weight_hp)<1e-16) weight_hp=1e-16;
-            if((weight_hm)<1e-16) weight_hm=1e-16;
-            if(isnan(weight_in)) weight_in=1e-16;
-            if(isnan(weight_hp)) weight_hp=1e-16;
-            if(isnan(weight_hm)) weight_hm=1e-16;
-            if(isinf(weight_in)) weight_in=1e-16;
-            if(isinf(weight_hp)) weight_hp=1e-16;
-            if(isinf(weight_hm)) weight_hm=1e-16;
+            if((weight_in)<1e-34) weight_in=1e-34;
+            if((weight_hp)<1e-34) weight_hp=1e-34;
+            if((weight_hm)<1e-34) weight_hm=1e-34;
+            if(isnan(weight_in)) weight_in=1e-34;
+            if(isnan(weight_hp)) weight_hp=1e-34;
+            if(isnan(weight_hm)) weight_hm=1e-34;
+            if(isinf(weight_in)) weight_in=1e-34;
+            if(isinf(weight_hp)) weight_hp=1e-34;
+            if(isinf(weight_hm)) weight_hm=1e-34;
 
 
             branch_weight_in1->Fill();
@@ -968,10 +939,11 @@ int main(Int_t argc, char *argv[]){
             T2->SetBranchAddress("dxs_incl",&dxs_incl);
             T2->SetBranchAddress("dxs_hp",&dxs_hp);
             T2->SetBranchAddress("dxs_hm",&dxs_hm);
-            //ULong64_t nsim2; 
-            //T2->SetBranchAddress("nsim",&nsim2);
-            //T2->GetEntry(N2-1);          //get nsim for this rootfile
-            //ULong64_t Nsim2=nsim2;
+            ULong64_t nsim2; 
+            T2->SetBranchAddress("nsim",&nsim2);
+            T2->GetEntry(N2-1);          //get nsim for this rootfile
+            ULong64_t Nsim20=nsim2;
+            cout<<Form("--- Root#2: Nsim = %lld / %lld", Nsim2, Nsim20)<<endl;
 
             TBranch *branch_weight_in2=T2->Branch("weight_in",&weight_in,"weight_in/D");
             TBranch *branch_weight_hp2=T2->Branch("weight_hp",&weight_hp,"weight_hp/D");
@@ -984,15 +956,15 @@ int main(Int_t argc, char *argv[]){
                 weight_hp=dxs_hp*Phase_space/Nsim2;   
                 weight_hm=dxs_hm*Phase_space/Nsim2;
 
-                if((weight_in)<1e-16) weight_in=1e-16;
-                if((weight_hp)<1e-16) weight_hp=1e-16;
-                if((weight_hm)<1e-16) weight_hm=1e-16;
-                if(isnan(weight_in)) weight_in=1e-16;
-                if(isnan(weight_hp)) weight_hp=1e-16;
-                if(isnan(weight_hm)) weight_hm=1e-16;
-                if(isinf(weight_in)) weight_in=1e-16;
-                if(isinf(weight_hp)) weight_hp=1e-16;
-                if(isinf(weight_hm)) weight_hm=1e-16;
+                if((weight_in)<1e-34) weight_in=1e-34;
+                if((weight_hp)<1e-34) weight_hp=1e-34;
+                if((weight_hm)<1e-34) weight_hm=1e-34;
+                if(isnan(weight_in)) weight_in=1e-34;
+                if(isnan(weight_hp)) weight_hp=1e-34;
+                if(isnan(weight_hm)) weight_hm=1e-34;
+                if(isinf(weight_in)) weight_in=1e-34;
+                if(isinf(weight_hp)) weight_hp=1e-34;
+                if(isinf(weight_hm)) weight_hm=1e-34;
                 branch_weight_in2->Fill();
                 branch_weight_hp2->Fill();
                 branch_weight_hm2->Fill();
@@ -1011,10 +983,11 @@ int main(Int_t argc, char *argv[]){
             T3->SetBranchAddress("dxs_incl",&dxs_incl);
             T3->SetBranchAddress("dxs_hp",&dxs_hp);
             T3->SetBranchAddress("dxs_hm",&dxs_hm);
-            //ULong64_t nsim3; 
-            //T3->SetBranchAddress("nsim",&nsim3);
-            //T3->GetEntry(N3-1);          //get nsim for this rootfile
-            //ULong64_t Nsim3=nsim3;
+            ULong64_t nsim3; 
+            T3->SetBranchAddress("nsim",&nsim3);
+            T3->GetEntry(N3-1);          //get nsim for this rootfile
+            ULong64_t Nsim30=nsim3;
+            cout<<Form("--- Root#3: Nsim = %lld / %lld", Nsim3, Nsim30)<<endl;
 
 
             TBranch *branch_weight_in3=T3->Branch("weight_in",&weight_in,"weight_in/D");
@@ -1028,15 +1001,15 @@ int main(Int_t argc, char *argv[]){
                 weight_hp=dxs_hp*Phase_space/Nsim3;   
                 weight_hm=dxs_hm*Phase_space/Nsim3;
 
-                if((weight_in)<1e-16) weight_in=1e-16;
-                if((weight_hp)<1e-16) weight_hp=1e-16;
-                if((weight_hm)<1e-16) weight_hm=1e-16;
-                if(isnan(weight_in)) weight_in=1e-16;
-                if(isnan(weight_hp)) weight_hp=1e-16;
-                if(isnan(weight_hm)) weight_hm=1e-16;
-                if(isinf(weight_in)) weight_in=1e-16;
-                if(isinf(weight_hp)) weight_hp=1e-16;
-                if(isinf(weight_hm)) weight_hm=1e-16;
+                if((weight_in)<1e-34) weight_in=1e-34;
+                if((weight_hp)<1e-34) weight_hp=1e-34;
+                if((weight_hm)<1e-34) weight_hm=1e-34;
+                if(isnan(weight_in)) weight_in=1e-34;
+                if(isnan(weight_hp)) weight_hp=1e-34;
+                if(isnan(weight_hm)) weight_hm=1e-34;
+                if(isinf(weight_in)) weight_in=1e-34;
+                if(isinf(weight_hp)) weight_hp=1e-34;
+                if(isinf(weight_hm)) weight_hm=1e-34;
                 
                 branch_weight_in3->Fill();
                 branch_weight_hp3->Fill();
@@ -1054,10 +1027,11 @@ int main(Int_t argc, char *argv[]){
             T4->SetBranchAddress("dxs_incl",&dxs_incl);
             T4->SetBranchAddress("dxs_hp",&dxs_hp);
             T4->SetBranchAddress("dxs_hm",&dxs_hm);
-            //ULong64_t nsim4; 
-            //T4->SetBranchAddress("nsim",&nsim4);
-            //T4->GetEntry(N4-1);          //get nsim for this rootfile
-            //ULong64_t Nsim4=nsim4;
+            ULong64_t nsim4; 
+            T4->SetBranchAddress("nsim",&nsim4);
+            T4->GetEntry(N4-1);          //get nsim for this rootfile
+            ULong64_t Nsim40=nsim4;
+            cout<<Form("--- Root#4: Nsim = %lld / %lld", Nsim4, Nsim40)<<endl;
 
             TBranch *branch_weight_in4=T4->Branch("weight_in",&weight_in,"weight_in/D");
             TBranch *branch_weight_hp4=T4->Branch("weight_hp",&weight_hp,"weight_hp/D");
@@ -1070,15 +1044,15 @@ int main(Int_t argc, char *argv[]){
                 weight_hp=dxs_hp*Phase_space/Nsim4;   
                 weight_hm=dxs_hm*Phase_space/Nsim4;
 
-                if((weight_in)<1e-16) weight_in=1e-16;
-                if((weight_hp)<1e-16) weight_hp=1e-16;
-                if((weight_hm)<1e-16) weight_hm=1e-16;
-                if(isnan(weight_in)) weight_in=1e-16;
-                if(isnan(weight_hp)) weight_hp=1e-16;
-                if(isnan(weight_hm)) weight_hm=1e-16;
-                if(isinf(weight_in)) weight_in=1e-16;
-                if(isinf(weight_hp)) weight_hp=1e-16;
-                if(isinf(weight_hm)) weight_hm=1e-16;
+                if((weight_in)<1e-34) weight_in=1e-34;
+                if((weight_hp)<1e-34) weight_hp=1e-34;
+                if((weight_hm)<1e-34) weight_hm=1e-34;
+                if(isnan(weight_in)) weight_in=1e-34;
+                if(isnan(weight_hp)) weight_hp=1e-34;
+                if(isnan(weight_hm)) weight_hm=1e-34;
+                if(isinf(weight_in)) weight_in=1e-34;
+                if(isinf(weight_hp)) weight_hp=1e-34;
+                if(isinf(weight_hm)) weight_hm=1e-34;
 
                 branch_weight_in4->Fill();
                 branch_weight_hp4->Fill();
@@ -1202,45 +1176,45 @@ int main(Int_t argc, char *argv[]){
     /*double GetIonMass(const int A, const int Z){{{*/
     double GetIonMass(const int A, const int Z){
         double ion_mass = 0.0;
-        if(A==1 && Z==1)//Hydrogen
-            ion_mass = mass_p;
-        else if(A==1 && Z==0)//Neutron
-            ion_mass = mass_n;
-        else if(A==2 && Z==1)//Deutron
-            ion_mass = mass_u*2.014102;
-        else if(A==3 && Z==1)//Tritium
-            ion_mass = mass_u*3.016049;
-        else if(A==3 && Z==2)//He3
-            ion_mass = mass_u*3.016029;
-        else if(A==4 && Z==2)//He4
-            ion_mass = mass_u*4.002602;
-        else if(A==7 && Z==3)//Lithium
-            ion_mass = mass_u*6.941000;
-        else if(A==9 && Z==4)//Be9
-            ion_mass = mass_u*9.012182;
-        else if(A==10 && Z==5)//Boron
-            ion_mass = mass_u*10.811000;
-        else if(A==12 && Z==6)//Carbon
-            ion_mass = mass_u*12.010700;
-        else if(A==14 && Z==7)//Nitrogen
-            ion_mass = mass_u*14.0067;
-        else if(A==16 && Z==8)//Oxygen
-            ion_mass = mass_u*15.9994;
-        else if(A==27 && Z==13)//Al
-            ion_mass = mass_u*26.981539;
-        else if(A==40 && Z==20)//C40
-            ion_mass = mass_u*40.07800;
-        else if(A==48 && Z==20)//C40
-            ion_mass = mass_u*47.952534;
-        else if(A==56 && Z==26)//Fe
-            ion_mass = mass_u*55.84500;
-        else if(A==64 && Z==29)//Cu
-            ion_mass = mass_u*63.546;
-        else if(A==197 && Z==79)//Cu
-            ion_mass = mass_u*196.966569;
-        //if the target is not in the list above, simply add the total mass of protons and neutrons
-        //but in general you can look at the PERIODIC TABLE for new target you want to add
-        else
+        //if(A==1 && Z==1)//Hydrogen
+            //ion_mass = mass_p;
+        //else if(A==1 && Z==0)//Neutron
+            //ion_mass = mass_n;
+        //else if(A==2 && Z==1)//Deutron
+            //ion_mass = mass_u*2.014102;
+        //else if(A==3 && Z==1)//Tritium
+            //ion_mass = mass_u*3.016049;
+        //else if(A==3 && Z==2)//He3
+            //ion_mass = mass_u*3.016029;
+        //else if(A==4 && Z==2)//He4
+            //ion_mass = mass_u*4.002602;
+        //else if(A==7 && Z==3)//Lithium
+            //ion_mass = mass_u*6.941000;
+        //else if(A==9 && Z==4)//Be9
+            //ion_mass = mass_u*9.012182;
+        //else if(A==10 && Z==5)//Boron
+            //ion_mass = mass_u*10.811000;
+        //else if(A==12 && Z==6)//Carbon
+            //ion_mass = mass_u*12.010700;
+        //else if(A==14 && Z==7)//Nitrogen
+            //ion_mass = mass_u*14.0067;
+        //else if(A==16 && Z==8)//Oxygen
+            //ion_mass = mass_u*15.9994;
+        //else if(A==27 && Z==13)//Al
+            //ion_mass = mass_u*26.981539;
+        //else if(A==40 && Z==20)//C40
+            //ion_mass = mass_u*40.07800;
+        //else if(A==48 && Z==20)//C40
+            //ion_mass = mass_u*47.952534;
+        //else if(A==56 && Z==26)//Fe
+            //ion_mass = mass_u*55.84500;
+        //else if(A==64 && Z==29)//Cu
+            //ion_mass = mass_u*63.546;
+        //else if(A==197 && Z==79)//Cu
+            //ion_mass = mass_u*196.966569;
+////        if the target is not in the list above, simply add the total mass of protons and neutrons
+////        but in general you can look at the PERIODIC TABLE for new target you want to add
+        //else
             ion_mass = Z*mass_p+(A-Z)*mass_n;
 
         return ion_mass;
