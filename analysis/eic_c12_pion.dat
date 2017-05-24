@@ -6,15 +6,15 @@
 ## ---, Z. Ye, 08/09/2016
 ###############################
 ## 1), int,  Target A
- 2
+ 12
 ## 2), int, Target Z
- 1
+ 6
 ## 3), int , Particle Flag: 1->pion, 2->kaon
  1
 ## 4), double, Electron Momentum (GeV/c)
  10
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
- 100
+ 600
 ## 6), int, Number of events. 
  100000
 ###  If events are generated based on XS, save total events in one ROOT file
