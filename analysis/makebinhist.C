@@ -106,24 +106,14 @@ int main(){
   //      TTree *t1 = (TTree*) f1->Get("T");
        TChain* t1 = new TChain("T");
        if(fA ==12){
-            if(imodel==1) new_filename=Form("./c12_pion_LO_free_noPt/EIC_A12_pion_10_600_skim%d_wide_free_noPt.root",j);
-            if(imodel==2) new_filename=Form("./c12_pion_LO_noPt/EIC_A12_pion_10_600_skim%d_wide_noPt.root",j);
+            if(imodel==1) new_filename=Form("./c12_pion_LO_free/EIC_A12_pion_10_600_skim%d_wide_free.root",j);
+            if(imodel==2) new_filename=Form("./c12_pion_LO/EIC_A12_pion_10_600_skim%d_wide.root",j);
             t1->Add(new_filename.Data());
             cerr<<Form("-- Reading in file: %s", new_filename.Data())<<endl;
-            
-            //if(imodel==1) new_filename=Form("./c12_pion_LO_free_noPt/EIC_A12_pion_10_600_skim%d_wide_free_noPt_new.root",j);
-            if(imodel==2) new_filename=Form("./c12_pion_LO_noPt/EIC_A12_pion_10_600_skim%d_wide_noPt_new.root",j);
-            t1->Add(new_filename.Data());
-            cerr<<Form("-- Reading in file: %s", new_filename.Data())<<endl;
-        }
-        if(fA ==2){
-            if(imodel==1) new_filename=Form("./d2_pion_LO_free_noPt/EIC_A2_pion_10_100_skim%d_wide_free_noPt.root",j);
-            if(imodel==2) new_filename=Form("./d2_pion_LO_noPt/EIC_A2_pion_10_100_skim%d_wide_noPt.root",j);
-            t1->Add(new_filename.Data());
-            cerr<<Form("-- Reading in file: %s", new_filename.Data())<<endl;
-            
-            //if(imodel==1) new_filename=Form("./d2_pion_LO_free_noPt/EIC_A2_pion_10_100_skim%d_wide_free_noPt_new.root",j);
-            if(imodel==2) new_filename=Form("./d2_pion_LO_noPt/EIC_A2_pion_10_100_skim%d_wide_noPt_new.root",j);
+       }
+       if(fA ==2){
+            if(imodel==1) new_filename=Form("./d2_pion_LO_free/EIC_A2_pion_10_100_skim%d_wide_free.root",j);
+            if(imodel==2) new_filename=Form("./d2_pion_LO/EIC_A2_pion_10_100_skim%d_wide.root",j);
             t1->Add(new_filename.Data());
             cerr<<Form("-- Reading in file: %s", new_filename.Data())<<endl;
         }

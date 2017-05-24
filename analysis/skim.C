@@ -59,11 +59,11 @@ int main(Int_t argc, char *argv[]){
     for(int i=0;i<100;i++){
         for(int j=1;j<=4;j++){
             if(fA ==12)
-                //T->Add(Form("./c12_pion_LO_free_noPt/EIC_A12_pion_10_600_%d_%d.root", j, i));
-                T->Add(Form("./c12_pion_LO_noPt/EIC_A12_pion_10_600_%d_%d.root", j, i));
+                //T->Add(Form("./c12_pion_LO_free/EIC_A12_pion_10_600_%d_%d.root", j, i));
+                T->Add(Form("./c12_pion_LO/EIC_A12_pion_10_600_%d_%d.root", j, i));
              if(fA ==2)
-                //T->Add(Form("./d2_pion_LO_free_noPt/EIC_A2_pion_10_100_%d_%d.root", j, i));
-                T->Add(Form("./d2_pion_LO_noPt/EIC_A2_pion_10_100_%d_%d.root", j, i));
+                //T->Add(Form("./d2_pion_LO_free/EIC_A2_pion_10_100_%d_%d.root", j, i));
+                T->Add(Form("./d2_pion_LO/EIC_A2_pion_10_100_%d_%d.root", j, i));
         }
     }
     /*Define{{{*/
@@ -158,13 +158,13 @@ int main(Int_t argc, char *argv[]){
     TString new_filename[8];
     if(fA ==12){
         for(int i=0;i<8;i++)
-            //new_filename[i]=Form("./c12_pion_LO_free_noPt/EIC_A12_pion_10_600_skim%d_wide_free_noPt.root",i);
-            new_filename[i]=Form("./c12_pion_LO_noPt/EIC_A12_pion_10_600_skim%d_wide_noPt_new1.root",i);
+            //new_filename[i]=Form("./c12_pion_LO_free/EIC_A12_pion_10_600_skim%d_wide_free.root",i);
+            new_filename[i]=Form("./c12_pion_LO/EIC_A12_pion_10_600_skim%d_wide.root",i);
     }
     if(fA ==2){
         for(int i=0;i<8;i++)
-            //new_filename[i]=Form("./d2_pion_LO_free_noPt/EIC_A2_pion_10_100_skim%d_wide_free_noPt.root",i);
-            new_filename[i]=Form("./d2_pion_LO_noPt/EIC_A2_pion_10_100_skim%d_wide_noPt_new1.root",i);
+            //new_filename[i]=Form("./d2_pion_LO_free/EIC_A2_pion_10_100_skim%d_wide_free.root",i);
+            new_filename[i]=Form("./d2_pion_LO/EIC_A2_pion_10_100_skim%d_wide.root",i);
     }
 
     /*Define new rootfile for each bin{{{*/

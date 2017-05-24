@@ -10,7 +10,8 @@
  I have a farm script "gofarm" to submit jobs to batch-farms, also "run.sh" is usefull. 
 
 ## Bin the data and calculate observables, such as counts and average kinematic quantities in each bin
- * Use this script, "MakeBinHist.C", to bin the data for D2, C12 in two different configuration
+* Using "skim.C" to merge all ROOT files generated (0-N), and then split them into individual files for different bins
+* Use this script, "MakeBinHist.C", to read the binned data from "skim" ROOT files for D2, C12 in two different configuration
 
 ## Read in binned data of D2 and C12, calculate asymmetry (or super-ratio)
  * A python Jupyter notebook script was written to do this job, named "asym_lo.ipynb"
