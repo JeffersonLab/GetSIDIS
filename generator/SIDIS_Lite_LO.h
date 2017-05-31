@@ -766,11 +766,11 @@ class SIDIS
             double dxs_hm_temp = dxs_hp_temp;
 
             //Temparetly set to zero, 02/10/2017
-            dxs_hp_temp *= fXb;
-            dxs_hm_temp *= fXb; 
+            //dxs_hp_temp *= fXb;
+            //dxs_hm_temp *= fXb; 
 
-            //dxs_hp_temp *= bpt_p/PI*exp(-bpt_p*pt_tmp*pt_tmp)*fXb;
-            //dxs_hm_temp *= bpt_m/PI*exp(-bpt_m*pt_tmp*pt_tmp)*fXb;
+            dxs_hp_temp *= bpt_p/PI*exp(-bpt_p*pt_tmp*pt_tmp)*fXb;
+            dxs_hm_temp *= bpt_m/PI*exp(-bpt_m*pt_tmp*pt_tmp)*fXb;
 
             double df_p_hp=0,df_p_hm=0;
             double df_n_hp=0,df_n_hm=0;
@@ -865,7 +865,6 @@ class SIDIS
             //else
                 alpha_s = cteq_pdf_evolveas(fPDF, sqrt(fQ2) );
 
-
             //cout << fY << "\t" << fQ2 << endl;
             //cout << alpha_s << endl;
 
@@ -882,6 +881,7 @@ class SIDIS
 
             double uquark=0.0,dquark=0.0,squark=0.0,ubarquark=0.0,dbarquark=0.0,sbarquark=0.0, gluon=0.0;
             double D_fav,D_unfav,D_s,D_g;
+            
             // doing the integral
             for (Int_t i=0;i!=100;i++){
                 xp = fXb + (1-fXb)/100.*(i+0.5);
