@@ -15,7 +15,7 @@
  10
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
  100
-## 6), int, Number of events. 
+## 6), int, Number of events.
  100000
 ###  If events are generated based on XS, save total events in one ROOT file
 ###  If events are generated uniformly, multiple ROOT files are created:
@@ -37,7 +37,7 @@ CTEQPDF
  0
 ## 12), int, save events based on XS or not, 1-> yes, 0->no
  0
-## 13), string, output file name, useful for batch farm jobs. 
+## 13), string, output file name, useful for batch farm jobs.
 ##      Set "NONE" for default names (eg., EIC_A12_Z6_pion_10_100_4_0.root)
  NONE
 ## 14), Debug, print out some useful information. Not in use now

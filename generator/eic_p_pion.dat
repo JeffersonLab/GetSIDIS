@@ -12,9 +12,9 @@
 ## 3), int , Particle Flag: 1->pion, 2->kaon
  1
 ## 4), double, Electron Momentum (GeV/c)
- 11
+ 10
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
- 0
+ 100
 ## 6), int, Number of events.
  100000
 ###  If events are generated based on XS, save total events in one ROOT file
@@ -24,21 +24,21 @@
 ###           EIC:  3 -> Q2>10, pt<1
 ###                 4 -> Q2>10, pt>1
 ## 7), int, FileNo, for Batch farm purpose
-##     If it is '0', use the number in the command line, e.g., ./GetSIDIS input_c12_kaon.dat 10
+##     If it is '0', use the number in the command line, e.g., ./GetSIDIS input_c12_pion.dat 10
  0
 ## 8), string, Configuration, "EIC" or "SoLID". Can add CLAS12 as well but not now
- SoLID
-## 9), string, PDF Model Type, "LHAPDF", "CTEQPDF" or "EPS09" or "nCTEQ15"(available soon)
- CTEQPDF
+ EIC
+## 9), string, PDF Model Type, "LHAPDF" or "EPS09" or "CTEQPDF"
+EPS09
 ## 10), Maximum Cross Section Value
 ##      0nly useful when generating LUND format or save root files based on XS distribution
- 1000.0
+ 10000.0
 ## 11), int, LUND output or not, 1-> yes, 0->no
- 1
+ 0
 ## 12), int, save events based on XS or not, 1-> yes, 0->no
- 1
+ 0
 ## 13), string, output file name, useful for batch farm jobs.
-##      Set "NONE" for default names (eg., EIC_A12_Z6_kaon_10_100_4_0.root)
+##      Set "NONE" for default names (eg., EIC_A12_Z6_pion_10_100_4_0.root)
  NONE
 ## 14), Debug, print out some useful information. Not in use now
  1

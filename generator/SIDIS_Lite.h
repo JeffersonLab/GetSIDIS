@@ -73,7 +73,7 @@ class SIDIS
         SIDIS(TString kModel){/*{{{*/
             fModel = kModel;
             if(fModel=="EPS09"){
-                //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, 
+                //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M,
                 fOrder = 2;
                 SetEPS09();
             }
@@ -93,25 +93,25 @@ class SIDIS
         }/*}}}*/
 
         virtual ~SIDIS(){/*{{{*/
-            if(fModel=="CTEQPDF"||fModel=="EPS09") 
+            if(fModel=="CTEQPDF"||fModel=="EPS09")
                 cteq_pdf_free(fPDF);
         }/*}}}*/
 
         /*void Print(){{{*/
         void Print(){
-            cerr<<"===================================================================================================="<<endl;	
+            cerr<<"===================================================================================================="<<endl;
             cerr<<" --- Useage:"<<endl;
             cerr<<"      1, SetKin(momentum_ele, momentum_ion, P_ele, Th_ele, Ph_ele, P_had, Th_had, Ph_had, A, Z, ptc_flg)"<<endl;
             cerr<<"           where momentum_* and P_* are in GeV/c, and Theta_* and Phi_* are in Deg,"<<endl;
             cerr<<"                  pct_flag = 1->Pion+, 2->Pion-, 3->Kaon+, 4->Kaon-;"<<endl;
-            cerr<<"      2, CalcXS() --> Calculated dxs_hp and dxs_hm; "<<endl; 
+            cerr<<"      2, CalcXS() --> Calculated dxs_hp and dxs_hm; "<<endl;
             cerr<<"      3, GetXS_HP() --> Get SIDIS XS of Pion+ or Kaon+ ,"<<endl;
             cerr<<"         GetXS_HM() --> Get SIDIS XS of Pion- or Kaon- ,"<<endl;
             cerr<<"         GetDilute_HP() --> Get Dilution of Pion+ or Kaon+ ,"<<endl;
             cerr<<"         GetDilute_HM() --> Get Dilution of Pion- or Kaon- ,"<<endl;
             cerr<<"      4, Other Output Quantities can be calculated after running CalcXS: "<<endl;
             cerr<<"           Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon, jacoF "<<endl;
-            cerr<<"===================================================================================================="<<endl;	
+            cerr<<"===================================================================================================="<<endl;
 
         }
         /*}}}*/
@@ -132,7 +132,7 @@ class SIDIS
             //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
             fPDF = cteq_pdf_alloc_id(mode);
         }/*}}}*/
-        
+
         void SetCTEQ(){/*{{{*/
             int mode = 0;
             if(fOrder==1||fOrder==3)
@@ -170,9 +170,9 @@ class SIDIS
         }/*}}}*/
 
         /*void SetKin( double mom_beam_ele, double mom_target,...){{{*/
-        void SetKin(double kMom_beam_ele,double kMom_beam_ion,                        // GeV          GeV   
-                double kP_ele, double kTh_ele, double kPh_ele,         // GeV/c         DEG            DEG 
-                double kP_had, double kTh_had, double kPh_had,         // GeV/c         DEG            DEG 
+        void SetKin(double kMom_beam_ele,double kMom_beam_ion,                        // GeV          GeV
+                double kP_ele, double kTh_ele, double kPh_ele,         // GeV/c         DEG            DEG
+                double kP_had, double kTh_had, double kPh_had,         // GeV/c         DEG            DEG
                 double kMass_ion,int kA, int kZ,  int kPtcl_flag){
 
             /*Define{{{*/
@@ -192,7 +192,7 @@ class SIDIS
             //--- I have question here: -- Z. Ye 07/27
             //  1) to get x, use the ion_mass, proton-mass or the average mass target_mass/A?
             //  2) then what is the momentum? Is it Mom_ion or Mom_ion/A?
-            //  I will use the average values temprately 
+            //  I will use the average values temprately
             ///////////////////////////////////////////////////////////////////////////////////
             //double mass_target = kMass_ion/kA;
             double mass_target = mass_p;
@@ -207,10 +207,10 @@ class SIDIS
                 fMass_Hadron = mass_kaon;
             }else{
                 cout << "particle_flag is wrong +-1 and +-2" << endl;
-            }	
+            }
 
             // //define the 4-momentum
-            //define electron direction as +z assuming a proton/neutron for the ion mass now 
+            //define electron direction as +z assuming a proton/neutron for the ion mass now
             // approximation for SIDIS
             TLorentzVector *P4_ini_ele = new TLorentzVector(0.,0.,mom_beam_ele, energy_beam_ele);
             TLorentzVector *P4_ini_ion = new TLorentzVector(0.,0.,-mom_target, energy_target);
@@ -268,7 +268,7 @@ class SIDIS
             *lrz_P4_ef = *P4_fin_ele;
 
             lrz_P4_ef->Boost(vnboost);
-            lrz_P4_h->Boost(vnboost); 
+            lrz_P4_h->Boost(vnboost);
             lrz_P4_q->Boost(vnboost);
 
             fGamma = 2*mass_target *fXb/sqrt(fQ2);
@@ -303,23 +303,23 @@ class SIDIS
             fTheta_had = P4_fin_had->Theta();
             fPhi_ele = P4_fin_ele->Phi();
             fPhi_had = P4_fin_had->Phi();
-            
+
             fRapidity = 0.5 * log((fMom_had + fPz_had)/(fMom_had - fPz_had)  );
 
             fJacobF = Jacobian(fMom_ele,fTheta_ele,fPhi_ele,fMom_had,fTheta_had,fPhi_had,mom_target,energy_target,mom_beam_ele);
             /*}}}*/
 
-            delete P4_ini_ele; delete P4_ini_ion;  
-            delete P4_fin_had; delete P4_fin_ele; delete P4_q; 
+            delete P4_ini_ele; delete P4_ini_ion;
+            delete P4_fin_had; delete P4_fin_ele; delete P4_q;
             delete lrz_P4_q; delete lrz_P4_h; delete lrz_P4_ef;
-        } 
+        }
         /*}}}*/
 
         /*int CalcXS(){{{*/
         int CalcXS(){
             double bpt_m=4.694;
             double bpt_p=4.661;
-            double pt_tmp = 0.0;	
+            double pt_tmp = 0.0;
             double dxs_all[3][4];
             double dxs_hp = -1000.0;
             double dxs_hm = -1000.0;
@@ -344,7 +344,7 @@ class SIDIS
 
             pt_tmp = fPt;
             if(fPt<0.8){
-                //first method 	 
+                //first method
                 bpt_p = 1./(0.2+fZ_h*fZ_h*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
                 ////Disable the TMD feature temparately, 02/01/2017
                 //bpt_p = 1./(0.2);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
@@ -375,7 +375,7 @@ class SIDIS
                 // bpt_p=4.661;
 
                 pt_tmp = 0.8;
-                GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[0], &dxs_temp[1],dxs_all[0]);	   
+                GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[0], &dxs_temp[1],dxs_all[0]);
 
                 //calculating the TMD parts using the new vpt_p values
                 bpt_p = 1./(0.25+fZ_h*fZ_h*0.28);// <pt^2> = 0.25 GeV^2 (quark internal momentum)
@@ -385,7 +385,7 @@ class SIDIS
 
                 //taking into account the NLO etc
                 pt_tmp = 1.0;
-                GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);	   
+                GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);
                 GetXS_hPt(pt_tmp, &dxs_temp[4],&dxs_temp[5],dxs_all[2]);
 
                 K[0] = (dxs_temp[0]-dxs_temp[2])/dxs_temp[4];
@@ -396,7 +396,7 @@ class SIDIS
 
                 if (fPt>1.2){
                     pt_tmp = fPt;
-                    GetXS(pt_tmp,bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);	   
+                    GetXS(pt_tmp,bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);
                     GetXS_hPt(pt_tmp,&dxs_temp[4],&dxs_temp[5],dxs_all[2]);
 
                     dxs_hp = dxs_temp[2] + K[0]*dxs_temp[4];
@@ -407,7 +407,7 @@ class SIDIS
 
                 }else{
                     pt_tmp = 1.2;
-                    GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);	   
+                    GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);
                     GetXS_hPt(pt_tmp,&dxs_temp[4],&dxs_temp[5],dxs_all[2]);
 
                     dxs_temp[2] = dxs_temp[2] + K[0]*dxs_temp[4];
@@ -451,7 +451,7 @@ class SIDIS
             /*}}}*/
 
             /*Save&Return{{{*/
-            dxs_hp *= decay_part; 
+            dxs_hp *= decay_part;
             dxs_hm *= decay_part;
 
             //to avoid some wired behavior in log scale/*{{{*/
@@ -477,7 +477,7 @@ class SIDIS
             fXS_HP = dxs_hp;
             fXS_HM = dxs_hm;
 
-            if(err_hp==0&&err_hm==0) 
+            if(err_hp==0&&err_hm==0)
                 return 0;
             else if(err_hp==0&&err_hm==1)
                 return 1;
@@ -487,7 +487,7 @@ class SIDIS
                 return 2;
             /*}}}*/
 
-        } 
+        }
         /*}}}*/
 
         /*Return Values{{{*/
@@ -515,15 +515,15 @@ class SIDIS
         double get_ubar(){ return fubar; }//return the average u
         double get_dbar(){ return fdbar; }//return the average d
         double get_sbar(){ return fsbar; }//return the average s
-        
+
         double get_Dfav(){ return fD_fav; }//return the favor Fragmentation Function
         double get_Dunfav(){ return fD_unfav; }//return the unfavor Fragmentation Function
         double get_Ds(){ return fD_s; }//return the sea Fragmentation Function
         double get_Dg(){ return fD_g; }//return the gluon Fragmentation Function
         /*}}}*/
-        
-        /*double RunCTEQPDF(double x,double fQ2){{{*/          
-        void RunCTEQPDF(double ix,double iQ2)          
+
+        /*double RunCTEQPDF(double x,double fQ2){{{*/
+        void RunCTEQPDF(double ix,double iQ2)
         {
             fubar = Get_CTEQPDF(-1, ix, iQ2);
             fdbar = Get_CTEQPDF(-2, ix, iQ2);
@@ -537,13 +537,13 @@ class SIDIS
 
         void RunEPS09(int iOrder, int iErrSet,int iA,int iZ, double ix, double iQ2){/*{{{*/
 
-            double iR_uv = 0.0, iR_dv = 0.0, iR_u = 0.0, iR_d = 0.0, iR_s = 0.0, iR_c = 0.0, iR_b = 0.0, iR_g = 0.0; 
+            double iR_uv = 0.0, iR_dv = 0.0, iR_u = 0.0, iR_d = 0.0, iR_s = 0.0, iR_c = 0.0, iR_b = 0.0, iR_g = 0.0;
             //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
             //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
             if(iA>2)
                 eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
             else{
-                iR_uv = 1.0; iR_dv = 1.0; iR_u = 1.0; iR_d = 1.0; iR_s = 1.0; iR_c = 1.0; iR_b = 1.0; iR_g = 1.0; 
+                iR_uv = 1.0; iR_dv = 1.0; iR_u = 1.0; iR_d = 1.0; iR_s = 1.0; iR_c = 1.0; iR_b = 1.0; iR_g = 1.0;
             }
 
             double ubar = Get_CTEQPDF(-1, ix, iQ2);
@@ -556,7 +556,7 @@ class SIDIS
 
             double uv = u-ubar;//uv = u - usea
             double dv = d-dbar;//dv = d - dsea
-            
+
 /*            fuA = (1.0*iZ)/(1.0*iA) * ( iR_uv * uv + iR_u * ubar)*/
                 //+ (1.0*(iA-iZ))/(1.0*iA) * (iR_dv * dv + iR_d * dbar);
 
@@ -611,7 +611,7 @@ class SIDIS
 
 
             double mass_pi = fMass_Hadron;
-            double P_hx,P_hy,P_hz;  
+            double P_hx,P_hy,P_hz;
             P_hx = P_hf*sin(theta_hf)*cos(phi_hf);
             P_hy = P_hf*sin(theta_hf)*sin(phi_hf);
             P_hz = qgamma * (P_hf*cos(theta_hf) - qbeta * sqrt(P_hf*P_hf+mass_pi*mass_pi));
@@ -626,7 +626,7 @@ class SIDIS
             alpha = atan(P_ef*sin(theta_ef)*cos(phi_ef)/qz);
             beta = atan(-P_ef*sin(theta_ef)*sin(phi_ef)*
                     qz/cos(alpha)/
-                    (pow(P_ef*sin(theta_ef)*sin(phi_ef),2) + 
+                    (pow(P_ef*sin(theta_ef)*sin(phi_ef),2) +
                      pow(qz,2)));
             gamma1 = atan(sin(beta)/tan(alpha));
 
@@ -641,7 +641,7 @@ class SIDIS
             double a1,b1,c1,d1,e1,f1;
             a1 = cos(alpha)*cos(alpha) + sin(beta)*sin(beta) * sin(alpha)*sin(alpha);
             b1 = cos(beta)* cos(beta);
-            c1 = sin(alpha)*sin(alpha) + sin(beta)*sin(beta) * cos(alpha)*cos(alpha);      
+            c1 = sin(alpha)*sin(alpha) + sin(beta)*sin(beta) * cos(alpha)*cos(alpha);
             d1 = 2*cos(beta)*sin(beta)*sin(alpha);
             e1 = -2*cos(beta)*sin(beta)*cos(alpha);
             f1 = 2*cos(beta)*cos(beta)*sin(alpha)*cos(alpha);
@@ -703,11 +703,11 @@ class SIDIS
                 + (2*b1*P_hy+d1*P_hx+e1*P_hz)*Py2
                 + (2*c1*P_hz+e1*P_hy+f1*P_hx)*Pz2; // ppt^2/ p (cos(theta_pi)) or p m / p e
 
-            jaco7 = (P_hxp*(a2*Px1 + b2*Py1) - 
+            jaco7 = (P_hxp*(a2*Px1 + b2*Py1) -
                     P_hyp*(d2*Px1 + e2*Py1) )/
                 (P_hxp*P_hxp + P_hyp*P_hyp); // p n / pf
 
-            jaco8 = (P_hxp*(a2*Px2 + b2*Py2 + c2*Pz2) - 
+            jaco8 = (P_hxp*(a2*Px2 + b2*Py2 + c2*Pz2) -
                     P_hyp*(d2*Px2 + e2*Py2 + f2*Pz2) )/
                 (P_hxp*P_hxp + P_hyp*P_hyp); // p n / p e
 
@@ -716,7 +716,7 @@ class SIDIS
             jaco12 = (2*a1*P_hx+d1*P_hy+f1*P_hz)*Px3
                 + (2*b1*P_hy+d1*P_hx+e1*P_hz)*Py3
                 + (2*c1*P_hz+e1*P_hy+f1*P_hx)*Pz3; // or p m / p d
-            jaco13 = (P_hxp*(a2*Px3 + b2*Py3 + c2*Pz3) - 
+            jaco13 = (P_hxp*(a2*Px3 + b2*Py3 + c2*Pz3) -
                     P_hyp*(d2*Px3 + e2*Py3 + f2*Pz3) )/
                 (P_hxp*P_hxp + P_hyp*P_hyp); // p n / p d
 
@@ -749,7 +749,7 @@ class SIDIS
 
             ////Temparetly set to zero, 02/10/2017
             //dxs_hp_temp *= fXb;
-            //dxs_hm_temp *= fXb; 
+            //dxs_hm_temp *= fXb;
 
             dxs_hp_temp *= bpt_p/PI*exp(-bpt_p*pt_tmp*pt_tmp)*fXb;
             dxs_hm_temp *= bpt_m/PI*exp(-bpt_m*pt_tmp*pt_tmp)*fXb;
@@ -766,14 +766,14 @@ class SIDIS
                 //dbarquark = Get_LHAPDF(-2,fXb,fQ2);
                 //sbarquark = Get_LHAPDF(-3,fXb,fQ2);
             //}
-            //else 
+            //else
             if(fOrder==1 || fOrder==2){/*{{{*/
                 //Calculate medium modified PDFs:
                 RunEPS09(fOrder, fErrSet, fA, fZ, fXb, fQ2);
             }
             else if(fOrder==3 || fOrder==4){
                //free PDF from CTEQ
-                RunCTEQPDF(fXb, fQ2);         
+                RunCTEQPDF(fXb, fQ2);
             }else{
                 cerr<<"***, in GetXS(....), I don't know the type of fOrder"<<endl;
             }
@@ -794,8 +794,8 @@ class SIDIS
             //}/*}}}*/
 
             //calculate F2p and F2n for inclusive XS calculations
-            fF2p = pow(qu,2) * (uquark+ubarquark) + pow(qd,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); 
-            fF2n = pow(qd,2) * (uquark+ubarquark) + pow(qu,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); //u-->d, d-->u, 
+            fF2p = pow(qu,2) * (uquark+ubarquark) + pow(qd,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark);
+            fF2n = pow(qd,2) * (uquark+ubarquark) + pow(qu,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); //u-->d, d-->u,
 
             double D_fav,D_unfav,D_s,D_g;
             if (fabs(particle_flag)==1) {
@@ -870,18 +870,18 @@ class SIDIS
                 zp =  fZ_h / (fZ_h + xp*pt_tmp*pt_tmp/fZ_h/(1-xp)/fQ2);
                 if (fZ_h/zp>1) continue;
 
-                Pqq = 64*PI/3.*fQ2/fY/fY*((1+(1-fY)*(1-fY))*((1-xp)*(1-zp) + (1+xp*xp*zp*zp)/(1-xp)/(1-zp)) 
+                Pqq = 64*PI/3.*fQ2/fY/fY*((1+(1-fY)*(1-fY))*((1-xp)*(1-zp) + (1+xp*xp*zp*zp)/(1-xp)/(1-zp))
                         + 8*xp*zp*(1-fY) //- 4 *sqrt(xp*zp*(1-fY)/(1-xp)/(1-zp))*(2-fY)*(xp*zp+(1-xp)*(1-zp))*cos(fPhi_h)
                         //+ 4*xp*zp*(1-fY)*cos(2. * fPhi_h)
                         ) *(1-fXb)/100. /(xp*pt_tmp*pt_tmp+fZ_h*fZ_h*(1-xp)*fQ2); //13
 
-                Pqg = 64*PI/3.*fQ2/fY/fY*( (1+(1-fY)*(1-fY))*((1-xp)*zp + (1+xp*xp*(1-zp)*(1-zp))/(1-xp)/zp) 
-                        + 8*xp*(1-fY)*(1-zp) 
+                Pqg = 64*PI/3.*fQ2/fY/fY*( (1+(1-fY)*(1-fY))*((1-xp)*zp + (1+xp*xp*(1-zp)*(1-zp))/(1-xp)/zp)
+                        + 8*xp*(1-fY)*(1-zp)
                         //+ 4.*sqrt(xp*(1-fY)*(1-zp)/(1-xp)/zp)*(2-fY)*(xp*(1-zp)+(1-xp)*zp)*cos(fPhi_h)
                         //+ 4.*xp*(1-fY)*(1-zp)*cos(2.*fPhi_h)
                         )*(1-fXb)/100. /(xp*pt_tmp*pt_tmp+fZ_h*fZ_h*(1-xp)*fQ2);  //14
 
-                Pgq = 8.*PI*fQ2/fY/fY*((1+(1-fY)*(1-fY))*(xp*xp+(1-xp)*(1-xp))*(zp*zp+(1-zp)*(1-zp))/zp/(1-zp) 
+                Pgq = 8.*PI*fQ2/fY/fY*((1+(1-fY)*(1-fY))*(xp*xp+(1-xp)*(1-xp))*(zp*zp+(1-zp)*(1-zp))/zp/(1-zp)
                         + 16*xp*(1-xp)*(1-fY)
                         //-4.*sqrt(xp*(1-xp)*(1-fY)/zp/(1-zp))*(2-fY)*(1-2*xp)*(1-2.*zp)*cos(fPhi_h)
                         //+ 8*xp*(1-xp)*(1-fY)*cos(2.*fPhi_h)
@@ -905,7 +905,7 @@ class SIDIS
                 //}
                 //else
                 if(fOrder==1 || fOrder==2){
-                    //Don't call RunEPS09DF(fXb, fQ2) again since now we are only dealing with hPt corrections         
+                    //Don't call RunEPS09DF(fXb, fQ2) again since now we are only dealing with hPt corrections
                     uquark = Get_EPS09(fOrder, fErrSet, fA, fZ, 1, fXb, fQ2);
                     dquark = Get_EPS09(fOrder, fErrSet, fA, fZ, 2, fXb, fQ2);
                     squark = Get_EPS09(fOrder, fErrSet, fA, fZ, 3, fXb, fQ2);
@@ -916,7 +916,7 @@ class SIDIS
                 }
                 else if(fOrder==3 || fOrder==4){
                     //free PDF from CTEQ
-                    //Don't call RunCTEQPDF(fXb, fQ2) again since now we are only dealing with hPt corrections         
+                    //Don't call RunCTEQPDF(fXb, fQ2) again since now we are only dealing with hPt corrections
                     uquark = Get_CTEQPDF(1,fXb/xp,fQ2);
                     dquark = Get_CTEQPDF(2,fXb/xp,fQ2);
                     squark = Get_CTEQPDF(3,fXb/xp,fQ2);
@@ -1022,14 +1022,14 @@ class SIDIS
         }
         /*}}}*/
 
-        /*double Get_LHAPDF(int iparton,double ix,double iQ2){{{*/          
+        /*double Get_LHAPDF(int iparton,double ix,double iQ2){{{*/
 /*        double Get_LHAPDF(int iparton,double ix,double iQ2)          */
         //{
             //double iQ = sqrt(iQ2);
             //double result = 0;
 
-            /////////////////in LHAPDF->xfx(): 
-            //// 1->d, 2->u, 3->s, 4->c, 5->b, 6->t, 21->g 
+            /////////////////in LHAPDF->xfx():
+            //// 1->d, 2->u, 3->s, 4->c, 5->b, 6->t, 21->g
             ////-1->dbar, -2->ubar,-3->sbar,-4->cbar,-5->bbar,-6->tbar
             ////For valance quarks:
             ////  dv-> d-dbar, u->u-ubar
@@ -1061,8 +1061,8 @@ class SIDIS
         /*}*/
         /*}}}*/
 
-        /*double Get_CTEQPDF(int iparton,double ix,double iQ2){{{*/          
-        double Get_CTEQPDF(int iprtn,double ix,double iQ2)          
+        /*double Get_CTEQPDF(int iparton,double ix,double iQ2){{{*/
+        double Get_CTEQPDF(int iprtn,double ix,double iQ2)
         {
             double iQ = sqrt(iQ2);
 
@@ -1089,13 +1089,13 @@ class SIDIS
 
         double Get_EPS09(int iOrder, int iErrSet,int iA,int iZ, int iParton, double ix, double iQ2){/*{{{*/
 
-            double iR_uv = 0.0, iR_dv = 0.0, iR_u = 0.0, iR_d = 0.0, iR_s = 0.0, iR_c = 0.0, iR_b = 0.0, iR_g = 0.0; 
+            double iR_uv = 0.0, iR_dv = 0.0, iR_u = 0.0, iR_d = 0.0, iR_s = 0.0, iR_c = 0.0, iR_b = 0.0, iR_g = 0.0;
             //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
             //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
             if(iA>2)
                 eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
             else{
-                iR_uv = 1.0; iR_dv = 1.0; iR_u = 1.0; iR_d = 1.0; iR_s = 1.0; iR_c = 1.0; iR_b = 1.0; iR_g = 1.0; 
+                iR_uv = 1.0; iR_dv = 1.0; iR_u = 1.0; iR_d = 1.0; iR_s = 1.0; iR_c = 1.0; iR_b = 1.0; iR_g = 1.0;
             }
 
             if(iParton==1){
@@ -1168,8 +1168,8 @@ class SIDIS
 
     public:
         double fMom_ele;
-        double fTheta_ele; 
-        double fPhi_ele; 
+        double fTheta_ele;
+        double fPhi_ele;
         double fMom_had;
         double fTheta_had;
         double fPhi_had;

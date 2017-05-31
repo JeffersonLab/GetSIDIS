@@ -1,28 +1,32 @@
 # A Generic Makefile for compiling ROOT programs
 # R. Michaels, rom@jlab.org, Aug 2001  See also README !!
 # Version of this release
-# 
+#
 ROOTLIBS      = $(shell root-config --libs)
 ROOTGLIBS     = $(shell root-config --glibs)
 ROOTINC       = $(shell root-config --incdir)
+LHAPDFINC     = $(shell lhapdf-config --incdir)
+LHAPDFLIBS     = $(shell lhapdf-config --libs)
+
 CXXFLAGS      = -Wall -g -frtti -fexceptions -fPIC \
                    -DLINUXVERS -O
 
 EPS09=../eps09_cxx/
 CTEQPDF=../CTEQ6/cteq-pdf-1.0.4
+#CTEQPDF=/Users/florian/cteq-pdf-1.0.4
 
 O=GetSIDIS
 
 # Linux with g++
-INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
-CXX           = clang++
-#CXX           = g++
-LD            = clang++
-#LD            = g++
-LDFLAGS       = 
+INCLUDES      = -I/opt/local/include -I$(ROOTINC)  -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/ -I$(LHAPDFINC)
+CXX           = clang++ -std=c++11
+#CXX           = gcc-7 -std=c++14
+LD            = clang++ -std=c++11
+#LD            = gcc-7 -std=c++14
+LDFLAGS       =
 
-LIBS          = $(ROOTLIBS)  -L/usr/lib/ -lcteqpdf -L$(CTEQPDF)/lib
-GLIBS         = $(ROOTGLIBS) -L/usr/X11/lib -L/usr/lib/ -lXpm -lX11 
+LIBS          = $(ROOTLIBS)  -L/usr/lib/ $(LHAPDFLIBS)  -L$(CTEQPDF)/lib -lcteqpdf
+GLIBS         = $(ROOTGLIBS) -L/usr/X11/lib -L/usr/lib/ -lXpm -lX11
 
 ALL_LIBS =  $(GLIBS) $(LIBS)
 
@@ -40,7 +44,7 @@ $(O): $(EPS09)/eps09.h eps09.o $(O).o $(O).C
 	rm -f $@
 	$(CXX) $(CXXFLAGS) $(INCLUDES)  -o $@ eps09.o $(O).o $(ALL_LIBS)
 
-         
+
 clean:
 	rm -f *.o core *~ *.d *.tar $(PROGS)
 
@@ -53,7 +57,7 @@ realclean:  clean
 .SUFFIXES: .c .cc .cpp .C .o .d
 
 ###Adding the EPS09 code
-eps09.o: $(EPS09)/eps09.cxx 
+eps09.o: $(EPS09)/eps09.cxx
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(EPS09)/eps09.cxx
 
 %.o:	%.C
@@ -66,4 +70,3 @@ eps09.o: $(EPS09)/eps09.cxx
 		[ -s $@ ] || rm -f $@'
 
 -include $(DEPS)
-

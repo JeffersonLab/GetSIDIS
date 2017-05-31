@@ -6,8 +6,8 @@
 //  -- Zhihong Ye, 06/10/2014                       //
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
-#include "SIDIS.h"
-//#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+//#include "SIDIS.h"
+#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
 //#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
 
 int main(Int_t argc, char *argv[]){
@@ -37,7 +37,7 @@ int main(Int_t argc, char *argv[]){
     if (config != "EIC" && config != "SoLID" && config != "SPECT"){
         cout << "not supported config = "<<config.Data() << endl;
         return -1;
-    }    
+    }
 
     //define output file
     Int_t target_flag = A;
@@ -50,11 +50,11 @@ int main(Int_t argc, char *argv[]){
     if (particle_flag == 1){
         prefix += "_pion";
         charge_pos = 1; pid_pos = 211; mass_had = 139.57/1000.;//GeV
-        charge_neg =-1; pid_neg =-211; 
+        charge_neg =-1; pid_neg =-211;
     }else if (particle_flag == 2){
         prefix += "_kaon";
         charge_pos = 1; pid_pos = 321; mass_had = 493.68/1000.;//GeV
-        charge_neg =-1; pid_neg =-321; 
+        charge_neg =-1; pid_neg =-321;
     }else{
         cout << "particle_flag is wrong +-1 and +-2" << endl;
         return -1;
@@ -88,11 +88,11 @@ int main(Int_t argc, char *argv[]){
     Double_t Th_Max_e = 0.0,Th_Min_e = 0.0,Th_Max_h = 0.0, Th_Min_h = 0.0;
     Double_t Ph_Max_e = 0.0,Ph_Min_e = 0.0,Ph_Max_h = 0.0, Ph_Min_h = 0.0;
     if(config=="SoLID" ){/*{{{*/
-        Mom_Min_e = SoLID_Mom_Min_e;  Mom_Max_e = momentum_ele; 
+        Mom_Min_e = SoLID_Mom_Min_e;  Mom_Max_e = momentum_ele;
         Mom_Min_h = SoLID_Mom_Min_h;  Mom_Max_h = SoLID_Mom_Max_h;
-        Th_Min_e = SoLID_Th_Min_e; Th_Max_e = SoLID_Th_Max_e; 
+        Th_Min_e = SoLID_Th_Min_e; Th_Max_e = SoLID_Th_Max_e;
         Th_Min_h = SoLID_Th_Min_h; Th_Max_h = SoLID_Th_Max_h;
-        Ph_Min_e = SoLID_Ph_Min_e; Ph_Max_e = SoLID_Ph_Max_e; 
+        Ph_Min_e = SoLID_Ph_Min_e; Ph_Max_e = SoLID_Ph_Max_e;
         Ph_Min_h = SoLID_Ph_Min_h; Ph_Max_h = SoLID_Ph_Max_h;
 
         beamsize_x_ele = SoLID_BeamSizeX_ele;
@@ -101,29 +101,29 @@ int main(Int_t argc, char *argv[]){
         vertex_center = SoLID_Target_Center;
 
     }/*}}}*/
-   
+
     //A rough guess but people claim EIC to be a full-acceptance device!
     else if(config=="EIC" ){/*{{{*/
-        Mom_Min_e = EIC_Mom_Min_e;  Mom_Max_e =  momentum_ele * 3.0; 
+        Mom_Min_e = EIC_Mom_Min_e;  Mom_Max_e =  momentum_ele * 3.0;
         Mom_Min_h = EIC_Mom_Min_h;  Mom_Max_h = EIC_Mom_Max_h;
-        Th_Min_e = EIC_Th_Min_e; Th_Max_e = EIC_Th_Max_e; 
-        Th_Min_h = EIC_Th_Min_h; Th_Max_h = EIC_Th_Max_h;    
-        Ph_Min_e = EIC_Ph_Min_e; Ph_Max_e = EIC_Ph_Max_e; 
-        Ph_Min_h = EIC_Ph_Min_h; Ph_Max_h = EIC_Ph_Max_h;    
+        Th_Min_e = EIC_Th_Min_e; Th_Max_e = EIC_Th_Max_e;
+        Th_Min_h = EIC_Th_Min_h; Th_Max_h = EIC_Th_Max_h;
+        Ph_Min_e = EIC_Ph_Min_e; Ph_Max_e = EIC_Ph_Max_e;
+        Ph_Min_h = EIC_Ph_Min_h; Ph_Max_h = EIC_Ph_Max_h;
 
         beamsize_x_ele = EIC_BeamSizeX_ele;
         beamsize_y_ele = EIC_BeamSizeY_ele;
         vertex_length = EIC_Vertex_Length;
         vertex_center = EIC_Vertex_Center;
     }/*}}}*/
-   
+
     else if(config=="SPECT"){/*{{{*/
-        Mom_Min_e = SPECT_Mom_Min_e;  Mom_Max_e = SPECT_Mom_Max_e; 
+        Mom_Min_e = SPECT_Mom_Min_e;  Mom_Max_e = SPECT_Mom_Max_e;
         Mom_Min_h = SPECT_Mom_Min_h;  Mom_Max_h = SPECT_Mom_Max_h;
-        Th_Min_e = SPECT_Th_Min_e; Th_Max_e = SPECT_Th_Max_e; 
-        Th_Min_h = SPECT_Th_Min_h; Th_Max_h = SPECT_Th_Max_h;    
-        Ph_Min_e = SPECT_Ph_Min_e; Ph_Max_e = SPECT_Ph_Max_e; 
-        Ph_Min_h = SPECT_Ph_Min_h; Ph_Max_h = SPECT_Ph_Max_h;    
+        Th_Min_e = SPECT_Th_Min_e; Th_Max_e = SPECT_Th_Max_e;
+        Th_Min_h = SPECT_Th_Min_h; Th_Max_h = SPECT_Th_Max_h;
+        Ph_Min_e = SPECT_Ph_Min_e; Ph_Max_e = SPECT_Ph_Max_e;
+        Ph_Min_h = SPECT_Ph_Min_h; Ph_Max_h = SPECT_Ph_Max_h;
 
         beamsize_x_ele = SPECT_BeamSizeX_ele;
         beamsize_y_ele = SPECT_BeamSizeY_ele;
@@ -202,7 +202,7 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("vx_had",&vx_had, "vx_had/D");
     t1->Branch("vy_had",&vy_had, "vy_had/D");
     t1->Branch("vz_had",&vz_had, "vz_had/D");
-    
+
     t1->Branch("u_pdf", &u_pdf, "u_pdf/D");
     t1->Branch("d_pdf", &d_pdf, "d_pdf/D");
     t1->Branch("s_pdf", &s_pdf, "s_pdf/D");
@@ -210,7 +210,7 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
     t1->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
     t1->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    
+
     t1->Branch("D_fav", &D_fav, "D_fav/D");
     t1->Branch("D_unfav", &D_unfav, "D_unfav/D");
     t1->Branch("D_s", &D_s, "D_s/D");
@@ -425,7 +425,7 @@ int main(Int_t argc, char *argv[]){
     //////////
     //sidis->SetEPS09(2);
     ////////////////////////////////
-   
+
     ////////////////////////////////
     /////////////
     //*** If using CTEQPDF, default is CTEQ6.1M, but you can specify the name of the PDF sets
@@ -434,25 +434,25 @@ int main(Int_t argc, char *argv[]){
     /////////////
     //SetCTEQ( mode);
     ////////////////////////////////
-     
+
     ////////////////////////////////
     //*** If using LHAPDF6, default is "CTnlo", but you can add this line here to specify the set of PDF you want
     ////////////////////////////////
     ////*** in general, just tell the name of the set
-    ////***  see https://lhapdf.hepforge.org/pdfsets.html 
+    ////***  see https://lhapdf.hepforge.org/pdfsets.html
     //SetLHAPDF("CJ15nlo");
-   
+
     ////*** Or if using nCTEQ, add this to specify the associated PDF set of the target
-    //sidis->SetLHAPDF(A, Z); 
+    //sidis->SetLHAPDF(A, Z);
     ////////////////////////////////
     /*}}}*/
 
     /*Start to generate events{{{*/
-    bool exitcondition=true;	
+    bool exitcondition=true;
     while(exitcondition){
         nsim ++;
 
-        /*Generator{{{*/
+        /*Generator*/
         //For electron
         vx_ele = gRandom->Uniform(-beamsize_x_ele, beamsize_x_ele);
         vy_ele = gRandom->Uniform(-beamsize_y_ele, beamsize_y_ele);
@@ -471,9 +471,9 @@ int main(Int_t argc, char *argv[]){
         theta_gen = acos(gRandom->Uniform(cos(Th_Max_h/DEG),cos(Th_Min_h/DEG)));
         mom_gen = gRandom->Uniform(Mom_Min_h, Mom_Max_h);
         mom_gen_had = mom_gen; theta_gen_had = theta_gen*DEG; phi_gen_had = phi_gen*DEG;
-        /*}}}*/
 
-        sidis->SetKin(momentum_ele, momentum_ion,/*{{{*/
+
+        sidis->SetKin(momentum_ele, momentum_ion,
                 mom_gen_ele, theta_gen_ele, phi_gen_ele,
                 mom_gen_had, theta_gen_had, phi_gen_had,
                 ion_mass, A, Z, particle_flag);
@@ -487,15 +487,15 @@ int main(Int_t argc, char *argv[]){
         x=sidis->fXb; y=sidis->fY; z=sidis->fZ_h; Q2=sidis->fQ2; W=sidis->fW; Wp=sidis->fWp;
         s=sidis->fS; nu=sidis->fNu; pt=sidis->fPt; gamma=sidis->fGamma; epsilon=sidis->fEpsilon;
         rapidity = sidis->fRapidity;
-        jacoF=sidis->fJacobF;/*}}}*/
+        jacoF=sidis->fJacobF;
 
         if(bXSMode){
             /*Generate Events based on XS and also for LUND output{{{*/
             if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
-            //For EIC  
+            //For EIC
             if( (config=="EIC" && z>0.2&&z<0.9
                         &&((count[0]<number_of_events)|| (count[1]<number_of_events)))
-                    ||(config=="SoLID" && z>0.3&&z<0.7 
+                    ||(config=="SoLID" && z>0.3&&z<0.7
                         &&((count[0]<number_of_events)|| (count[1]<number_of_events)))
                     ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events)){
 
@@ -505,7 +505,7 @@ int main(Int_t argc, char *argv[]){
                 dxs_hm = sidis->GetXS_HM();
                 dilute_hp = sidis->GetDilute_HP();
                 dilute_hm = sidis->GetDilute_HM();
-                
+
                 u_pdf = sidis->get_uA();
                 d_pdf = sidis->get_dA();
                 s_pdf = sidis->get_s();
@@ -513,7 +513,7 @@ int main(Int_t argc, char *argv[]){
                 ubar_pdf = sidis->get_ubar();
                 dbar_pdf = sidis->get_dbar();
                 sbar_pdf = sidis->get_sbar();
-                
+
                 D_fav = sidis->get_Dfav();
                 D_unfav = sidis->get_Dunfav();
                 D_s = sidis->get_Ds();
@@ -535,14 +535,14 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hp						
+                            dxs_hp
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
                     pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             1, //index
                             -1.0,//charge
-                            1, //=1 for active 
+                            1, //=1 for active
                             11,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
@@ -550,7 +550,7 @@ int main(Int_t argc, char *argv[]){
                             py_ele,
                             pz_ele,
                             E_ele,
-                            0.0005, //mass not in used	
+                            0.0005, //mass not in used
                             vx_ele, //vx
                             vy_ele, //vx
                             vz_ele  //vx
@@ -559,14 +559,14 @@ int main(Int_t argc, char *argv[]){
                     pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             2, //index
                             charge_pos,//charge
-                            1, //=1 for active 
+                            1, //=1 for active
                             pid_pos,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
                             px_had,
                             py_had,
                             pz_had,
-                            E_had, 
+                            E_had,
                             mass_had, //mass not in used
                             vx_had, //vx
                             vy_had, //vx
@@ -590,14 +590,14 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hm						
+                            dxs_hm
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
                     neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             1, //index
                             -1.0,//charge
-                            1, //=1 for active 
+                            1, //=1 for active
                             11,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
@@ -605,7 +605,7 @@ int main(Int_t argc, char *argv[]){
                             py_ele,
                             pz_ele,
                             E_ele,
-                            0.0005, //mass not in used	
+                            0.0005, //mass not in used
                             vx_ele, //vx
                             vy_ele, //vx
                             vz_ele  //vx
@@ -614,14 +614,14 @@ int main(Int_t argc, char *argv[]){
                     neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             2, //index
                             charge_neg,//charge
-                            1, //=1 for active 
+                            1, //=1 for active
                             pid_neg,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
                             px_had,
                             py_had,
                             pz_had,
-                            E_had, 
+                            E_had,
                             mass_had, //mass not in used
                             vx_had, //vx
                             vy_had, //vx
@@ -653,10 +653,10 @@ int main(Int_t argc, char *argv[]){
             }
             //judging exitcondition/*{{{*/
             if (config=="EIC"||config=="SoLID") {
-                if (count[0] < number_of_events || count[1] < number_of_events 
+                if (count[0] < number_of_events || count[1] < number_of_events
                    ) exitcondition=true;
                 else exitcondition=false;
-            } 
+            }
             else if(config=="SPECT") {
                 if (count[0] < number_of_events) exitcondition=true;
                 else exitcondition=false;
@@ -670,7 +670,7 @@ int main(Int_t argc, char *argv[]){
                             ||(count[1]<number_of_events&&pt>1.0&&Q2<=10.)
                             ||(count[2]<number_of_events&&pt<=1.0&&Q2>10.)
                             ||(count[3]<number_of_events&&pt>1.0&&Q2>10.)))
-                    ||(config=="SoLID" && z>0.3&&z<0.7 
+                    ||(config=="SoLID" && z>0.3&&z<0.7
                         &&(   (count[0]<number_of_events&&pt<=1.0)
                             ||(count[1]<number_of_events&&pt>1.0)))
                     ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events))
@@ -682,7 +682,7 @@ int main(Int_t argc, char *argv[]){
                 dxs_hm = sidis->GetXS_HM();
                 dilute_hp = sidis->GetDilute_HP();
                 dilute_hm = sidis->GetDilute_HM();
-                
+
                 u_pdf = sidis->get_uA();
                 d_pdf = sidis->get_dA();
                 s_pdf = sidis->get_s();
@@ -690,7 +690,7 @@ int main(Int_t argc, char *argv[]){
                 ubar_pdf = sidis->get_ubar();
                 dbar_pdf = sidis->get_dbar();
                 sbar_pdf = sidis->get_sbar();
-                
+
                 D_fav = sidis->get_Dfav();
                 D_unfav = sidis->get_Dunfav();
                 D_s = sidis->get_Ds();
@@ -712,14 +712,14 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hp						
+                            dxs_hp
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
                     pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             1, //index
                             -1.0,//charge
-                            1, //=1 for active 
+                            1, //=1 for active
                             11,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
@@ -727,7 +727,7 @@ int main(Int_t argc, char *argv[]){
                             py_ele,
                             pz_ele,
                             E_ele,
-                            0.0005, //mass not in used	
+                            0.0005, //mass not in used
                             vx_ele, //vx
                             vy_ele, //vx
                             vz_ele  //vx
@@ -736,14 +736,14 @@ int main(Int_t argc, char *argv[]){
                     pos_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             2, //index
                             charge_pos,//charge
-                            1, //=1 for active 
+                            1, //=1 for active
                             pid_pos,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
                             px_had,
                             py_had,
                             pz_had,
-                            E_had, 
+                            E_had,
                             mass_had, //mass not in used
                             vx_had, //vx
                             vy_had, //vx
@@ -767,14 +767,14 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hm						
+                            dxs_hm
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
                     neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             1, //index
                             -1.0,//charge
-                            1, //=1 for active 
+                            1, //=1 for active
                             11,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
@@ -782,7 +782,7 @@ int main(Int_t argc, char *argv[]){
                             py_ele,
                             pz_ele,
                             E_ele,
-                            0.0005, //mass not in used	
+                            0.0005, //mass not in used
                             vx_ele, //vx
                             vy_ele, //vx
                             vz_ele  //vx
@@ -791,14 +791,14 @@ int main(Int_t argc, char *argv[]){
                     neg_gemc<<Form("%2d \t %4.2f \t %1d \t %8d \t %1d \t %1d \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",
                             2, //index
                             charge_neg,//charge
-                            1, //=1 for active 
+                            1, //=1 for active
                             pid_neg,//pid
                             0,// parent pid, not in used now
                             0,// doughter for decay bookkeeping, not in used now
                             px_had,
                             py_had,
                             pz_had,
-                            E_had, 
+                            E_had,
                             mass_had, //mass not in used
                             vx_had, //vx
                             vy_had, //vx
@@ -842,19 +842,19 @@ int main(Int_t argc, char *argv[]){
 
             //judging exitcondition/*{{{*/
             if (config=="EIC") {
-                if (count[0] < number_of_events || count[1] < number_of_events 
+                if (count[0] < number_of_events || count[1] < number_of_events
                         || count[2] < number_of_events || count[3] < number_of_events) exitcondition=true;
                 else exitcondition=false;
-            } 
+            }
             else if (config=="SoLID") {
                 if (count[0] < number_of_events || count[1] < number_of_events) exitcondition=true;
                 else exitcondition=false;
-            } 
+            }
             else if(config=="SPECT") {
                 if (count[0] < number_of_events) exitcondition=true;
                 else exitcondition=false;
             } /*}}}*/
-            /*}}}*/ 
+            /*}}}*/
         }
     }
     /*}}}*/
@@ -894,7 +894,7 @@ int main(Int_t argc, char *argv[]){
         T1->SetBranchAddress("dxs_hp",&dxs_hp);
         T1->SetBranchAddress("dxs_hm",&dxs_hm);
         T1->SetBranchAddress("dxs_incl",&dxs_incl);
-        ULong64_t nsim1; 
+        ULong64_t nsim1;
         T1->SetBranchAddress("nsim",&nsim1);
         T1->GetEntry(N1-1);          //get nsim for this rootfile
         ULong64_t Nsim10=nsim1;
@@ -907,8 +907,8 @@ int main(Int_t argc, char *argv[]){
         for(ULong64_t i=0;i<N1;i++){
             T1->GetEntry(i);
             //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
-            weight_in=dxs_incl*electron_phase_space/Nsim1;   
-            weight_hp=dxs_hp*Phase_space/Nsim1;   
+            weight_in=dxs_incl*electron_phase_space/Nsim1;
+            weight_hp=dxs_hp*Phase_space/Nsim1;
             weight_hm=dxs_hm*Phase_space/Nsim1;
 
             if((weight_in)<1e-34) weight_in=1e-34;
@@ -939,7 +939,7 @@ int main(Int_t argc, char *argv[]){
             T2->SetBranchAddress("dxs_incl",&dxs_incl);
             T2->SetBranchAddress("dxs_hp",&dxs_hp);
             T2->SetBranchAddress("dxs_hm",&dxs_hm);
-            ULong64_t nsim2; 
+            ULong64_t nsim2;
             T2->SetBranchAddress("nsim",&nsim2);
             T2->GetEntry(N2-1);          //get nsim for this rootfile
             ULong64_t Nsim20=nsim2;
@@ -952,8 +952,8 @@ int main(Int_t argc, char *argv[]){
             for(ULong64_t i=0;i<N2;i++){
                 T2->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
-                weight_in=dxs_incl*electron_phase_space/Nsim2;   
-                weight_hp=dxs_hp*Phase_space/Nsim2;   
+                weight_in=dxs_incl*electron_phase_space/Nsim2;
+                weight_hp=dxs_hp*Phase_space/Nsim2;
                 weight_hm=dxs_hm*Phase_space/Nsim2;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
@@ -983,7 +983,7 @@ int main(Int_t argc, char *argv[]){
             T3->SetBranchAddress("dxs_incl",&dxs_incl);
             T3->SetBranchAddress("dxs_hp",&dxs_hp);
             T3->SetBranchAddress("dxs_hm",&dxs_hm);
-            ULong64_t nsim3; 
+            ULong64_t nsim3;
             T3->SetBranchAddress("nsim",&nsim3);
             T3->GetEntry(N3-1);          //get nsim for this rootfile
             ULong64_t Nsim30=nsim3;
@@ -997,8 +997,8 @@ int main(Int_t argc, char *argv[]){
             for(ULong64_t i=0;i<N3;i++){
                 T3->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
-                weight_in=dxs_incl*electron_phase_space/Nsim3;   
-                weight_hp=dxs_hp*Phase_space/Nsim3;   
+                weight_in=dxs_incl*electron_phase_space/Nsim3;
+                weight_hp=dxs_hp*Phase_space/Nsim3;
                 weight_hm=dxs_hm*Phase_space/Nsim3;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
@@ -1010,7 +1010,7 @@ int main(Int_t argc, char *argv[]){
                 if(isinf(weight_in)) weight_in=1e-34;
                 if(isinf(weight_hp)) weight_hp=1e-34;
                 if(isinf(weight_hm)) weight_hm=1e-34;
-                
+
                 branch_weight_in3->Fill();
                 branch_weight_hp3->Fill();
                 branch_weight_hm3->Fill();
@@ -1027,7 +1027,7 @@ int main(Int_t argc, char *argv[]){
             T4->SetBranchAddress("dxs_incl",&dxs_incl);
             T4->SetBranchAddress("dxs_hp",&dxs_hp);
             T4->SetBranchAddress("dxs_hm",&dxs_hm);
-            ULong64_t nsim4; 
+            ULong64_t nsim4;
             T4->SetBranchAddress("nsim",&nsim4);
             T4->GetEntry(N4-1);          //get nsim for this rootfile
             ULong64_t Nsim40=nsim4;
@@ -1040,8 +1040,8 @@ int main(Int_t argc, char *argv[]){
             for(ULong64_t i=0;i<N4;i++){
                 T4->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
-                weight_in=dxs_incl*electron_phase_space/Nsim4;   
-                weight_hp=dxs_hp*Phase_space/Nsim4;   
+                weight_in=dxs_incl*electron_phase_space/Nsim4;
+                weight_hp=dxs_hp*Phase_space/Nsim4;
                 weight_hm=dxs_hm*Phase_space/Nsim4;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
