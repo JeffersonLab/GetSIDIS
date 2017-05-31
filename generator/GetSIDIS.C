@@ -6,9 +6,9 @@
 //  -- Zhihong Ye, 06/10/2014                       //
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
-#include "SIDIS.h"
+//#include "SIDIS.h"
 //#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
-//#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
+#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
