@@ -7,8 +7,13 @@
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
 //#include "SIDIS.h"
+<<<<<<< HEAD
 #include "SIDIS_Lite.h" //this version doesn't include LHAPDF
 //#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
+=======
+//#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
+>>>>>>> master
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
@@ -20,6 +25,7 @@ int main(Int_t argc, char *argv[]){
     cout<<endl;
 
     gRandom->SetSeed(0);// uses time for seed
+
     /*Inputs&Output{{{*/
     //initialize
     TString inputfilename = argv[1];

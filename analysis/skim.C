@@ -56,16 +56,14 @@ int main(Int_t argc, char *argv[]){
 	int fA = 0; cerr<<"-- What nucleus: A = ? "; cin >> fA;
 
     TChain *T = new TChain("T");
-    //for(int i=0;i<100;i++){
-        for(int i=300;i<600;i++){
-        //for(int i=100;i<200;i++){
+    for(int i=0;i<100;i++){
         for(int j=1;j<=4;j++){
             if(fA ==12)
-                T->Add(Form("./c12_pion_LO_free_noPt/EIC_A12_pion_10_600_%d_%d.root", j, i));
-                //T->Add(Form("./c12_pion_LO_noPt/EIC_A12_pion_10_600_%d_%d.root", j, i));
+                //T->Add(Form("./c12_pion_LO_free/EIC_A12_pion_10_600_%d_%d.root", j, i));
+                T->Add(Form("./c12_pion_LO/EIC_A12_pion_10_600_%d_%d.root", j, i));
              if(fA ==2)
-                //T->Add(Form("./d2_pion_LO_free_noPt/EIC_A2_pion_10_100_%d_%d.root", j, i));
-                T->Add(Form("./d2_pion_LO_noPt/EIC_A2_pion_10_100_%d_%d.root", j, i));
+                //T->Add(Form("./d2_pion_LO_free/EIC_A2_pion_10_100_%d_%d.root", j, i));
+                T->Add(Form("./d2_pion_LO/EIC_A2_pion_10_100_%d_%d.root", j, i));
         }
     }
     /*Define{{{*/
@@ -94,6 +92,8 @@ int main(Int_t argc, char *argv[]){
     T->SetBranchAddress("z",&z );
     T->SetBranchAddress("nu",&nu );
     T->SetBranchAddress("s",&s );
+    T->SetBranchAddress("epsilon",&epsilon );
+    T->SetBranchAddress("gamma",&gamma );
     T->SetBranchAddress("pt",&pt );
     T->SetBranchAddress("weight_hp",&weight_hp );
     T->SetBranchAddress("weight_hm",&weight_hm );
@@ -158,13 +158,13 @@ int main(Int_t argc, char *argv[]){
     TString new_filename[8];
     if(fA ==12){
         for(int i=0;i<8;i++)
-            new_filename[i]=Form("./c12_pion_LO_free_noPt/EIC_A12_pion_10_600_skim%d_wide_free_noPt_new.root",i);
-            //new_filename[i]=Form("./c12_pion_LO_noPt/EIC_A12_pion_10_600_skim%d_wide_noPt.root",i);
+            //new_filename[i]=Form("./c12_pion_LO_free/EIC_A12_pion_10_600_skim%d_wide_free.root",i);
+            new_filename[i]=Form("./c12_pion_LO/EIC_A12_pion_10_600_skim%d_wide.root",i);
     }
     if(fA ==2){
         for(int i=0;i<8;i++)
-           // new_filename[i]=Form("./d2_pion_LO_free_noPt/EIC_A2_pion_10_100_skim%d_wide_free_noPt.root",i);
-            new_filename[i]=Form("./d2_pion_LO_noPt/EIC_A2_pion_10_100_skim%d_wide_noPt.root",i);
+            //new_filename[i]=Form("./d2_pion_LO_free/EIC_A2_pion_10_100_skim%d_wide_free.root",i);
+            new_filename[i]=Form("./d2_pion_LO/EIC_A2_pion_10_100_skim%d_wide.root",i);
     }
 
     /*Define new rootfile for each bin{{{*/
@@ -179,6 +179,8 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("z",&z,"data/D");
     t1->Branch("nu",&nu,"data/D");
     t1->Branch("s",&s,"data/D");
+    t1->Branch("gamma",&gamma,"data/D");
+    t1->Branch("epsilon",&epsilon,"data/D");
     t1->Branch("pt",&pt,"data/D");
     t1->Branch("rapidity",&rapidity,"data/D");
     t1->Branch("theta_q",&theta_q,"data/D");
@@ -248,6 +250,8 @@ int main(Int_t argc, char *argv[]){
     t2->Branch("nu",&nu,"data/D");
     t2->Branch("s",&s,"data/D");
     t2->Branch("pt",&pt,"data/D");
+    t2->Branch("gamma",&gamma,"data/D");
+    t2->Branch("epsilon",&epsilon,"data/D");
     t2->Branch("weight_hp",&weight_hp,"data/D");
     t2->Branch("weight_hm",&weight_hm,"data/D");
     t2->Branch("weight_in",&weight_in,"data/D");
@@ -315,6 +319,8 @@ int main(Int_t argc, char *argv[]){
     t3->Branch("z",&z,"data/D");
     t3->Branch("nu",&nu,"data/D");
     t3->Branch("s",&s,"data/D");
+    t3->Branch("gamma",&gamma,"data/D");
+    t3->Branch("epsilon",&epsilon,"data/D");
     t3->Branch("pt",&pt,"data/D");
     t3->Branch("weight_hp",&weight_hp,"data/D");
     t3->Branch("weight_hm",&weight_hm,"data/D");
@@ -384,6 +390,8 @@ int main(Int_t argc, char *argv[]){
     t4->Branch("nu",&nu,"data/D");
     t4->Branch("s",&s,"data/D");
     t4->Branch("pt",&pt,"data/D");
+    t4->Branch("gamma",&gamma,"data/D");
+    t4->Branch("epsilon",&epsilon,"data/D");
     t4->Branch("weight_hp",&weight_hp,"data/D");
     t4->Branch("weight_hm",&weight_hm,"data/D");
     t4->Branch("weight_in",&weight_in,"data/D");
@@ -450,6 +458,8 @@ int main(Int_t argc, char *argv[]){
     t5->Branch("z",&z,"data/D");
     t5->Branch("nu",&nu,"data/D");
     t5->Branch("s",&s,"data/D");
+    t5->Branch("gamma",&gamma,"data/D");
+    t5->Branch("epsilon",&epsilon,"data/D");
     t5->Branch("pt",&pt,"data/D");
     t5->Branch("weight_hp",&weight_hp,"data/D");
     t5->Branch("weight_hm",&weight_hm,"data/D");
@@ -517,6 +527,8 @@ int main(Int_t argc, char *argv[]){
     t6->Branch("z",&z,"data/D");
     t6->Branch("nu",&nu,"data/D");
     t6->Branch("s",&s,"data/D");
+    t6->Branch("gamma",&gamma,"data/D");
+    t6->Branch("epsilon",&epsilon,"data/D");
     t6->Branch("pt",&pt,"data/D");
     t6->Branch("weight_hp",&weight_hp,"data/D");
     t6->Branch("weight_hm",&weight_hm,"data/D");
@@ -584,9 +596,11 @@ int main(Int_t argc, char *argv[]){
     t7->Branch("z",&z,"data/D");
     t7->Branch("nu",&nu,"data/D");
     t7->Branch("s",&s,"data/D");
+    t7->Branch("gamma",&gamma,"data/D");
+    t7->Branch("epsilon",&epsilon,"data/D");
     t7->Branch("pt",&pt,"data/D");
     t7->Branch("weight_hp",&weight_hp,"data/D");
-    t7->Branch("weight_hm",&weight_hm,"data/D");
+   t7->Branch("weight_hm",&weight_hm,"data/D");
     t7->Branch("weight_in",&weight_in,"data/D");
     t7->Branch("rapidity",&rapidity,"data/D");
     t7->Branch("theta_q",&theta_q,"data/D");
@@ -652,6 +666,8 @@ int main(Int_t argc, char *argv[]){
     t8->Branch("nu",&nu,"data/D");
     t8->Branch("s",&s,"data/D");
     t8->Branch("pt",&pt,"data/D");
+    t8->Branch("gamma",&gamma,"data/D");
+    t8->Branch("epsilon",&epsilon,"data/D");
     t8->Branch("weight_hp",&weight_hp,"data/D");
     t8->Branch("weight_hm",&weight_hm,"data/D");
     t8->Branch("weight_in",&weight_in,"data/D");
@@ -711,7 +727,7 @@ int main(Int_t argc, char *argv[]){
     const double xbj_min = 0.0;
     const double xbj_max = 0.35;
     const int Q2bin=8;
-    const double Q2_log[9] = {0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6};
+    const double Q2_log[9] = {0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 3.0};
     //const int Q2bin=4;
     //const double Q2_log[5] = {0.0, 0.4, 0.8, 1.2, 1.6};
     double Q2_Cut[9];

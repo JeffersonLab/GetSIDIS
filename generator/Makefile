@@ -18,12 +18,14 @@ CTEQPDF=../CTEQ6/cteq-pdf-1.0.4
 O=GetSIDIS
 
 # Linux with g++
+
 INCLUDES      = -I/opt/local/include -I$(ROOTINC)  -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/ -I$(LHAPDFINC)
 CXX           = clang++ -std=c++11
 #CXX           = gcc-7 -std=c++14
 LD            = clang++ -std=c++11
 #LD            = gcc-7 -std=c++14
 LDFLAGS       =
+
 
 LIBS          = $(ROOTLIBS)  -L/usr/lib/ $(LHAPDFLIBS)  -L$(CTEQPDF)/lib -lcteqpdf
 GLIBS         = $(ROOTGLIBS) -L/usr/X11/lib -L/usr/lib/ -lXpm -lX11
