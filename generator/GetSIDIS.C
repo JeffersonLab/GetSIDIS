@@ -680,8 +680,7 @@ int main(Int_t argc, char *argv[]){
             /*}}}*/
         }else{
             /*Generate Events Uniformly{{{*/
-            //if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
-            if (x<0.05 || x>0.3 || Q2 <1.0 || W< 2.0) continue;
+            if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
             if ( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
                         &&(   (count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
                             ||(count[1]<number_of_events&&pt>1.0&&Q2<=10.)

@@ -542,39 +542,39 @@ class SIDIS
             //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
             //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
              if(iA>2){
-                //eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
-                const int A_EPS09[17] = {4,6,9,12,16,27,40,56,64,108,115,117,184,195,197,208,238};
-                int A1 =0, A2=0, I1=0;
-                for(int i=0;i<17;i++){
-                    if(iA<=A_EPS09[i]){ 
-                        A2 = A_EPS09[i]; 
-                        I1=i-1; 
-                    }
-                }
-                if(I1>=0) 
-                    A1 = A_EPS09[I1]; 
-                else
-                    A1 = 1;
+                eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
+               /* const int A_EPS09[17] = {4,6,9,12,16,27,40,56,64,108,115,117,184,195,197,208,238};*/
+                //int A1 =0, A2=0, I1=0;
+                //for(int i=0;i<17;i++){
+                    //if(iA<=A_EPS09[i]){ 
+                        //A2 = A_EPS09[i]; 
+                        //I1=i-1; 
+                    //}
+                //}
+                //if(I1>=0) 
+                    //A1 = A_EPS09[I1]; 
+                //else
+                    //A1 = 1;
 
-                double iR1_uv = 0.0, iR1_dv = 0.0, iR1_u = 0.0, iR1_d = 0.0, iR1_s = 0.0, iR1_c = 0.0, iR1_b = 0.0, iR1_g = 0.0; 
-                double iR2_uv = 0.0, iR2_dv = 0.0, iR2_u = 0.0, iR2_d = 0.0, iR2_s = 0.0, iR2_c = 0.0, iR2_b = 0.0, iR2_g = 0.0; 
-                eps09(iOrder, iErrSet, A2, ix, sqrt(iQ2), iR2_uv, iR2_dv, iR2_u, iR2_d, iR2_s, iR2_c,iR2_b,iR2_g);
-                if(A1>1) 
-                    eps09(iOrder, iErrSet, A1, ix, sqrt(iQ2), iR1_uv, iR1_dv, iR1_u, iR1_d, iR1_s, iR1_c,iR1_b,iR1_g);
-                else{
-                    iR1_uv = 1.0; iR1_dv = 1.0; iR1_u = 1.0; iR1_d = 1.0; iR1_s = 1.0; iR1_c = 1.0; iR1_b = 1.0; iR1_g = 1.0; 
-                }
+                //double iR1_uv = 0.0, iR1_dv = 0.0, iR1_u = 0.0, iR1_d = 0.0, iR1_s = 0.0, iR1_c = 0.0, iR1_b = 0.0, iR1_g = 0.0; 
+                //double iR2_uv = 0.0, iR2_dv = 0.0, iR2_u = 0.0, iR2_d = 0.0, iR2_s = 0.0, iR2_c = 0.0, iR2_b = 0.0, iR2_g = 0.0; 
+                //eps09(iOrder, iErrSet, A2, ix, sqrt(iQ2), iR2_uv, iR2_dv, iR2_u, iR2_d, iR2_s, iR2_c,iR2_b,iR2_g);
+                //if(A1>1) 
+                    //eps09(iOrder, iErrSet, A1, ix, sqrt(iQ2), iR1_uv, iR1_dv, iR1_u, iR1_d, iR1_s, iR1_c,iR1_b,iR1_g);
+                //else{
+                    //iR1_uv = 1.0; iR1_dv = 1.0; iR1_u = 1.0; iR1_d = 1.0; iR1_s = 1.0; iR1_c = 1.0; iR1_b = 1.0; iR1_g = 1.0; 
+                //}
             
-                //Use linear extrapolation for A1<iA<A2
-                double AR = (iA-A1)/(A2-A1);
-                iR_uv = iR1_uv + AR * (iR2_uv - iR1_uv);
-                iR_dv = iR1_dv + AR * (iR2_dv - iR1_dv);
-                iR_u  = iR1_u  + AR * (iR2_u  - iR1_u );
-                iR_d  = iR1_d  + AR * (iR2_d  - iR1_d );
-                iR_s  = iR1_s  + AR * (iR2_s  - iR1_s );
-                iR_c  = iR1_c  + AR * (iR2_c  - iR1_c );
-                iR_b  = iR1_b  + AR * (iR2_b  - iR1_b );
-                iR_g  = iR1_g  + AR * (iR2_g  - iR1_g );
+                ////Use linear extrapolation for A1<iA<A2
+                //double AR = (iA-A1)/(A2-A1);
+                //iR_uv = iR1_uv + AR * (iR2_uv - iR1_uv);
+                //iR_dv = iR1_dv + AR * (iR2_dv - iR1_dv);
+                //iR_u  = iR1_u  + AR * (iR2_u  - iR1_u );
+                //iR_d  = iR1_d  + AR * (iR2_d  - iR1_d );
+                //iR_s  = iR1_s  + AR * (iR2_s  - iR1_s );
+                //iR_c  = iR1_c  + AR * (iR2_c  - iR1_c );
+                //iR_b  = iR1_b  + AR * (iR2_b  - iR1_b );
+                /*iR_g  = iR1_g  + AR * (iR2_g  - iR1_g );*/
             }
             else{
                 iR_uv = 1.0; iR_dv = 1.0; iR_u = 1.0; iR_d = 1.0; iR_s = 1.0; iR_c = 1.0; iR_b = 1.0; iR_g = 1.0; 
@@ -1135,39 +1135,39 @@ class SIDIS
             //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
             //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
             if(iA>2){
-                //eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
-                const int A_EPS09[17] = {4,6,9,12,16,27,40,56,64,108,115,117,184,195,197,208,238};
-                int A1 =0, A2=0, I1=0;
-                for(int i=0;i<17;i++){
-                    if(iA<=A_EPS09[i]){ 
-                        A2 = A_EPS09[i]; 
-                        I1=i-1; 
-                    }
-                }
-                if(I1>=0) 
-                    A1 = A_EPS09[I1]; 
-                else
-                    A1 = 1;
+                eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
+               /* const int A_EPS09[17] = {4,6,9,12,16,27,40,56,64,108,115,117,184,195,197,208,238};*/
+                //int A1 =0, A2=0, I1=0;
+                //for(int i=0;i<17;i++){
+                    //if(iA<=A_EPS09[i]){ 
+                        //A2 = A_EPS09[i]; 
+                        //I1=i-1; 
+                    //}
+                //}
+                //if(I1>=0) 
+                    //A1 = A_EPS09[I1]; 
+                //else
+                    //A1 = 1;
 
-                double iR1_uv = 0.0, iR1_dv = 0.0, iR1_u = 0.0, iR1_d = 0.0, iR1_s = 0.0, iR1_c = 0.0, iR1_b = 0.0, iR1_g = 0.0; 
-                double iR2_uv = 0.0, iR2_dv = 0.0, iR2_u = 0.0, iR2_d = 0.0, iR2_s = 0.0, iR2_c = 0.0, iR2_b = 0.0, iR2_g = 0.0; 
-                eps09(iOrder, iErrSet, A2, ix, sqrt(iQ2), iR2_uv, iR2_dv, iR2_u, iR2_d, iR2_s, iR2_c,iR2_b,iR2_g);
-                if(A1>1) 
-                    eps09(iOrder, iErrSet, A1, ix, sqrt(iQ2), iR1_uv, iR1_dv, iR1_u, iR1_d, iR1_s, iR1_c,iR1_b,iR1_g);
-                else{
-                    iR1_uv = 1.0; iR1_dv = 1.0; iR1_u = 1.0; iR1_d = 1.0; iR1_s = 1.0; iR1_c = 1.0; iR1_b = 1.0; iR1_g = 1.0; 
-                }
+                //double iR1_uv = 0.0, iR1_dv = 0.0, iR1_u = 0.0, iR1_d = 0.0, iR1_s = 0.0, iR1_c = 0.0, iR1_b = 0.0, iR1_g = 0.0; 
+                //double iR2_uv = 0.0, iR2_dv = 0.0, iR2_u = 0.0, iR2_d = 0.0, iR2_s = 0.0, iR2_c = 0.0, iR2_b = 0.0, iR2_g = 0.0; 
+                //eps09(iOrder, iErrSet, A2, ix, sqrt(iQ2), iR2_uv, iR2_dv, iR2_u, iR2_d, iR2_s, iR2_c,iR2_b,iR2_g);
+                //if(A1>1) 
+                    //eps09(iOrder, iErrSet, A1, ix, sqrt(iQ2), iR1_uv, iR1_dv, iR1_u, iR1_d, iR1_s, iR1_c,iR1_b,iR1_g);
+                //else{
+                    //iR1_uv = 1.0; iR1_dv = 1.0; iR1_u = 1.0; iR1_d = 1.0; iR1_s = 1.0; iR1_c = 1.0; iR1_b = 1.0; iR1_g = 1.0; 
+                //}
 
-                //Use linear extrapolation for A1<iA<A2
-                double AR = (iA-A1)/(A2-A1);
-                iR_uv = iR1_uv + AR * (iR2_uv - iR1_uv);
-                iR_dv = iR1_dv + AR * (iR2_dv - iR1_dv);
-                iR_u  = iR1_u  + AR * (iR2_u  - iR1_u );
-                iR_d  = iR1_d  + AR * (iR2_d  - iR1_d );
-                iR_s  = iR1_s  + AR * (iR2_s  - iR1_s );
-                iR_c  = iR1_c  + AR * (iR2_c  - iR1_c );
-                iR_b  = iR1_b  + AR * (iR2_b  - iR1_b );
-                iR_g  = iR1_g  + AR * (iR2_g  - iR1_g );
+                ////Use linear extrapolation for A1<iA<A2
+                //double AR = (iA-A1)/(A2-A1);
+                //iR_uv = iR1_uv + AR * (iR2_uv - iR1_uv);
+                //iR_dv = iR1_dv + AR * (iR2_dv - iR1_dv);
+                //iR_u  = iR1_u  + AR * (iR2_u  - iR1_u );
+                //iR_d  = iR1_d  + AR * (iR2_d  - iR1_d );
+                //iR_s  = iR1_s  + AR * (iR2_s  - iR1_s );
+                //iR_c  = iR1_c  + AR * (iR2_c  - iR1_c );
+                //iR_b  = iR1_b  + AR * (iR2_b  - iR1_b );
+                /*iR_g  = iR1_g  + AR * (iR2_g  - iR1_g );*/
             }
             else{
                 iR_uv = 1.0; iR_dv = 1.0; iR_u = 1.0; iR_d = 1.0; iR_s = 1.0; iR_c = 1.0; iR_b = 1.0; iR_g = 1.0; 
