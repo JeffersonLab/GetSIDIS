@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////
-// SIDIS Events Generators for SoLID or EIC         //
+// SIDIS Events Generators for SoLID, CLAS12 or EIC //
 //                                                  //
 //Note: Basically the same as Xin Qian's "collider" //
 //      but the model is coded in "SIDIS.h"         //
@@ -7,13 +7,13 @@
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
 //#include "SIDIS.h"
-//#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
-#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
+#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+//#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
-    cout<<"oO0 SIDIS Events Generators for SoLID or EIC or Spectrometer  0Oo//"<<endl;
+    cout<<"oO0 SIDIS Events Generators for SoLID or CLAS12 or EIC or Spectrometer  0Oo//"<<endl;
     cout<<"oO0  with nPDF (EPS09) and free-PDF (LHDAPDF) implemented.    0Oo//"<<endl;
     cout<<"oO0  -- Zhihong Ye, updated in 08/12/2016                     0Oo//"<<endl;
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
@@ -35,7 +35,7 @@ int main(Int_t argc, char *argv[]){
 
     Double_t Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon,rapidity, jacoF;
 
-    if (config != "EIC" && config != "SoLID" && config != "SPECT"){
+    if (config != "EIC" && config != "SoLID" && config != "CLAS12" && config != "SPECT"){
         cout << "not supported config = "<<config.Data() << endl;
         return -1;
     }    
@@ -100,6 +100,21 @@ int main(Int_t argc, char *argv[]){
         beamsize_y_ele = SoLID_BeamSizeY_ele;
         vertex_length = SoLID_Target_Length;
         vertex_center = SoLID_Target_Center;
+
+    }/*}}}*/
+    
+    if(config=="CLAS12" ){/*{{{*/
+        Mom_Min_e = CLAS12_Mom_Min_e;  Mom_Max_e = momentum_ele; 
+        Mom_Min_h = CLAS12_Mom_Min_h;  Mom_Max_h = CLAS12_Mom_Max_h;
+        Th_Min_e = CLAS12_Th_Min_e; Th_Max_e = CLAS12_Th_Max_e; 
+        Th_Min_h = CLAS12_Th_Min_h; Th_Max_h = CLAS12_Th_Max_h;
+        Ph_Min_e = CLAS12_Ph_Min_e; Ph_Max_e = CLAS12_Ph_Max_e; 
+        Ph_Min_h = CLAS12_Ph_Min_h; Ph_Max_h = CLAS12_Ph_Max_h;
+
+        beamsize_x_ele = CLAS12_BeamSizeX_ele;
+        beamsize_y_ele = CLAS12_BeamSizeY_ele;
+        vertex_length = CLAS12_Target_Length;
+        vertex_center = CLAS12_Target_Center;
 
     }/*}}}*/
    
@@ -224,7 +239,7 @@ int main(Int_t argc, char *argv[]){
     TFile *file2 = new TFile(filename2,"RECREATE");
     TTree *t2 = new TTree("T","T");
     t2->SetDirectory(file2);
-    if(config=="SoLID" || config=="EIC" || bXSMode ){ //If it is in bXSModle, t1 save hp events and t2 save hm events
+    if(config=="SoLID" || config=="CLAS12" || config=="EIC" || bXSMode ){ //If it is in bXSModle, t1 save hp events and t2 save hm events
         t2->Branch("Q2",&Q2,"data/D");/*{{{*/
         t2->Branch("W",&W,"data/D");
         t2->Branch("Wp",&Wp,"data/D");
@@ -496,7 +511,7 @@ int main(Int_t argc, char *argv[]){
             //For EIC  
             if( (config=="EIC" && z>0.2&&z<0.9
                         &&((count[0]<number_of_events)|| (count[1]<number_of_events)))
-                    ||(config=="SoLID" && z>0.3&&z<0.7 
+                    ||((config=="SoLID" || config=="CLAS12") && z>0.3&&z<0.7 
                         &&((count[0]<number_of_events)|| (count[1]<number_of_events)))
                     ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events)){
 
@@ -653,7 +668,7 @@ int main(Int_t argc, char *argv[]){
                 cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
             }
             //judging exitcondition/*{{{*/
-            if (config=="EIC"||config=="SoLID") {
+            if (config=="EIC"||config=="SoLID"||config=="CLAS12") {
                 if (count[0] < number_of_events || count[1] < number_of_events 
                    ) exitcondition=true;
                 else exitcondition=false;
@@ -665,13 +680,14 @@ int main(Int_t argc, char *argv[]){
             /*}}}*/
         }else{
             /*Generate Events Uniformly{{{*/
-            if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
+            //if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
+            if (x<0.05 || x>0.3 || Q2 <1.0 || W< 2.0) continue;
             if ( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
                         &&(   (count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
                             ||(count[1]<number_of_events&&pt>1.0&&Q2<=10.)
                             ||(count[2]<number_of_events&&pt<=1.0&&Q2>10.)
                             ||(count[3]<number_of_events&&pt>1.0&&Q2>10.)))
-                    ||(config=="SoLID" && z>0.3&&z<0.7 
+                    ||((config=="SoLID"||config=="CLAS12") && z>0.3&&z<0.7 
                         &&(   (count[0]<number_of_events&&pt<=1.0)
                             ||(count[1]<number_of_events&&pt>1.0)))
                     ||(config=="SPECT" && z>0.2&&z<0.9 && count[0]<number_of_events))
@@ -809,7 +825,7 @@ int main(Int_t argc, char *argv[]){
                 /*}}}*/
 
                 /*Fill ROOT{{{*/
-                if(config=="SoLID"||config=="EIC"){
+                if(config=="SoLID"||config=="CLAS12"||config=="EIC"){
                     if(Q2<=10.&&pt<=1.0){
                         t1->Fill();
                         count[0] ++;//cout << 0 << " " << count[0] << endl;
@@ -847,7 +863,7 @@ int main(Int_t argc, char *argv[]){
                         || count[2] < number_of_events || count[3] < number_of_events) exitcondition=true;
                 else exitcondition=false;
             } 
-            else if (config=="SoLID") {
+            else if (config=="SoLID"||config=="CLAS12") {
                 if (count[0] < number_of_events || count[1] < number_of_events) exitcondition=true;
                 else exitcondition=false;
             } 
@@ -864,7 +880,7 @@ int main(Int_t argc, char *argv[]){
 
     file1->Write();/*{{{*/
     file1->Close();
-    if(config=="SoLID" || config=="EIC" ){
+    if(config=="SoLID" || config=="CLAS12" || config=="EIC" ){
         file2->Write();
         file2->Close();
     }
@@ -931,7 +947,7 @@ int main(Int_t argc, char *argv[]){
         f1->Close();
         /*}}}*/
 
-        if(config=="SoLID" || config=="EIC" ){
+        if(config=="SoLID" || config=="CLAS12" || config=="EIC" ){
             /*Generate weights for file2{{{*/
             cout<<"--- Now insert weights to Root-file #2"<<filename2.Data()<<endl;
             TFile *f2 = new TFile(filename2.Data(), "update");
