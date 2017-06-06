@@ -582,14 +582,19 @@ class SIDIS
             double ubar = Get_CTEQPDF(-1, ix, iQ2);
             double dbar = Get_CTEQPDF(-2, ix, iQ2);
             double sbar = Get_CTEQPDF(-3, ix, iQ2);
+            double cbar = Get_CTEQPDF(-4, ix, iQ2);
+            double bbar = Get_CTEQPDF(-5, ix, iQ2);
             double u = Get_CTEQPDF(1, ix, iQ2);
             double d = Get_CTEQPDF(2, ix, iQ2);
             double s = Get_CTEQPDF(3, ix, iQ2);
+            double c = Get_CTEQPDF(4, ix, iQ2);
+            double b = Get_CTEQPDF(5, ix, iQ2);
             double g = Get_CTEQPDF(0, ix, iQ2);
 
             double uv = u-ubar;//uv = u - usea
             double dv = d-dbar;//dv = d - dsea
-            
+
+
 /*            fuA = (1.0*iZ)/(1.0*iA) * ( iR_uv * uv + iR_u * ubar)*/
                 //+ (1.0*(iA-iZ))/(1.0*iA) * (iR_dv * dv + iR_d * dbar);
 
@@ -604,6 +609,12 @@ class SIDIS
 
             fs =  iR_s * s;
             fsbar =  iR_s *sbar;
+
+            fc =  iR_c * c;
+            fcbar =  iR_c *cbar;
+
+            fb =  iR_b * b;
+            fbbar =  iR_b *bbar;
 
             fg =  iR_g * g;
         }/*}}}*/
@@ -1126,7 +1137,7 @@ class SIDIS
             //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
             //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
             if(iA>2){
-                //eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
+                //    eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
                 const int A_EPS09[17] = {4,6,9,12,16,27,40,56,64,108,115,117,184,195,197,208,238};
                 int A1 =0, A2=0, I1=0;
                 for(int i=0;i<17;i++){
@@ -1148,7 +1159,7 @@ class SIDIS
                 else{
                     iR1_uv = 1.0; iR1_dv = 1.0; iR1_u = 1.0; iR1_d = 1.0; iR1_s = 1.0; iR1_c = 1.0; iR1_b = 1.0; iR1_g = 1.0; 
                 }
-            
+
                 //Use linear extrapolation for A1<iA<A2
                 double AR = (iA-A1)/(A2-A1);
                 iR_uv = iR1_uv + AR * (iR2_uv - iR1_uv);
@@ -1182,6 +1193,14 @@ class SIDIS
                 double s = Get_CTEQPDF(3, ix, iQ2);
                 return iR_s * s;
             }
+            if(iParton==4){
+                double c = Get_CTEQPDF(4, ix, iQ2);
+                return iR_c * c;
+            }
+            if(iParton==5){
+                double b = Get_CTEQPDF(5, ix, iQ2);
+                return iR_b * b;
+            }
             if(iParton==-1){
                 double ubar = Get_CTEQPDF(-1, ix, iQ2);
                 return iR_u * ubar;
@@ -1193,6 +1212,14 @@ class SIDIS
             if(iParton==-3){
                 double sbar = Get_CTEQPDF(-3, ix, iQ2);
                 return iR_s * sbar;
+            }
+            if(iParton==-4){
+                double cbar = Get_CTEQPDF(-4, ix, iQ2);
+                return iR_c * cbar;
+            }
+            if(iParton==-5){
+                double bbar = Get_CTEQPDF(-5, ix, iQ2);
+                return iR_b * bbar;
             }
             if(iParton==0){
                 double g = Get_CTEQPDF(0, ix, iQ2);
@@ -1211,10 +1238,14 @@ class SIDIS
         double fuA;
         double fdA;
         double fs;
+        double fc;
+        double fb;
         double fg;
         double fubar;
         double fdbar;
         double fsbar;
+        double fcbar;
+        double fbbar;
         double fF2p;
         double fF2n;
         double fD_unfav;

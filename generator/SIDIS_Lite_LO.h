@@ -593,9 +593,13 @@ class SIDIS
             double ubar = Get_CTEQPDF(-1, ix, iQ2);
             double dbar = Get_CTEQPDF(-2, ix, iQ2);
             double sbar = Get_CTEQPDF(-3, ix, iQ2);
+            double cbar = Get_CTEQPDF(-4, ix, iQ2);
+            double bbar = Get_CTEQPDF(-5, ix, iQ2);
             double u = Get_CTEQPDF(1, ix, iQ2);
             double d = Get_CTEQPDF(2, ix, iQ2);
             double s = Get_CTEQPDF(3, ix, iQ2);
+            double c = Get_CTEQPDF(4, ix, iQ2);
+            double b = Get_CTEQPDF(5, ix, iQ2);
             double g = Get_CTEQPDF(0, ix, iQ2);
 
             double uv = u-ubar;//uv = u - usea
@@ -615,6 +619,12 @@ class SIDIS
 
             fs =  iR_s * s;
             fsbar =  iR_s *sbar;
+
+            fc =  iR_c * c;
+            fcbar =  iR_c *cbar;
+
+            fb =  iR_b * b;
+            fbbar =  iR_b *bbar;
 
             fg =  iR_g * g;
 
@@ -1200,6 +1210,14 @@ class SIDIS
                 double s = Get_CTEQPDF(3, ix, iQ2);
                 return iR_s * s;
             }
+            if(iParton==4){
+                double c = Get_CTEQPDF(4, ix, iQ2);
+                return iR_c * c;
+            }
+            if(iParton==5){
+                double b = Get_CTEQPDF(5, ix, iQ2);
+                return iR_b * b;
+            }
             if(iParton==-1){
                 double ubar = Get_CTEQPDF(-1, ix, iQ2);
                 return iR_u * ubar;
@@ -1211,6 +1229,14 @@ class SIDIS
             if(iParton==-3){
                 double sbar = Get_CTEQPDF(-3, ix, iQ2);
                 return iR_s * sbar;
+            }
+            if(iParton==-4){
+                double cbar = Get_CTEQPDF(-4, ix, iQ2);
+                return iR_c * cbar;
+            }
+            if(iParton==-5){
+                double bbar = Get_CTEQPDF(-5, ix, iQ2);
+                return iR_b * bbar;
             }
             if(iParton==0){
                 double g = Get_CTEQPDF(0, ix, iQ2);
@@ -1229,10 +1255,14 @@ class SIDIS
         double fuA;
         double fdA;
         double fs;
+        double fc;
+        double fb;
         double fg;
         double fubar;
         double fdbar;
         double fsbar;
+        double fcbar;
+        double fbbar;
         double fF2p;
         double fF2n;
         double fD_unfav;
