@@ -21,6 +21,7 @@
 #include <TObjArray.h>
 #include <TChain.h>
 #include <TMath.h>
+#include <TRandom3.h>
 #include <TH1.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -56,19 +57,19 @@ const Double_t mass_u = 0.931494;//GeV
 ////////////////////////
 //SoLID Acceptance
 ////////////////////////
-const Double_t SoLID_Mom_Min_e = 0.5;  
-const Double_t SoLID_Mom_Max_e = 11.0;//not in use 
-const Double_t SoLID_Mom_Min_h = 0.5;  
+const Double_t SoLID_Mom_Min_e = 0.5;
+const Double_t SoLID_Mom_Max_e = 11.0;//not in use
+const Double_t SoLID_Mom_Min_h = 0.5;
 const Double_t SoLID_Mom_Max_h = 6.0;
 
-const Double_t SoLID_Th_Min_e  = 7.0;  
-const Double_t SoLID_Th_Max_e = 30.0; 
-const Double_t SoLID_Th_Min_h  =  7.0; 
+const Double_t SoLID_Th_Min_e  = 7.0;
+const Double_t SoLID_Th_Max_e = 30.0;
+const Double_t SoLID_Th_Min_h  =  7.0;
 const Double_t SoLID_Th_Max_h =  30.0;
 
-const Double_t SoLID_Ph_Min_e  = 0.0;  
-const Double_t SoLID_Ph_Max_e = 360.0; 
-const Double_t SoLID_Ph_Min_h  =  0.0; 
+const Double_t SoLID_Ph_Min_e  = 0.0;
+const Double_t SoLID_Ph_Max_e = 360.0;
+const Double_t SoLID_Ph_Min_h  =  0.0;
 const Double_t SoLID_Ph_Max_h =  360.0;
 
 //SoLID BeamSize Info
@@ -84,21 +85,21 @@ const Double_t SoLID_Target_Length = 40.0 *cm;
 //EIC Acceptance
 ////////////////////////
 //A rough guess but people claim EIC to be a full-acceptance device!
-const Double_t EIC_Mom_Min_e = 0.5;  
-const Double_t EIC_Mom_Max_e = 3.*10.0; //not in use 
-const Double_t EIC_Mom_Min_h = 0.0;  
+const Double_t EIC_Mom_Min_e = 0.5;
+const Double_t EIC_Mom_Max_e = 3.*10.0; //not in use
+const Double_t EIC_Mom_Min_h = 0.0;
 //const Double_t EIC_Mom_Max_h = 50.0;
 const Double_t EIC_Mom_Max_h = 10.0;
 
-const Double_t EIC_Th_Min_e = 0.0;  
-//const Double_t EIC_Th_Max_e  = 180.0;            
-const Double_t EIC_Th_Max_e  = 140.0;            
-const Double_t EIC_Th_Min_h = 0.0;  
+const Double_t EIC_Th_Min_e = 0.0;
+//const Double_t EIC_Th_Max_e  = 180.0;
+const Double_t EIC_Th_Max_e  = 140.0;
+const Double_t EIC_Th_Min_h = 0.0;
 const Double_t EIC_Th_Max_h  = 180.0;
 
-const Double_t EIC_Ph_Min_e = 0.0;  
-const Double_t EIC_Ph_Max_e  = 360.0;            
-const Double_t EIC_Ph_Min_h = 0.0;  
+const Double_t EIC_Ph_Min_e = 0.0;
+const Double_t EIC_Ph_Max_e  = 360.0;
+const Double_t EIC_Ph_Min_h = 0.0;
 const Double_t EIC_Ph_Max_h  = 360.0;
 
 //EIC BeamSize Info, to be updated
@@ -113,19 +114,19 @@ const Double_t EIC_Vertex_Length = 0.0 *cm;
 ////////////////////////
 //SPECT Acceptance
 ////////////////////////
-const Double_t SPECT_Mom_Min_e = 2.0;  
+const Double_t SPECT_Mom_Min_e = 2.0;
 const Double_t SPECT_Mom_Max_e = 6.0;
-const Double_t SPECT_Mom_Min_h = 2.0;  
+const Double_t SPECT_Mom_Min_h = 2.0;
 const Double_t SPECT_Mom_Max_h = 6.0;
 
-const Double_t SPECT_Th_Min_e  = 5.0;  
-const Double_t SPECT_Th_Max_e = 40.0; 
-const Double_t SPECT_Th_Min_h  = 5.0; 
+const Double_t SPECT_Th_Min_e  = 5.0;
+const Double_t SPECT_Th_Max_e = 40.0;
+const Double_t SPECT_Th_Min_h  = 5.0;
 const Double_t SPECT_Th_Max_h =  40.0;
 
-const Double_t SPECT_Ph_Min_e  =-5.0;  
-const Double_t SPECT_Ph_Max_e = 5.0; 
-const Double_t SPECT_Ph_Min_h  = -5.0; 
+const Double_t SPECT_Ph_Min_e  =-5.0;
+const Double_t SPECT_Ph_Max_e = 5.0;
+const Double_t SPECT_Ph_Min_h  = -5.0;
 const Double_t SPECT_Ph_Max_h =  5.0;
 
 
@@ -136,7 +137,7 @@ const Double_t SPECT_BeamSizeY_ele = 0.5 * cm;
 //const Double_t SPECT_BeamSizeY_ion = 0.5 * cm;
 const Double_t SPECT_Target_Center = -0.0 * cm;
 const Double_t SPECT_Target_Length = 10.0 *cm;
- 
+
 
 //////////////////////////////////
 //For the input parameters

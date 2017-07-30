@@ -7,13 +7,10 @@
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
 //#include "SIDIS.h"
-<<<<<<< HEAD
-#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
-//#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
-=======
 //#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
 #include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
->>>>>>> master
+
+
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
@@ -23,9 +20,9 @@ int main(Int_t argc, char *argv[]){
     cout<<"oO0  -- Zhihong Ye, updated in 08/12/2016                     0Oo//"<<endl;
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
     cout<<endl;
-
+    gRandom = new TRandom3();
     gRandom->SetSeed(0);// uses time for seed
-
+    cout <<"SEED number is " << gRandom->GetSeed()<<endl;
     /*Inputs&Output{{{*/
     //initialize
     TString inputfilename = argv[1];
@@ -111,8 +108,12 @@ int main(Int_t argc, char *argv[]){
     //A rough guess but people claim EIC to be a full-acceptance device!
     else if(config=="EIC" ){/*{{{*/
         Mom_Min_e = EIC_Mom_Min_e;  Mom_Max_e =  momentum_ele * 3.0;
+        //next line are the values for fast MC generation for Q2 <10, pt < 1GeV/c and 0.05 < x < 0.1, F.H. 11.7.17
+        Mom_Min_e = 8.5; Mom_Max_e = 10.5;
         Mom_Min_h = EIC_Mom_Min_h;  Mom_Max_h = EIC_Mom_Max_h;
         Th_Min_e = EIC_Th_Min_e; Th_Max_e = EIC_Th_Max_e;
+//next line are the values for fast MC generation for Q2 <10, pt < 1GeV/c and 0.05 < x < 0.1, F.H. 11.7.17
+        Th_Min_e = 0; Th_Max_e = 25.0;
         Th_Min_h = EIC_Th_Min_h; Th_Max_h = EIC_Th_Max_h;
         Ph_Min_e = EIC_Ph_Min_e; Ph_Max_e = EIC_Ph_Max_e;
         Ph_Min_h = EIC_Ph_Min_h; Ph_Max_h = EIC_Ph_Max_h;
@@ -507,6 +508,7 @@ int main(Int_t argc, char *argv[]){
 
                 sidis->CalcXS();/*{{{*/
                 dxs_incl = sidis->GetXS_Inclusive();
+
                 dxs_hp = sidis->GetXS_HP();
                 dxs_hm = sidis->GetXS_HM();
                 dilute_hp = sidis->GetDilute_HP();
@@ -673,9 +675,9 @@ int main(Int_t argc, char *argv[]){
             if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
             if ( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
                         &&(   (count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
-                            ||(count[1]<number_of_events&&pt>1.0&&Q2<=10.)
-                            ||(count[2]<number_of_events&&pt<=1.0&&Q2>10.)
-                            ||(count[3]<number_of_events&&pt>1.0&&Q2>10.)))
+                            ||(count[1]<(number_of_events/100000)&&pt>1.0&&Q2<=10.)
+                            ||(count[2]<(number_of_events/100000)&&pt<=1.0&&Q2>10.)
+                            ||(count[3]<(number_of_events/100000)&&pt>1.0&&Q2>10.)))
                     ||(config=="SoLID" && z>0.3&&z<0.7
                         &&(   (count[0]<number_of_events&&pt<=1.0)
                             ||(count[1]<number_of_events&&pt>1.0)))
@@ -684,6 +686,7 @@ int main(Int_t argc, char *argv[]){
 
                 sidis->CalcXS();/*{{{*/
                 dxs_incl = sidis->GetXS_Inclusive();
+                //cout << "XS Inclusive in eventloop " << dxs_incl<< endl;
                 dxs_hp = sidis->GetXS_HP();
                 dxs_hm = sidis->GetXS_HM();
                 dilute_hp = sidis->GetDilute_HP();
@@ -848,8 +851,8 @@ int main(Int_t argc, char *argv[]){
 
             //judging exitcondition/*{{{*/
             if (config=="EIC") {
-                if (count[0] < number_of_events || count[1] < number_of_events
-                        || count[2] < number_of_events || count[3] < number_of_events) exitcondition=true;
+                if (count[0] < number_of_events || count[1] < number_of_events/100000
+                        || count[2] < number_of_events/100000 || count[3] < number_of_events/100000) exitcondition=true;
                 else exitcondition=false;
             }
             else if (config=="SoLID") {
