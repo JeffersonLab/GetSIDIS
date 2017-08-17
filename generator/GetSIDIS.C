@@ -672,7 +672,8 @@ int main(Int_t argc, char *argv[]){
             /*}}}*/
         }else{
             /*Generate Events Uniformly{{{*/
-            if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
+            //if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
+            if (x<0.03 || x>0.15 || Q2 <1.0 || W< 2.0) continue;
             if ( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
                         &&(   (count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
                             ||(count[1]<(number_of_events/100000)&&pt>1.0&&Q2<=10.)
@@ -846,7 +847,7 @@ int main(Int_t argc, char *argv[]){
                     Nsim1 = nsim;
                 }
                 /*}}}*/
-                cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
+              //  cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << "\r";
             }
 
             //judging exitcondition/*{{{*/
@@ -868,7 +869,7 @@ int main(Int_t argc, char *argv[]){
     }
     /*}}}*/
 
-    cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << endl;
+  //  cout << count[0] << "\t" << count[1] << "\t" << count[2] << "\t" << count[3] << endl;
 
     file1->Write();/*{{{*/
     file1->Close();
