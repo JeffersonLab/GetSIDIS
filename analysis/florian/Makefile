@@ -13,7 +13,8 @@ EPS09=../../eps09_cxx/
 CTEQPDF=../../CTEQ6/cteq-pdf-1.0.4
 
 
-O=mccomparison
+#O=mccomparison
+O=skimdata
 
 # Linux with g++
 INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
