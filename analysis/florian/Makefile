@@ -14,7 +14,8 @@ CTEQPDF=../../CTEQ6/cteq-pdf-1.0.4
 
 
 #O=mccomparison
-O=skimdata
+#O=skimdata
+O=perbinanalysis
 
 # Linux with g++
 INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
