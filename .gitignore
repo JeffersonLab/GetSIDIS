@@ -1,2 +1,6 @@
 */*.o
 */*.root
+*/*.pdf
+analysis/batch_files
+test/massproduction*
+test/Runs*
