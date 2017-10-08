@@ -1,0 +1,31 @@
+{
+//TFile *file0 = new TFile("perbinplots_c12.root","R");
+//TFile *file1 = new TFile("perbinplots_d.root","R");
+//TH2D *h1 = (TH2D*)file0->GetObjectChecked("countratediff","TH2D");
+//TH2D *h2 = (TH2D*)file1->GetObjectChecked("countratediff","TH2D");
+TFile *file0 = new TFile("perbinplots_c12500farm.root","R");
+TFile *file1 = new TFile("perbinplots_d500farm.root","R");
+TH2D *h1 = (TH2D*)file0->GetObjectChecked("crosssectiondiff","TH2D");
+TH2D *h2 = (TH2D*)file1->GetObjectChecked("crosssectiondiff","TH2D");
+TH2D *h3 = (TH2D*)file0->GetObjectChecked("countratediff1","TH2D");
+TH2D *h4 = (TH2D*)file1->GetObjectChecked("countratediff1","TH2D");
+TH2D *sratio = new TH2D("sratio","; z; Q^{2} [GeV^{2}]",h1->GetNbinsX(), h1->GetXaxis()->GetXmin(), h1->GetXaxis()->GetXmax(), h1->GetNbinsY(), h1->GetYaxis()->GetXmin(), h1->GetYaxis()->GetXmax());
+sratio->SetMarkerSize(3);
+sratio->GetYaxis()->CenterTitle(1);
+sratio->GetXaxis()->CenterTitle(1);
+sratio->GetXaxis()->SetLabelSize(0.05);
+sratio->GetXaxis()->SetTitleSize(0.05);
+sratio->GetXaxis()->SetTitleOffset(0.95);
+sratio->GetXaxis()->SetNdivisions(5,3,0);
+sratio->GetYaxis()->SetLabelSize(0.05);
+sratio->GetYaxis()->SetTitleSize(0.05);
+sratio->GetYaxis()->SetTitleOffset(0.9);
+sratio->GetYaxis()->SetNdivisions(5,3,0);
+gStyle->SetOptStat(0);
+gStyle->SetPaintTextFormat("4.3f");
+gStyle->SetPadGridX(1);
+gStyle->SetPadGridY(1);
+sratio->Sumw2();
+sratio->Divide(h1,h2,1/12.,1/2.);
+sratio->Draw("TEXTE");
+}
