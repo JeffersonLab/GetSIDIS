@@ -51,9 +51,42 @@
 
 using namespace std;
 
-
+//Input values to the function are
+//1. the mass of the nucleus under consideration, 2 for deuterium and 12 for Carbon
+//2. the number of the rootfile for smearing (usually from 0-500)
 int main(Int_t argc, char *argv[]){
-  	int fA = 0; cerr<<"-- What nucleus: A = ? "; cin >> fA;
+
+
+   if (argc<2) { cout<< "Not enough arguments given to the function. Program ended" << endl; return 0; }
+   else if (argc>3) { cout << "Too many arguments for the function. Program ended" << endl; return 0;}
+   else {
+        try
+        {
+           const string str = argv[1] ;
+           std::size_t pos ;
+           // http://en.cppreference.com/w/cpp/string/basic_string/stol
+           const int value =  std::stoi( str, &pos, 10 ) ; // decimal integer literal
+           if( pos == str.size() ) cout << "integer value of first input is " << value << '\n' ;
+           else { cout << "partial conversion to int; value: " << value << " (non-numeric character found at position " << pos << ")\n" ; return -1; }
+        }
+        catch( const std::invalid_argument& ) { cout << "invalid characters: no conversion could be performed\n" ; return -1; }
+        catch( const std::out_of_range& ) {  cout << "integer value is out of the range of int\n" ; return -1; }
+        try
+        {
+           const string str = argv[2] ;
+           std::size_t pos ;
+           // http://en.cppreference.com/w/cpp/string/basic_string/stol
+           const int value =  std::stoi( str, &pos, 10 ) ; // decimal integer literal
+           if( pos == str.size() ) cout << "integer value of second input is " << value << '\n' ;
+           else { cout << "partial conversion to int; value: " << value << " (non-numeric character found at position " << pos << ")\n" ; return -1; }
+        }
+        catch( const std::invalid_argument& ) { cout << "invalid characters: no conversion could be performed\n" ; return -1; }
+        catch( const std::out_of_range& ) {  cout << "integer value is out of the range of int\n" ; return -1; }
+
+    }
+
+  	int fA = 0;
+    fA = atoi(argv[1]); //nucleus number
     int fZ = 1;
     double momentum_ele = 10;
     double momentum_ion = 0;
@@ -71,34 +104,41 @@ int main(Int_t argc, char *argv[]){
     double ele_the_reso = 0.002;
     double had_the_reso = ele_the_reso;
 
-    cout << "Resolution values for smearing: p_ele " << ele_mom_reso << " , p_had " << had_mom_reso <<
-    " , theta " << ele_the_reso << " [rad]" << endl;
-
     TFile *inputfile;
 
+    int runnumber = atoi(argv[2]); //number of input root file
     if(fA ==12){
-  //        inputfile = new TFile("../massproduction_CTEQfree/EIC_A12_pion_10_600_1_1.root","R");
-            inputfile = new TFile("../../test/massproduction_CTEQ/EIC_A12_pion_10_600_1_0.root","R");
+            cout << "Input nucleus is carbon" << endl;
+          //  TString filename = Form("../../test/massproduction_CTEQ/EIC_A12_pion_10_600_1_%i.root",runnumber);
+            TString filename = Form("../massproduction_CTEQfree/EIC_A12_pion_10_600_1_%i.root",runnumber);
+            inputfile = new TFile(filename,"R");
             momentum_ele = 10; //GeV
             momentum_ion = 600; //GeV
             fZ = 6;
             ion_mass = fZ*mass_p+(fA-fZ)*mass_n;
-
+            cout << "Input nucleus is carbon" << endl;
+            if (inputfile->IsZombie()) { cout << "Input file not found. Exit program." << endl; return 0;}
     }
     else if(fA ==2) {
-        //  inputfile = new TFile("../massproduction_CTEQ/EIC_A2_pion_10_100_1_1.root","R");
-            inputfile = new TFile("../../test/massproduction_CTEQ/EIC_A2_pion_10_100_1_0.root","R");
+            cout << "Input nucleus is deuterium" << endl;
+      //     TString filename = Form("../../test/massproduction_CTEQ/EIC_A2_pion_10_100_1_%i.root",runnumber);
+            TString filename = Form("../massproduction_CTEQfree/EIC_A2_pion_10_100_1_%i.root",runnumber);
+            inputfile = new TFile(filename,"R");
             momentum_ele = 10; //GeV
             momentum_ion = 100; //GeV
             fZ = 1;
             ion_mass = fZ*mass_p+(fA-fZ)*mass_n;
-
+            if (inputfile->IsZombie()) { cout << "Input file not found. Exit program." << endl; return 0;}
     }
-    else { cout << "no valid nucleus" << endl; return 0;}
+    else { cout << "no valid nucleus: " << fA << endl; return 0;}
+
+    cout << "Resolution values for smearing: p_ele " << ele_mom_reso << " , p_had " << had_mom_reso <<
+    " , theta " << ele_the_reso << " [rad]" << endl;
 
     cout << " A is " << fA << " , Z is " << fZ << " , ionmass is " << ion_mass << endl;
     TTree *T = (TTree*)inputfile->GetObjectChecked("T", "TTree");
 
+    if (T->IsZombie()) { cout << "Tree not found. Exit program" << endl; return 0;}
     //Define
     Double_t Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon,rapidity;
     Double_t theta_q, theta_s,phi_h,phi_s,mom_ele,mom_had,theta_ele, theta_had,phi_ele,phi_had;
