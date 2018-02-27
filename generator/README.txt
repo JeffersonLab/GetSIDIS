@@ -4,6 +4,14 @@
 *   for SoLID and EIC          *
 *  -- Zhihong Ye, 07/26/2016   *
 ********************************
+Update Version in 02/27/2018:
+1) Add Lsidis.h to calculate the SIDIS XS based on Tianbo Liu's method
+2) Used LHAPDF version 6.2 or above which you have to installed by yourself
+3) Remove any LHAPDF independent model, since Lsidis.h will do the job
+4) Remove (or won't include nCTEQ) since Lsidis.h will do the job
+5) Add two flag, isphy_hp and isphy_hm to determine if the events are in the good physical region
+6) To-Do: Use a better sampling method when generating XS based on physical distributions
+
 Update Version in 09/16/2016:
 1) Add LHAPDF6 (replace LHAPDF5.8). Please install your won LHAPDF6.
 2) Keep the "Lite" version which only include EPS09 and CTEQ, and also the full version

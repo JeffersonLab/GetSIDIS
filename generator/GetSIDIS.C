@@ -6,8 +6,8 @@
 //  -- Zhihong Ye, 06/10/2014                       //
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
-//#include "SIDIS.h"
-#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
+#include "SIDIS_new.h"
+//#include "SIDIS_Lite.h" //this version doesn't include LHAPDF
 //#include "SIDIS_Lite_LO.h" //this version doesn't include LHAPDF, contributions from s, sbar and g, and only LO PDF
 
 int main(Int_t argc, char *argv[]){
@@ -33,7 +33,7 @@ int main(Int_t argc, char *argv[]){
         }
     }
 
-    Double_t Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon,rapidity, jacoF;
+    Double_t Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon,rapidity,physical, jacoF;
 
     if (config != "EIC" && config != "SoLID" && config != "CLAS12" && config != "SPECT"){
         cout << "not supported config = "<<config.Data() << endl;
@@ -74,7 +74,7 @@ int main(Int_t argc, char *argv[]){
     Double_t theta_gen_ele,theta_gen_had;
     Double_t phi_gen_ele,phi_gen_had;
     Double_t theta_q, theta_s,phi_h,phi_s,mom_ele,mom_had,theta_ele, theta_had,phi_ele,phi_had;
-    Double_t dxs_incl,dxs_hm,dxs_hp,dilute_hp,dilute_hm;
+    Double_t dxs_incl,dxs_hm,dxs_hp,dxs_hm_sidis,dxs_hp_sidis,dilute_hp,dilute_hm;
     Double_t px_ele, py_ele,pz_ele, px_had, py_had, pz_had, E_ele,E_had;
     Double_t u_pdf, d_pdf, s_pdf, g_pdf, ubar_pdf, dbar_pdf, sbar_pdf;
     Double_t D_fav, D_unfav, D_s, D_g;
@@ -83,6 +83,7 @@ int main(Int_t argc, char *argv[]){
     Double_t vx_ele, vy_ele, vz_ele, vx_had, vy_had, vz_had;
     double beamsize_x_ele=0.0, beamsize_y_ele=0.0;
     double vertex_length =0.0, vertex_center=0.0;
+    int isphy_hp, isphy_hm;
 
     //The idea is to generate a phase-space which is slightly larger than the actual one
     Double_t Mom_Max_e = 0.0, Mom_Min_e = 0.0, Mom_Max_h = 0.0,Mom_Min_h = 0.0;
@@ -153,6 +154,10 @@ int main(Int_t argc, char *argv[]){
     Double_t Phase_space=electron_phase_space*hadron_phase_space;           //electron*hadron phase space eg, for electron: delta_cos_theta*delta_phi*delta_energy
     cout<<" -- For Config="<<config<<" Phase_space: "<<electron_phase_space<<"	"<<hadron_phase_space<<"	"<<Phase_space<<endl;
 
+    Double_t Q2_CutOff = 10.0; //A default setting
+    if(config=="CLAS12")
+        Q2_CutOff = 12.0; //A loose Q2 cut-off just for clas12 to see how far it can go
+
     /*}}}*/
 
     /*New ROOT files, Trees and  Branches{{{*/
@@ -181,13 +186,18 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("gamma",&gamma,"data/D");
     t1->Branch("epsilon", &epsilon,"data/D");
     t1->Branch("rapidity",&rapidity,"data/D");
+    t1->Branch("physical",&physical,"data/D");
     t1->Branch("theta_q",&theta_q,"data/D");
     t1->Branch("theta_s",&theta_s,"data/D");
     t1->Branch("phi_h",&phi_h,"data/D");
     t1->Branch("phi_s",&phi_s,"data/D");
     t1->Branch("jacoF",&jacoF,"jacoF/D");
+    t1->Branch("isphy_hm",&isphy_hm,"isphy_hm/I");
+    t1->Branch("isphy_hp",&isphy_hp,"isphy_hp/I");
     t1->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
     t1->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
+    t1->Branch("dxs_hm_sidis",&dxs_hm_sidis,"dxs_hm_sidis/D");
+    t1->Branch("dxs_hp_sidis",&dxs_hp_sidis,"dxs_hp_sidis/D");
     t1->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
     t1->Branch("mom_ele",&mom_ele,"mom_ele/D");
     t1->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
@@ -252,13 +262,18 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("gamma",&gamma,"data/D");
         t2->Branch("epsilon", &epsilon,"data/D");
         t2->Branch("rapidity",&rapidity,"data/D");
+        t2->Branch("physical",&physical,"data/D");
         t2->Branch("theta_q",&theta_q,"data/D");
         t2->Branch("theta_s",&theta_s,"data/D");
         t2->Branch("phi_h",&phi_h,"data/D");
         t2->Branch("phi_s",&phi_s,"data/D");
         t2->Branch("jacoF",&jacoF,"jacoF/D");
+        t2->Branch("isphy_hm",&isphy_hm,"isphy_hm/I");
+        t2->Branch("isphy_hp",&isphy_hp,"isphy_hp/I");
         t2->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
         t2->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
+        t2->Branch("dxs_hm_sidis",&dxs_hm_sidis,"dxs_hm_sidis/D");
+        t2->Branch("dxs_hp_sidis",&dxs_hp_sidis,"dxs_hp_sidis/D");
         t2->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
         t2->Branch("mom_ele",&mom_ele,"mom_ele/D");
         t2->Branch("mom_had",&mom_had,"mom_had/D");
@@ -320,13 +335,18 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("gamma",&gamma,"data/D");
         t3->Branch("epsilon", &epsilon,"data/D");
         t3->Branch("rapidity",&rapidity,"data/D");
+        t3->Branch("physical",&physical,"data/D");
         t3->Branch("theta_q",&theta_q,"data/D");
         t3->Branch("theta_s",&theta_s,"data/D");
         t3->Branch("phi_h",&phi_h,"data/D");
         t3->Branch("phi_s",&phi_s,"data/D");
         t3->Branch("jacoF",&jacoF,"jacoF/D");
+        t3->Branch("isphy_hm",&isphy_hm,"isphy_hm/I");
+        t3->Branch("isphy_hp",&isphy_hp,"isphy_hp/I");
         t3->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
         t3->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
+        t3->Branch("dxs_hm_sidis",&dxs_hm_sidis,"dxs_hm_sidis/D");
+        t3->Branch("dxs_hp_sidis",&dxs_hp_sidis,"dxs_hp_sidis/D");
         t3->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
         t3->Branch("mom_ele",&mom_ele,"mom_ele/D");
         t3->Branch("mom_had",&mom_had,"mom_had/D");
@@ -376,13 +396,18 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("gamma",&gamma,"data/D");
         t4->Branch("epsilon", &epsilon,"data/D");
         t4->Branch("rapidity",&rapidity,"data/D");
+        t4->Branch("physical",&physical,"data/D");
         t4->Branch("theta_q",&theta_q,"data/D");
         t4->Branch("theta_s",&theta_s,"data/D");
         t4->Branch("phi_h",&phi_h,"data/D");
         t4->Branch("phi_s",&phi_s,"data/D");
         t4->Branch("jacoF",&jacoF,"jacoF/D");
+        t4->Branch("isphy_hm",&isphy_hm,"isphy_hm/I");
+        t4->Branch("isphy_hp",&isphy_hp,"isphy_hp/I");
         t4->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
         t4->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
+        t4->Branch("dxs_hm_sidis",&dxs_hm_sidis,"dxs_hm_sidis/D");
+        t4->Branch("dxs_hp_sidis",&dxs_hp_sidis,"dxs_hp_sidis/D");
         t4->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
         t4->Branch("mom_ele",&mom_ele,"mom_ele/D");
         t4->Branch("mom_had",&mom_had,"mom_had/D");
@@ -432,8 +457,9 @@ int main(Int_t argc, char *argv[]){
     }/*}}}*/
 
     //Initialize XS Model here/*{{{*/
-    //LHAPDF, CTEQPDF or EPS09
+    //CTEQPDF or EPS09
     SIDIS *sidis = new SIDIS(model);
+    sidis->Init(ion_mass, A, Z, particle_flag);
 
     ////////////////////////////////
     //*** If using EPS09, two CTEQ PDF sets are used for LO and NLO EPS09 sets
@@ -450,14 +476,7 @@ int main(Int_t argc, char *argv[]){
     /////////////
     //SetCTEQ( mode);
     ////////////////////////////////
-     
-    ////////////////////////////////
-    //*** If using LHAPDF6, default is "CTnlo", but you can add this line here to specify the set of PDF you want
-    ////////////////////////////////
-    ////*** in general, just tell the name of the set
-    ////***  see https://lhapdf.hepforge.org/pdfsets.html 
-    //SetLHAPDF("CJ15nlo");
-   
+       
     ////*** Or if using nCTEQ, add this to specify the associated PDF set of the target
     //sidis->SetLHAPDF(A, Z); 
     ////////////////////////////////
@@ -491,8 +510,7 @@ int main(Int_t argc, char *argv[]){
 
         sidis->SetKin(momentum_ele, momentum_ion,/*{{{*/
                 mom_gen_ele, theta_gen_ele, phi_gen_ele,
-                mom_gen_had, theta_gen_had, phi_gen_had,
-                ion_mass, A, Z, particle_flag);
+                mom_gen_had, theta_gen_had, phi_gen_had);
 
         mom_ele = sidis->fMom_ele; theta_ele = sidis->fTheta_ele; phi_ele = sidis->fPhi_ele;
         mom_had = sidis->fMom_had; theta_had = sidis->fTheta_had; phi_had = sidis->fPhi_had;
@@ -503,6 +521,7 @@ int main(Int_t argc, char *argv[]){
         x=sidis->fXb; y=sidis->fY; z=sidis->fZ_h; Q2=sidis->fQ2; W=sidis->fW; Wp=sidis->fWp;
         s=sidis->fS; nu=sidis->fNu; pt=sidis->fPt; gamma=sidis->fGamma; epsilon=sidis->fEpsilon;
         rapidity = sidis->fRapidity;
+        physical = sidis->fPhysical;
         jacoF=sidis->fJacobF;/*}}}*/
 
         if(bXSMode){
@@ -519,10 +538,14 @@ int main(Int_t argc, char *argv[]){
                 dxs_incl = sidis->GetXS_Inclusive();
                 dxs_hp = sidis->GetXS_HP();
                 dxs_hm = sidis->GetXS_HM();
+                dxs_hp_sidis = sidis->GetXS_HP_SIDIS();
+                dxs_hm_sidis = sidis->GetXS_HM_SIDIS();
                 dilute_hp = sidis->GetDilute_HP();
                 dilute_hm = sidis->GetDilute_HM();
-                
-                u_pdf = sidis->get_uA();
+                isphy_hp = sidis->IsPhy_HP();
+                isphy_hm = sidis->IsPhy_HM();
+
+                 u_pdf = sidis->get_uA();
                 d_pdf = sidis->get_dA();
                 s_pdf = sidis->get_s();
                 g_pdf = sidis->get_g();
@@ -681,11 +704,12 @@ int main(Int_t argc, char *argv[]){
         }else{
             /*Generate Events Uniformly{{{*/
             if (x<0.0 || x>1.0 || Q2 <1.0 || W< 2.0) continue;
+            //if (x<0.05 || x>0.3 || Q2 <1.0 || W< 2.0) continue;
             if ( (config=="EIC" && z>0.2&&z<0.9//&&y>0.05&&y<0.8
-                        &&(   (count[0]<number_of_events&&pt<=1.0&&Q2<=10.)
-                            ||(count[1]<number_of_events&&pt>1.0&&Q2<=10.)
-                            ||(count[2]<number_of_events&&pt<=1.0&&Q2>10.)
-                            ||(count[3]<number_of_events&&pt>1.0&&Q2>10.)))
+                        &&(   (count[0]<number_of_events&&pt<=1.0&&Q2<=Q2_CutOff)
+                            ||(count[1]<number_of_events&&pt>1.0&&Q2<=Q2_CutOff)
+                            ||(count[2]<number_of_events&&pt<=1.0&&Q2>Q2_CutOff)
+                            ||(count[3]<number_of_events&&pt>1.0&&Q2>Q2_CutOff)))
                     ||((config=="SoLID"||config=="CLAS12") && z>0.3&&z<0.7 
                         &&(   (count[0]<number_of_events&&pt<=1.0)
                             ||(count[1]<number_of_events&&pt>1.0)))
@@ -696,6 +720,8 @@ int main(Int_t argc, char *argv[]){
                 dxs_incl = sidis->GetXS_Inclusive();
                 dxs_hp = sidis->GetXS_HP();
                 dxs_hm = sidis->GetXS_HM();
+                dxs_hp_sidis = sidis->GetXS_HP_SIDIS();
+                dxs_hm_sidis = sidis->GetXS_HM_SIDIS();
                 dilute_hp = sidis->GetDilute_HP();
                 dilute_hm = sidis->GetDilute_HM();
                 
@@ -825,23 +851,23 @@ int main(Int_t argc, char *argv[]){
 
                 /*Fill ROOT{{{*/
                 if(config=="SoLID"||config=="CLAS12"||config=="EIC"){
-                    if(Q2<=10.&&pt<=1.0){
+                    if(Q2<=Q2_CutOff&&pt<=1.0){
                         t1->Fill();
                         count[0] ++;//cout << 0 << " " << count[0] << endl;
                         Nsim1 = nsim;
                     }
-                    if (Q2<=10.&&pt>1.0){
+                    if (Q2<=Q2_CutOff&&pt>1.0){
                         t2->Fill();
                         count[1] ++;
                         Nsim2 = nsim;
                     }
 
-                    if (config=="EIC"&&Q2>10.&&pt<=1.0){
+                    if (config=="EIC"&&Q2>Q2_CutOff&&pt<=1.0){
                         t3->Fill();
                         count[2] ++;//cout << 2 << " " << count[2] << endl;
                         Nsim3 = nsim;
                     }
-                    if (config=="EIC"&&Q2>10.&&pt>1.0){
+                    if (config=="EIC"&&Q2>Q2_CutOff&&pt>1.0){
                         t4->Fill();
                         count[3] ++;//cout << 3 << " " << count[3] <<  endl;
                         Nsim4 = nsim;
