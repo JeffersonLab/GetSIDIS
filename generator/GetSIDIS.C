@@ -562,7 +562,7 @@ int main(Int_t argc, char *argv[]){
                 /*LUND For Positive Hadron{{{*/
                 //These section will save events based on their XS distributions
                 Double_t cdxs_max_rndm_hp = cdxs_max * gRandom->Uniform(0, 1);
-                if(bLUND&&dxs_hp > cdxs_max_rndm_hp){
+                if(bLUND&&dxs_hp_sidis > cdxs_max_rndm_hp){
                     //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                     pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
@@ -574,7 +574,7 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hp						
+                            dxs_hp_sidis						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
@@ -617,7 +617,7 @@ int main(Int_t argc, char *argv[]){
                 /*LUND For Negative Hadron{{{*/
                 //These section will save events based on their XS distributions
                 Double_t cdxs_max_rndm_hm = cdxs_max * gRandom->Uniform(0, 1);
-                if(bLUND&&dxs_hm > cdxs_max_rndm_hm){
+                if(bLUND&&dxs_hm_sidis > cdxs_max_rndm_hm){
                     //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                     neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
@@ -629,7 +629,7 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hm						
+                            dxs_hm_sidis						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
@@ -670,7 +670,7 @@ int main(Int_t argc, char *argv[]){
                 /*}}}*/
 
                 /*Save PI+ ROOT file based on XS distribution{{{*/
-                if(dxs_hp > cdxs_max_rndm_hp){
+                if(dxs_hp_sidis > cdxs_max_rndm_hp){
                     t1->Fill();
                     //Just save events in one root files in this case
                     count[0] ++;//cout << 0 << " " << count[0] << endl;
@@ -680,7 +680,7 @@ int main(Int_t argc, char *argv[]){
                 /*}}}*/
 
                 /*Save PI- ROOT file based on XS distribution{{{*/
-                if(dxs_hm > cdxs_max_rndm_hm){
+                if(dxs_hm_sidis > cdxs_max_rndm_hm){
                     t2->Fill();
                     //Just save events in one root files in this case
                     count[1] ++;//cout << 0 << " " << count[0] << endl;
@@ -742,7 +742,7 @@ int main(Int_t argc, char *argv[]){
                 /*LUND For Positive Hadron{{{*/
                 //These section will save events based on their XS distributions
                 Double_t cdxs_max_rndm_hp = cdxs_max * gRandom->Uniform(0, 1);
-                if(bLUND&&dxs_hp > cdxs_max_rndm_hp){
+                if(bLUND&&dxs_hp_sidis > cdxs_max_rndm_hp){
                     //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                     pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
@@ -754,7 +754,7 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hp						
+                            dxs_hp_sidis						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
@@ -797,7 +797,7 @@ int main(Int_t argc, char *argv[]){
                 /*LUND For Negative Hadron{{{*/
                 //These section will save events based on their XS distributions
                 Double_t cdxs_max_rndm_hm = cdxs_max * gRandom->Uniform(0, 1);
-                if(bLUND&&dxs_hm > cdxs_max_rndm_hm){
+                if(bLUND&&dxs_hm_sidis > cdxs_max_rndm_hm){
                     //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                     neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
@@ -809,7 +809,7 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hm						
+                            dxs_hm_sidis						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
@@ -933,8 +933,8 @@ int main(Int_t argc, char *argv[]){
         TFile *f1 = new TFile(filename1.Data(), "update");
         TTree *T1=(TTree*) f1->Get("T");
         ULong64_t N1=T1->GetEntries();
-        T1->SetBranchAddress("dxs_hp",&dxs_hp);
-        T1->SetBranchAddress("dxs_hm",&dxs_hm);
+        T1->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
+        T1->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
         T1->SetBranchAddress("dxs_incl",&dxs_incl);
         ULong64_t nsim1; 
         T1->SetBranchAddress("nsim",&nsim1);
@@ -950,8 +950,8 @@ int main(Int_t argc, char *argv[]){
             T1->GetEntry(i);
             //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
             weight_in=dxs_incl*electron_phase_space/Nsim1;   
-            weight_hp=dxs_hp*Phase_space/Nsim1;   
-            weight_hm=dxs_hm*Phase_space/Nsim1;
+            weight_hp=dxs_hp_sidis*Phase_space/Nsim1;   
+            weight_hm=dxs_hm_sidis*Phase_space/Nsim1;
 
             if((weight_in)<1e-34) weight_in=1e-34;
             if((weight_hp)<1e-34) weight_hp=1e-34;
@@ -979,8 +979,8 @@ int main(Int_t argc, char *argv[]){
             TTree *T2=(TTree*) f2->Get("T");
             ULong64_t N2=T2->GetEntries();
             T2->SetBranchAddress("dxs_incl",&dxs_incl);
-            T2->SetBranchAddress("dxs_hp",&dxs_hp);
-            T2->SetBranchAddress("dxs_hm",&dxs_hm);
+            T2->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
+            T2->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
             ULong64_t nsim2; 
             T2->SetBranchAddress("nsim",&nsim2);
             T2->GetEntry(N2-1);          //get nsim for this rootfile
@@ -995,8 +995,8 @@ int main(Int_t argc, char *argv[]){
                 T2->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim2;   
-                weight_hp=dxs_hp*Phase_space/Nsim2;   
-                weight_hm=dxs_hm*Phase_space/Nsim2;
+                weight_hp=dxs_hp_sidis*Phase_space/Nsim2;   
+                weight_hm=dxs_hm_sidis*Phase_space/Nsim2;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
                 if((weight_hp)<1e-34) weight_hp=1e-34;
@@ -1023,8 +1023,8 @@ int main(Int_t argc, char *argv[]){
             TTree *T3=(TTree*) f3->Get("T");
             ULong64_t N3=T3->GetEntries();
             T3->SetBranchAddress("dxs_incl",&dxs_incl);
-            T3->SetBranchAddress("dxs_hp",&dxs_hp);
-            T3->SetBranchAddress("dxs_hm",&dxs_hm);
+            T3->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
+            T3->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
             ULong64_t nsim3; 
             T3->SetBranchAddress("nsim",&nsim3);
             T3->GetEntry(N3-1);          //get nsim for this rootfile
@@ -1040,8 +1040,8 @@ int main(Int_t argc, char *argv[]){
                 T3->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim3;   
-                weight_hp=dxs_hp*Phase_space/Nsim3;   
-                weight_hm=dxs_hm*Phase_space/Nsim3;
+                weight_hp=dxs_hp_sidis*Phase_space/Nsim3;   
+                weight_hm=dxs_hm_sidis*Phase_space/Nsim3;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
                 if((weight_hp)<1e-34) weight_hp=1e-34;
@@ -1067,8 +1067,8 @@ int main(Int_t argc, char *argv[]){
             TTree *T4=(TTree*) f4->Get("T");
             ULong64_t N4=T4->GetEntries();
             T4->SetBranchAddress("dxs_incl",&dxs_incl);
-            T4->SetBranchAddress("dxs_hp",&dxs_hp);
-            T4->SetBranchAddress("dxs_hm",&dxs_hm);
+            T4->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
+            T4->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
             ULong64_t nsim4; 
             T4->SetBranchAddress("nsim",&nsim4);
             T4->GetEntry(N4-1);          //get nsim for this rootfile
@@ -1083,8 +1083,8 @@ int main(Int_t argc, char *argv[]){
                 T4->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim4;   
-                weight_hp=dxs_hp*Phase_space/Nsim4;   
-                weight_hm=dxs_hm*Phase_space/Nsim4;
+                weight_hp=dxs_hp_sidis*Phase_space/Nsim4;   
+                weight_hm=dxs_hm_sidis*Phase_space/Nsim4;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
                 if((weight_hp)<1e-34) weight_hp=1e-34;
