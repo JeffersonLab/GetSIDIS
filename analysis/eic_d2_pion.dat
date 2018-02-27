@@ -10,7 +10,7 @@
 ## 2), int, Target Z
  1
 ## 3), int , Particle Flag: 1->pion, 2->kaon
- 2
+ 1
 ## 4), double, Electron Momentum (GeV/c)
  10
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
@@ -29,7 +29,7 @@
 ## 8), string, Configuration, "EIC" or "SoLID". Can add CLAS12 as well but not now
  EIC
 ## 9), string, PDF Model Type, "LHAPDF" or "EPS09" or "CTEQPDF"
- CTEQPDF
+ EPS09
 ## 10), Maximum Cross Section Value
 ##      0nly useful when generating LUND format or save root files based on XS distribution
  10000.0

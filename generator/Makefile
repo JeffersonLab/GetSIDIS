@@ -5,26 +5,29 @@
 ROOTLIBS      = $(shell root-config --libs)
 ROOTGLIBS     = $(shell root-config --glibs)
 ROOTINC       = $(shell root-config --incdir)
+LHAPDFLIBS    = $(shell lhapdf-config --cflags --ldflags)
 CXXFLAGS      = -Wall -g -frtti -fexceptions -fPIC \
                    -DLINUXVERS -O
 
+
 EPS09=../eps09_cxx/
+#CTEQPDF=/home/yez/work/cteq-pdf-1.0.4
 CTEQPDF=../CTEQ6/cteq-pdf-1.0.4
 
 O=GetSIDIS
 
 # Linux with g++
-INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/
+INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/ -I$(LHAPDF)/include
 #CXX           = clang++
 CXX           = g++
 #LD            = clang++
 LD            = g++
 LDFLAGS       = 
 
-LIBS          = $(ROOTLIBS)  -L/usr/lib/ -lcteqpdf -L$(CTEQPDF)/lib
-GLIBS         = $(ROOTGLIBS) -L/usr/X11/lib -L/usr/lib/ -lXpm -lX11 
+LIBS          = $(ROOTLIBS)  -L/usr/lib/ -lcteqpdf -L$(CTEQPDF)/lib -L$(LHAPDF)/lib  -lLHAPDF
+GLIBS         = $(ROOTGLIBS) -L/usr/X11/lib -L/usr/lib/ -lXpm -lX11
 
-ALL_LIBS =  $(GLIBS) $(LIBS)
+ALL_LIBS =  $(GLIBS) $(LIBS) $(LHAPDFLIBS)
 
 # The following sources comprise the package of scaler classes by R. Michaels.
 SRC = $(O).C

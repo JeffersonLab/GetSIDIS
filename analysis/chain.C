@@ -1,43 +1,143 @@
 {
-    gStyle->SetOptStat(0);
-    TChain *T0 = new TChain("T");
-    for(int i=0;i<100;i++){
-        for(int j=1;j<=4;j++)
-            //T0->Add(Form("./c12_pion/EIC_A12_pion_10_600_%d_%d.root", j, i));
-            T0->Add(Form("./prot_pion/EIC_A1_pion_10_100_%d_%d.root", j, i));
-    }
+    TString target ="";  cout<<"--- Target (He3 or NH3) = "; cin>>target;
+    TString hadron=""; cout<<"--- Hadron (pion or kaon) = "; cin>>hadron;
+    Int_t Ebeam=""; cout<<"--- Beam Energy (11 or 8)= "; cin>>Ebeam;
 
-    TCanvas *c1 = new TCanvas("c1","c1", 800, 600);
-    TH2D *h1 = new TH2D("h1","^{12}C(e,e'#pi^{+})X, E_{e}=10GeV, E_{A}=600GeV; p_{T} (GeV); z (GeV))", 100, 0.0, 5.0,100, 0.15, 0.85);
+    TChain* T0 = new TChain("T");
+    T0->Add(Form("skim_%s_%s_E%d_z1_Qsq1.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z1_Qsq2.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z1_Qsq3.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z1_Qsq4.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z1_Qsq5.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z1_Qsq6.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z2_Qsq1.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z2_Qsq2.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z2_Qsq3.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z2_Qsq4.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z2_Qsq5.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z2_Qsq6.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z3_Qsq1.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z3_Qsq2.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z3_Qsq3.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z3_Qsq4.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z3_Qsq5.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z3_Qsq6.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z4_Qsq1.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z4_Qsq2.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z4_Qsq3.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z4_Qsq4.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z4_Qsq5.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z4_Qsq6.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z5_Qsq1.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z5_Qsq2.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z5_Qsq3.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z5_Qsq4.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z5_Qsq5.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z5_Qsq6.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z6_Qsq1.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z6_Qsq2.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z6_Qsq3.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z6_Qsq4.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z6_Qsq5.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z6_Qsq6.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z7_Qsq1.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z7_Qsq2.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z7_Qsq3.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z7_Qsq4.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z7_Qsq5.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z7_Qsq6.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z8_Qsq1.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z8_Qsq2.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z8_Qsq3.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z8_Qsq4.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z8_Qsq5.root",target.Data(), hadron.Data(), Ebeam));
+    T0->Add(Form("skim_%s_%s_E%d_z8_Qsq6.root",target.Data(), hadron.Data(), Ebeam));
+
+    TCanvas *c1 = new TCanvas("c1","c1", 800,1000);
+    c1->Divide(2,3);
+    c1->cd(1); gPad->SetLogz(1);
+    T0->Draw("mom_ele:theta_ele>>h1(200, 0.,30, 200, 0.5, 9.0)","weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp*(isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7)","colz");
+    h1->SetXTitle("#theta_{ele}");
+    h1->SetYTitle("P_{ele}");
+    h1->SetTitle("");
     h1->GetXaxis()->CenterTitle(1);
     h1->GetYaxis()->CenterTitle(1);
-    gPad->SetLogz(1);
-    T0->Draw("z:pt>>h1","weight_hm*(weight_hm>0.0)","colz");
-    c1->Print("c12_pim_z_pt_A600.pdf");
-    
-    TCanvas *c2 = new TCanvas("c2","c2", 800, 600);
-    gPad->SetLogz(1);
-    TH2D *h2 = new TH2D("h2","^{12}C(e,e'#pi^{+})X, E_{e}=10GeV, E_{A}=600GeV; log10(x); log10(Q^{2}) (GeV^{2}))", 100,-3.5, 0.0,100, -0.1, 3.0);
+    c1->cd(2); gPad->SetLogz(1);
+    T0->Draw("mom_had:theta_had>>h2(200, 0.,30, 200, 0.5, 6.5)","weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp*(isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7)","colz");
+    h2->SetXTitle("#theta_{had}");
+    h2->SetYTitle("P_{had}");
+    h2->SetTitle("");
     h2->GetXaxis()->CenterTitle(1);
     h2->GetYaxis()->CenterTitle(1);
-    T0->Draw("log10(Q2):log10(x)>>h2","weight_hp","colz");
-    c2->Print("c12_pip_Q2_x_log_A600.pdf");
+    c1->cd(3); gPad->SetLogz(1);
+    T0->Draw("mom_ele:phi_ele>>h3(200, -181.,181, 200, 0.5, 9.0)","weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp*(isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7)","colz");
+    h3->SetXTitle("#phi_{ele}");
+    h3->SetYTitle("P_{ele}");
+    h3->SetTitle("");
+    h3->GetXaxis()->CenterTitle(1);
+    h3->GetYaxis()->CenterTitle(1);
+    c1->cd(4); gPad->SetLogz(1);
+    T0->Draw("mom_had:phi_had>>h4(200, -181.,181, 200, 0.5, 6.5)","weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp*(isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7)","colz");
+    h4->SetXTitle("#phi_{had}");
+    h4->SetYTitle("P_{had}");
+    h4->SetTitle("");
+    h4->GetXaxis()->CenterTitle(1);
+    h4->GetYaxis()->CenterTitle(1);
+    c1->cd(5); gPad->SetLogz(1);
+    T0->Draw("phi_ele:theta_ele>>h5(200,0.,30.,200, -181.,181)","weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp*(isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7)","colz");
+    h5->SetXTitle("#theta_{ele}");
+    h5->SetYTitle("#phi_{ele}");
+    h5->SetTitle("");
+    h5->GetXaxis()->CenterTitle(1);
+    h5->GetYaxis()->CenterTitle(1);
+    c1->cd(6); gPad->SetLogz(1);
+    T0->Draw("phi_had:theta_had>>h6(200,0.,30.,200, -181.,181)","weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp*(isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7)","colz");
+    h6->SetXTitle("#theta_{had}");
+    h6->SetYTitle("#phi_{had}");
+    h6->SetTitle("");
+    h6->GetXaxis()->CenterTitle(1);
+    h6->GetYaxis()->CenterTitle(1);
 
-    TCanvas *c3 = new TCanvas("c3","c3", 600, 800);
-    c3->Divide(1,2);
-    
-    TH2D *hTP_ele = new TH2D("hTP_ele","Electron Acceptance, ^{12}C(e,e'#pi^{+})X, E_{e}=10GeV, E_{A}=600GeV; #theta_{e} (Degree); P_{e} (GeV/c)", 150, -5.0, 145., 100, 0.0, 14);
-    hTP_ele->GetXaxis()->CenterTitle(1);
-    hTP_ele->GetYaxis()->CenterTitle(1);
-    TH2D *hTP_had = new TH2D("hTP_had","Hadron Acceptance, ^{12}C(e,e'#pi^{+})X, E_{e}=10GeV, E_{A}=600GeV; #theta_{h} (Degree); P_{h} (GeV/c)", 190, -5.0, 185., 100, 0.0, 12.);
-    hTP_had->GetXaxis()->CenterTitle(1);
-    hTP_had->GetYaxis()->CenterTitle(1);
+    c1.Print(Form("%s_acc_%s_%d.pdf",target.Data(), hadron.Data(), Ebeam));
+    c1.Print(Form("%s_acc_%s_%d.png",target.Data(), hadron.Data(), Ebeam));
 
-    c3->cd(1); gPad->SetLogz(1);
-    T0->Draw("mom_ele:theta_ele*180/3.14>>hTP_ele","weight_hp","colz");
-    c3->cd(2); gPad->SetLogz(1);
-    T0->Draw("mom_had:theta_had*180/3.14>>hTP_had","weight_hp","colz");
-    c3->Print("c12_pip_acc_A600.pdf");
+    TCanvas *c2 = new TCanvas("c2","c2", 800,1000);
+    c2->Divide(2,3);
+    c2->cd(1);
+    T0->Draw("weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp>>kp1","mom_had<7.5&&isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7");
+    c2->cd(2);
+    T0->Draw("weight_hm*(acc_f_ele+acc_l_ele)*acc_f_hm>>km1","mom_had<7.5&&isphy_hm>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7");
+
+    c2->cd(3);
+    T0->Draw("weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp>>kp2","mom_had<5.0&&isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7");
+    c2->cd(4);
+    T0->Draw("weight_hm*(acc_f_ele+acc_l_ele)*acc_f_hm>>km2","mom_had<5.0&&isphy_hm>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7");
+
+    c2->cd(5);
+    T0->Draw("weight_hp*(acc_f_ele+acc_l_ele)*acc_f_hp>>kp3","mom_had<2.5&&isphy_hp>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7");
+    c2->cd(6);
+    T0->Draw("weight_hm*(acc_f_ele+acc_l_ele)*acc_f_hm>>km3","mom_had<2.5&&isphy_hm>0&&Q2>1 && W>2.3 && Wp>1.6 && z>0.3 && z<0.7");
+
+    ofstream outf(Form("%s_rate_%s_%d.dat",target.Data(), hadron.Data(), Ebeam));
+
+    cout<<"--- had+ (Ph<7.5GeV/c): "<< kp1->GetSum() * kp1->GetMean()<<endl;
+    cout<<"--- had+ (Ph<5.0GeV/c): "<< kp2->GetSum() * kp2->GetMean()<<endl;
+    cout<<"--- had+ (Ph<2.5GeV/c): "<< kp3->GetSum() * kp3->GetMean()<<endl;
+
+    cout<<"--- had- (Ph<7.5GeV/c): "<< km1->GetSum() * km1->GetMean()<<endl;
+    cout<<"--- had- (Ph<5.0GeV/c): "<< km2->GetSum() * km2->GetMean()<<endl;
+    cout<<"--- had- (Ph<2.5GeV/c): "<< km3->GetSum() * km3->GetMean()<<endl;
+
+    outf<<"--- had+ (Ph<7.5GeV/c): "<< kp1->GetSum() * kp1->GetMean()<<endl;
+    outf<<"--- had+ (Ph<5.0GeV/c): "<< kp2->GetSum() * kp2->GetMean()<<endl;
+    outf<<"--- had+ (Ph<2.5GeV/c): "<< kp3->GetSum() * kp3->GetMean()<<endl;
+
+    outf<<"--- had- (Ph<7.5GeV/c): "<< km1->GetSum() * km1->GetMean()<<endl;
+    outf<<"--- had- (Ph<5.0GeV/c): "<< km2->GetSum() * km2->GetMean()<<endl;
+    outf<<"--- had- (Ph<2.5GeV/c): "<< km3->GetSum() * km3->GetMean()<<endl;
+    outf.close();
+
+
+
 
 }
-

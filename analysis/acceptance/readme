@@ -1,0 +1,48 @@
+This tries to study acceptane and record the results in some histograms
+
+shoot particles from target position over target length into the detector and look for the hits on various detectors, if there is a hit, this event is considered detected and the generated particle P and theta, phi are recorded.
+
+geantino can be used to test neutron particle
+chargedgeantino(+1 particle) can be used to test positive particle
+chargedgeantino(+1 particle) and flip field by gemc option SCALE_FIELD="field_name, -1" can be used to test negative particle
+Use real particle to include decay effect
+
+In geometry, use only vaccum and "Kryptonite" as material to make sure particles can get blocked and use virtualplane in front of detectors to see particle hits by GEMC built-in flux bank with "true info" turned on
+
+When analyzing results, include fiducial cuts to choose good detector areas
+
+here is how to use it
+1. run simulation with the gcard included like "gemc acceptance_solid_SIDIS_He3_electron.gcard"
+2. convert output from evio to root like "eveio2root -INPUTF=acceptance_solid_SIDIS_He3_electron.evio"
+3. analyze results by "root 'acceptance.C+("acceptance_solid_SIDIS_He3_electron.root")'" (the script runs much faster when compiled)
+4. there are some picture output and histgrams in another root file acceptance_solid_SIDIS_He3_electron_output.root
+5. there are a few histgrams in another root file acceptance_solid_SIDIS_He3_electron_output_final.root which is only some histgrams for late use
+
+A good acceptance needs large enough statistics to prevents any artifucal structures like holes.
+
+In the output root file, acceptance in P, theta, phi histograms are stored.
+By definition, acceptance of a particle should be 0 or 1 if all degree of freedom are taken into consideration, including particle 3 momentum and particle 3 vertex.
+Here we only record results in 3 momentum and integral over 3 vertex with a assumption that particles are evenly distributed over their 3 vertex, thus we have acceptance value between 0 and 1
+
+For solid_PVDIS, histogram "acceptance_ThetaP_forwardangle" is in Theta and P
+For solid_SIDIS_He3, solid_JPsi, histogram "acceptance_ThetaP_forwardangle" and "acceptance_ThetaP_largeangle" is in Theta and P
+For solid_SIDIS_NH3, histogram "acceptance_ThetaPhiP_largeangle" and "acceptance_ThetaPhiP_forwardangle" are in Theta, Phi and P
+
+= result =============================
+
+result_PVDIS/201503, with baffle "babarmore1_block" babarmore1 and photon blocker before EC
+
+result_SIDIS_He3/201402, with target window collimator, both downstream and upstream blocking forward angle
+
+result_SIDIS_He3/201701, with target window collimator, downstream blocking forward angle, upstream block both forward and large angle
+
+result_SIDIS_NH3/201503, with wrong ptarget field and the sheet of flame cut is NOT applied
+
+result_SIDIS_NH3/201710, with oxford ptarget field and  the sheet of flame cut is applied
+
+result_SIDIS_JPsi/201501, with new target position
+
+= log ================================
+previous version at solid_gemc/analysistool/acceptance
+created 2014_08_14 by Zhiwen Zhao 
+created 2017_11_14 by Zhiwen Zhao 

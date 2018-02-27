@@ -26,8 +26,16 @@
 ```
 
 ## To Do
-  *      Find the maximum XS value automatically. Now it has to be defined in the input file
+  *      Use a better sampling method when generating XS based on physical distributions
   *      Add absolute lumi
+
+## Update Version in 02/27/2018:
+* Add Lsidis.h to calculate the SIDIS XS based on Tianbo Liu's method
+* Used LHAPDF version 6.2 or above which you have to installed by yourself
+* Remove any LHAPDF independent model, since Lsidis.h will do the job
+* Remove (or won't include nCTEQ) since Lsidis.h will do the job
+* Add two flags, isphy_hp and isphy_hm to determine if the events are in the good physical region
+
 
 ## Update Version in 09/16/2016:
 * Add LHAPDF6 (replace LHAPDF5.8). Please install your won LHAPDF6. LHAPDF5.8 is still in the code but blocked-out.

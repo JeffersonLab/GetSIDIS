@@ -22,6 +22,8 @@
 #include <TH1.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TH2D.h>
+#include <TH3D.h>
 #include <TFile.h>
 #include <TROOT.h>
 #include <TF1.h>
@@ -48,45 +50,62 @@
 //#include <TMatrix.h>
 /*}}}*/
 
+#include "acceptance/SIDIS_Acceptance.h"
+
 using namespace std;
 const double DEG = 180./3.1415926;
 const double PI = 3.1415926;
 
 int main(Int_t argc, char *argv[]){
-	int fA = 0; cerr<<"-- What nucleus: A = ? "; cin >> fA;
+    TString prefix = "./rootfiles/SoLID_";
+    TString new_prefix = "./skim_rootfiles/skim_";
 
-    TChain *T = new TChain("T");
-    //for(int i=0;i<100;i++){
-        for(int i=300;i<600;i++){
-        //for(int i=100;i<200;i++){
-        for(int j=1;j<=4;j++){
-            if(fA ==12)
-                T->Add(Form("./c12_pion_LO_free_noPt/EIC_A12_pion_10_600_%d_%d.root", j, i));
-                //T->Add(Form("./c12_pion_LO_noPt/EIC_A12_pion_10_600_%d_%d.root", j, i));
-             if(fA ==2)
-                //T->Add(Form("./d2_pion_LO_free_noPt/EIC_A2_pion_10_100_%d_%d.root", j, i));
-                T->Add(Form("./d2_pion_LO_noPt/EIC_A2_pion_10_100_%d_%d.root", j, i));
-        }
-    }
+    TString target = "X"; cerr<<"-- What target (He3, NH3 (p))? "; cin >> target;
+    TString particle = "X"; cerr<<"-- What particle (pion, kaon)? "; cin >> particle;
+    int Ebeam = 0; cerr<<"-- What beam energy (11 or 8.8 GeV)? "; cin >> Ebeam;
+    TString TA="X";
+    if(target=="He3") TA = "A3";
+    if(target=="NH3") TA = "A1";
+
+    Int_t start_num  = 0;
+    Int_t end_num  = 2;
+    Int_t zflag = 0;
+    Int_t Q2flag = 0;
+
+    TString posfix,new_filename;
+    TChain *T = new TChain("T","T");
+    for (Int_t i=start_num; i<end_num;i++){
+        posfix.Form("_%d_0_1_%d.root",int(Ebeam), i);
+        new_filename = prefix + TA +"_"+ particle+posfix;
+        cerr<<Form(" @@@ Adding Root File: %s", new_filename.Data())<<endl;
+        T->AddFile(new_filename);
+    
+        posfix.Form("_%d_0_2_%d.root",int(Ebeam), i);
+        new_filename = prefix + TA +"_"+ particle+posfix;
+        cerr<<Form(" @@@ Adding Root File: %s", new_filename.Data())<<endl;
+        T->AddFile(new_filename);
+}
+
     /*Define{{{*/
     Double_t Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon,rapidity, jacoF;
-    Double_t theta_gen= 0.0 , phi_gen = 0.0, mom_gen = 0.0;
-    Double_t mom_gen_ele,mom_gen_had;
-    Double_t theta_gen_ele,theta_gen_had;
-    Double_t phi_gen_ele,phi_gen_had;
+    //Double_t theta_gen= 0.0 , phi_gen = 0.0, mom_gen = 0.0;
+    //Double_t mom_gen_ele,mom_gen_had;
+    //Double_t theta_gen_ele,theta_gen_had;
+    //Double_t phi_gen_ele,phi_gen_had;
     Double_t theta_q, theta_s,phi_h,phi_s,mom_ele,mom_had,theta_ele, theta_had,phi_ele,phi_had;
-    Double_t dxs_incl,dxs_hm,dxs_hp,dilute_hp,dilute_hm;
+    Double_t dxs_incl,dxs_hm,dxs_hp,dxs_hm_sidis,dxs_hp_sidis,dilute_hp,dilute_hm;
     Double_t px_ele, py_ele,pz_ele, px_had, py_had, pz_had, E_ele,E_had;
     Double_t u_pdf, d_pdf, s_pdf, g_pdf, ubar_pdf, dbar_pdf, sbar_pdf;
     Double_t weight_hp, weight_hm, weight_in;
-    ULong64_t nsim = 0, Nsim1 = 0, Nsim2 = 0, Nsim3 = 0,Nsim4 = 0;
+    ULong64_t nsim = 0;// Nsim1 = 0, Nsim2 = 0, Nsim3 = 0,Nsim4 = 0;
     //For Beam Position and Vertex info
     Double_t vx_ele, vy_ele, vz_ele, vx_had, vy_had, vz_had;
     Double_t D_fav, D_unfav, D_s, D_g;
+    Int_t isphy_hp, isphy_hm;
     /*}}}*/
  
 	/*Define old root file{{{*/
-    T->SetBranchAddress("Q2",&Q2);/*{{{*/
+    T->SetBranchAddress("Q2",&Q2);
     T->SetBranchAddress("W",&W);
     T->SetBranchAddress("Wp",&Wp);
     T->SetBranchAddress("x",&x );
@@ -94,7 +113,11 @@ int main(Int_t argc, char *argv[]){
     T->SetBranchAddress("z",&z );
     T->SetBranchAddress("nu",&nu );
     T->SetBranchAddress("s",&s );
+    T->SetBranchAddress("epsilon",&epsilon );
+    T->SetBranchAddress("gamma",&gamma );
     T->SetBranchAddress("pt",&pt );
+    T->SetBranchAddress("isphy_hp",&isphy_hp );
+    T->SetBranchAddress("isphy_hm",&isphy_hm );
     T->SetBranchAddress("weight_hp",&weight_hp );
     T->SetBranchAddress("weight_hm",&weight_hm );
     T->SetBranchAddress("weight_in",&weight_in );
@@ -106,6 +129,8 @@ int main(Int_t argc, char *argv[]){
     T->SetBranchAddress("jacoF",&jacoF);
     T->SetBranchAddress("dxs_hm",&dxs_hm);
     T->SetBranchAddress("dxs_hp",&dxs_hp);
+    T->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
+    T->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
     T->SetBranchAddress("dxs_incl",&dxs_incl);
     T->SetBranchAddress("mom_ele",&mom_ele);
     //T->SetBranchAddress("mom_gen_ele",&mom_gen_ele);
@@ -151,597 +176,236 @@ int main(Int_t argc, char *argv[]){
     T->SetBranchAddress("D_unfav", &D_unfav);
     /*}}}*/
 
-    /*}}}*/
-
     ULong64_t N_Total=T->GetEntries();
+    cout<<"--- Total Number of Events: "<<N_Total<<endl;
 
-    TString new_filename[8];
-    if(fA ==12){
-        for(int i=0;i<8;i++)
-            new_filename[i]=Form("./c12_pion_LO_free_noPt/EIC_A12_pion_10_600_skim%d_wide_free_noPt_new.root",i);
-            //new_filename[i]=Form("./c12_pion_LO_noPt/EIC_A12_pion_10_600_skim%d_wide_noPt.root",i);
+    SIDIS_Acceptance* accept = new SIDIS_Acceptance();
+    accept->Init(target);
+
+    Double_t zmin=1000,zmax=-1000;
+    Double_t Q2min=1000,Q2max=-1000.;
+    Double_t acc_f_ele = 0.0, acc_l_ele = 0.0;
+    Double_t acc_f_hp = 0.0, acc_l_hp = 0.0;
+    Double_t acc_f_hm = 0.0, acc_l_hm = 0.0;
+    Double_t W_hp = 0.0, W_hm = 0.0;
+    Double_t luminosity = 0.0, time = 0.0;
+    Double_t rate_hp =0.0, rate_hm=0.0;
+
+    for(zflag=1;zflag<=8;zflag++){
+        for(Q2flag=1;Q2flag<=6;Q2flag++){
+            /*Get Z and Q2 Bin{{{*/
+            if (zflag==1){
+                zmin = 0.3; zmax = 0.35;
+            }else if (zflag==2){
+                zmin = 0.35; zmax = 0.4;
+            }else if (zflag==3){
+                zmin = 0.4; zmax = 0.45;
+            }else if (zflag==4){
+                zmin = 0.45; zmax = 0.5;
+            }else if (zflag==5){
+                zmin = 0.5; zmax = 0.55;
+            }else if (zflag==6){
+                zmin = 0.55; zmax = 0.6;
+            }else if (zflag==7){
+                zmin = 0.6; zmax = 0.65;
+            }else if (zflag==8){
+                zmin = 0.65; zmax = 0.7;
+            }
+            if (Q2flag==1){
+                Q2min = 1.; Q2max = 2.0;
+            }else if (Q2flag==2){
+                Q2min = 2.0; Q2max = 3.0;
+            }else if (Q2flag==3){
+                Q2min = 3.0; Q2max = 4.0;
+            }else if (Q2flag==4){
+                Q2min = 4.0; Q2max = 5.0;
+            }else if (Q2flag==5){
+                Q2min = 5.0; Q2max = 6.0;
+            }else if (Q2flag==6){
+                Q2min = 6.0; Q2max = 8.0;
+            }else if (Q2flag==7){
+                Q2min = 8.0; Q2max = 10.0;
+            }
+            /*}}}*/
+
+            /*Define new rootfile for each bin{{{*/
+            posfix.Form("_E%d_z%d_Qsq%d.root",int(Ebeam),zflag,Q2flag);
+            new_filename = new_prefix +target+"_"+ particle + posfix;
+            TFile *file = new TFile(new_filename,"RECREATE");
+            TTree *t1 = new TTree("T","T");
+            t1->SetDirectory(file);
+
+            t1->Branch("Q2",&Q2,"data/D");
+            t1->Branch("W",&W,"data/D");
+            t1->Branch("Wp",&Wp,"data/D");
+            t1->Branch("x",&x,"data/D");
+            t1->Branch("y",&y,"data/D");
+            t1->Branch("z",&z,"data/D");
+            t1->Branch("nu",&nu,"data/D");
+            t1->Branch("s",&s,"data/D");
+            t1->Branch("pt",&pt,"data/D");
+            t1->Branch("theta_q",&theta_q,"data/D");
+            t1->Branch("theta_s",&theta_s,"data/D");
+            t1->Branch("phi_h",&phi_h,"data/D");
+            t1->Branch("phi_s",&phi_s,"data/D");
+            t1->Branch("jacoF",&jacoF,"jacoF/D");
+            t1->Branch("isphy_hp",&isphy_hp,"isphy_hp/I");
+            t1->Branch("isphy_hm",&isphy_hm,"isphy_hm/I");
+            t1->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
+            t1->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
+            t1->Branch("dxs_hm_sidis",&dxs_hm_sidis,"dxs_hm_sidis/D");
+            t1->Branch("dxs_hp_sidis",&dxs_hp_sidis,"dxs_hp_sidis/D");
+            t1->Branch("weight_hp",&weight_hp,"weight_hp/D");
+            t1->Branch("weight_hm",&weight_hm,"weight_hm/D");
+            t1->Branch("mom_ele",&mom_ele,"mom_ele/D");
+            t1->Branch("mom_had",&mom_had,"mom_had/D");
+            t1->Branch("theta_ele",&theta_ele,"theta_ele/D");
+            t1->Branch("theta_had",&theta_had,"theta_had/D");
+            t1->Branch("phi_ele",&phi_ele,"phi_ele/D");
+            t1->Branch("phi_had",&phi_had,"phi_had/D");
+            t1->Branch("nsim",&nsim,"nsim/I");
+            t1->Branch("acc_f_ele",&acc_f_ele,"data/D");
+            t1->Branch("acc_l_ele",&acc_l_ele,"data/D");
+            t1->Branch("acc_f_hp",&acc_f_hp,"data/D");
+            t1->Branch("acc_f_hm",&acc_f_hm,"data/D");
+            t1->Branch("acc_l_hp",&acc_l_hp,"data/D");
+            t1->Branch("acc_l_hm",&acc_l_hm,"data/D");
+            t1->Branch("W_hp",&W_hp,"W_hp/D");
+            t1->Branch("W_hm",&W_hm,"W_hm/D");
+            t1->Branch("luminosity",&luminosity,"luminosity/D");
+            t1->Branch("time",&time,"time/D");
+            /*}}}*/
+
+            cerr<<Form("--- Working on zflag=%d (min=%3.2f,max=%3.2f), Q2flag=%d (min=%3.2f,max=%3.2f) ...",
+                    zflag,zmin,zmax,Q2flag,Q2min,Q2max)<<endl;
+            for (Int_t i=0;i!=T->GetEntries();i++){
+                T->GetEntry(i);
+                if (z>=zmin&&z<zmax&&Q2>=Q2min&&Q2<Q2max){
+                    theta_ele *= DEG; theta_had *= DEG;
+                    phi_ele *= DEG;   phi_had *= DEG;
+
+                    /*Get acceptance of e and pi-{{{*/
+                    //Make sure to use the corrected quantities for multipile scattering and eloss effects
+                    //Do not use the smeared quantities since we are about whether particles are in the accepntace or not, but not how good we measure
+                    /*Elec Acc {{{*/
+                    if(target=="He3"){
+                        acc_f_ele = accept->GetAcc("e-","forward", mom_ele, theta_ele);
+                        acc_l_ele = accept->GetAcc("e-","large", mom_ele, theta_ele);
+                    }
+                    else if(target=="NH3"){
+                        acc_f_ele = accept->GetAcc3D("e-","forward", mom_ele, theta_ele, phi_ele);
+                        acc_l_ele = accept->GetAcc3D("e-","large", mom_ele, theta_ele, phi_ele);
+                    }
+                    //if(mom_ele<1.0||theta_ele>14.8||theta_ele<8.0)//GeV, CLEO
+                        //acc_f_ele=0.0;//Farward-Angle EC Cut at 1 GeV
+                    //if(mom_ele<3.5||theta_ele<16.0||theta_ele>24)//GeV,CLEO
+                        //acc_l_ele=0.0; //Larger-Angle EC Cut at 3 GeV
+                    if(acc_f_ele>1.) 
+                        acc_f_ele=1.0; 
+                    if(acc_l_ele>1.) 
+                        acc_l_ele=1.0; 
+                    /*}}}*/
+
+                    /*Hadron Acc{{{*/
+                    if(particle=="pion"){
+                        if(target=="He3"){
+                            acc_f_hp = accept->GetAcc("pi+","forward", mom_had, theta_had);
+                            acc_f_hm = accept->GetAcc("pi-","forward", mom_had, theta_had);
+                            acc_l_hp = accept->GetAcc("pi+","large",   mom_had, theta_had);
+                            acc_l_hm = accept->GetAcc("pi-","large",   mom_had, theta_had);
+                        }
+                        else if(target=="NH3"){
+                            acc_f_hp = accept->GetAcc3D("pi+","forward", mom_had, theta_had, phi_had);
+                            acc_f_hm = accept->GetAcc3D("pi-","forward", mom_had, theta_had, phi_had);
+                            acc_l_hp = accept->GetAcc3D("pi+","large",   mom_had, theta_had, phi_had);
+                            acc_l_hm = accept->GetAcc3D("pi-","large",   mom_had, theta_had, phi_had);
+                        }
+                    }
+                    else if(particle=="kaon"){
+                        if(target=="He3"){
+                            acc_f_hp = accept->GetAcc("K+","forward", mom_had, theta_had);
+                            acc_f_hm = accept->GetAcc("K-","forward", mom_had, theta_had);
+                            acc_l_hp = accept->GetAcc("K+","large",   mom_had, theta_had);
+                            acc_l_hm = accept->GetAcc("K-","large",   mom_had, theta_had);
+                        }
+                        else if(target=="NH3"){
+                            acc_f_hp = accept->GetAcc3D("K+","forward", mom_had, theta_had, phi_had);
+                            acc_f_hm = accept->GetAcc3D("K-","forward", mom_had, theta_had, phi_had);
+                            acc_l_hp = accept->GetAcc3D("K+","large",   mom_had, theta_had, phi_had);
+                            acc_l_hm = accept->GetAcc3D("K-","large",   mom_had, theta_had, phi_had);
+                        }
+                    }
+                    else
+                        cerr<<"*** ERROR, I don't know the PID in skim.C, "<<particle.Data()<<endl;
+
+                    //if(theta_had>14.8||theta_had<8.0||mom_had<0.||mom_had>Ebeam){//GeV, CLEO
+                        //acc_f_hp=0.0; acc_f_hm=0.0;
+                    //}
+                    //if(theta_had<16.0||theta_had>24.0||mom_had<0.||mom_had>Ebeam){//GeV, CLEO
+                        //acc_l_hp=0.0; acc_l_hm=0.0;
+                    //}
+                    if(acc_f_hp>1.) {acc_f_hp=0.0;}
+                    if(acc_f_hm>1.) {acc_f_hm=0.0;}
+                    if(acc_l_hp>1.) {acc_l_hp=0.0;}
+                    if(acc_l_hm>1.) {acc_l_hm=0.0;}
+                   
+                    //Add the TOF Cut off here, assuming 30ps timing resolutions
+                    if(particle=="kaon"&&mom_had>10.0){//GeV,FIX HERE, need to conform this cut-off value
+                        acc_f_hp=0.0; 
+                    }
+                    if(particle=="kaon"&&mom_had>10.0){//GeV,FIX HERE, need to conform this cut-off value
+                        acc_l_hp=0.0; 
+                    }
+                    /*}}}*/
+
+                    /*}}}*/
+
+                    /*Get Luminosity and Beam Time{{{*/
+                    //1e36cm^-1*s^-1 for he3, 1e-33 is for nbar->cm
+                    luminosity = 1e36 * 1e-33;
+                    double day = 0; // days
+                    // nevents = dxs (nbar) * L (nucleons/cm^2/s) * T(days) 
+                    // 1 day = 24hr*3600s = 86400
+                    // nbar=10-9 barn = 10^-9*10^-28 m^2=10^-9*10^-28 *10^4 cm^2=10^-33 cm^2
+                    // so weight  = Lumi * nbar * 86400 *day *acc_ele*acc_had / nsim;
+                    if(fabs(Ebeam-11.0)<0.1)
+                        day  = 48; // days
+                    if(fabs(Ebeam-8.80)<0.1)
+                        day  = 21; // days
+                    time = day * 24 *3600; //sec
+                    /*}}}*/
+
+                    //Use Tianbo Liu's SIDIS XS
+                    if(dxs_hp>1e-33&&isphy_hp)
+                        weight_hp *= dxs_hp_sidis/dxs_hp/end_num;
+                    else
+                        weight_hp = 1e-33;
+                    
+                    if(dxs_hm>1e-33&&isphy_hm)
+                        weight_hm *= dxs_hm_sidis/dxs_hm/end_num;
+                    else
+                        weight_hm = 1e-33;
+
+                    W_hp = weight_hp * luminosity * time * (acc_f_ele+acc_l_ele)*(acc_f_hp);
+                    W_hm = weight_hm * luminosity * time * (acc_f_ele+acc_l_ele)*(acc_f_hm);
+                    t1->Fill();
+                    if(!(i%10000))
+                        cerr<<Form("--- Working on zflag=%d, Q2flag=%d, evt=%d",zflag,Q2flag,i)<<"\r";
+
+                    if(Q2>1.0&&W>2.3&&Wp>1.6&&z>0.3&&z<0.7){
+                        rate_hp += weight_hp * luminosity * (acc_f_ele+acc_l_ele)*(acc_f_hp);
+                        rate_hm += weight_hm * luminosity * (acc_f_ele+acc_l_ele)*(acc_f_hm);
+                    }
+                }
+            }
+            file->Write();
+            file->Close();
+        }
+        }
+        delete T;
+
+        cout<<"--- Hadron+: Rate = "<<rate_hp<<endl;
+        cout<<"--- Hadron-: Rate = "<<rate_hm<<endl;
+
+        return 0;
     }
-    if(fA ==2){
-        for(int i=0;i<8;i++)
-           // new_filename[i]=Form("./d2_pion_LO_free_noPt/EIC_A2_pion_10_100_skim%d_wide_free_noPt.root",i);
-            new_filename[i]=Form("./d2_pion_LO_noPt/EIC_A2_pion_10_100_skim%d_wide_noPt.root",i);
-    }
-
-    /*Define new rootfile for each bin{{{*/
-    TFile *file1= new TFile(new_filename[0],"RECREATE");
-    TTree *t1 = new TTree("T","T");
-    t1->SetDirectory(file1);
-    t1->Branch("Q2",&Q2,"data/D");/*{{{*/
-    t1->Branch("W",&W,"data/D");
-    t1->Branch("Wp",&Wp,"data/D");
-    t1->Branch("x",&x,"data/D");
-    t1->Branch("y",&y,"data/D");
-    t1->Branch("z",&z,"data/D");
-    t1->Branch("nu",&nu,"data/D");
-    t1->Branch("s",&s,"data/D");
-    t1->Branch("pt",&pt,"data/D");
-    t1->Branch("rapidity",&rapidity,"data/D");
-    t1->Branch("theta_q",&theta_q,"data/D");
-    t1->Branch("theta_s",&theta_s,"data/D");
-    t1->Branch("phi_h",&phi_h,"data/D");
-    t1->Branch("phi_s",&phi_s,"data/D");
-    t1->Branch("jacoF",&jacoF,"jacoF/D");
-    t1->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
-    t1->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t1->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
-    t1->Branch("mom_ele",&mom_ele,"mom_ele/D");
-    t1->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
-    t1->Branch("mom_had",&mom_had,"mom_had/D");
-    t1->Branch("mom_gen_had",&mom_gen_had,"mom_gen_had/D");
-    t1->Branch("theta_ele",&theta_ele,"theta_ele/D");
-    t1->Branch("theta_gen_ele",&theta_gen_ele,"theta_gen_ele/D");
-    t1->Branch("theta_had",&theta_had,"theta_had/D");
-    t1->Branch("theta_gen_had",&theta_gen_had,"theta_gen_had/D");
-    t1->Branch("phi_ele",&phi_ele,"phi_ele/D");
-    t1->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
-    t1->Branch("phi_had",&phi_had,"phi_had/D");
-    t1->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t1->Branch("nsim",&nsim,"nsim/l");
-    t1->Branch("dilute_p",&dilute_hp,"data/D");
-    t1->Branch("dilute_m",&dilute_hm ,"data/D");
-    t1->Branch("px_ele",&px_ele, "px_ele/D");
-    t1->Branch("py_ele",&py_ele, "py_ele/D");
-    t1->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t1->Branch("E_ele",&E_ele, "E_ele/D");
-    t1->Branch("px_had",&px_had, "px_had/D");
-    t1->Branch("py_had",&py_had, "py_had/D");
-    t1->Branch("pz_had",&pz_had, "pz_had/D");
-    t1->Branch("E_had",&E_had, "E_had/D");
-    t1->Branch("vx_ele",&vx_ele, "vx_ele/D");
-    t1->Branch("vy_ele",&vy_ele, "vy_ele/D");
-    t1->Branch("vz_ele",&vz_ele, "vz_ele/D");
-    t1->Branch("vx_had",&vx_had, "vx_had/D");
-    t1->Branch("vy_had",&vy_had, "vy_had/D");
-    t1->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t1->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t1->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t1->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t1->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t1->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t1->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t1->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    t1->Branch("weight_hp",&weight_hp,"data/D");
-    t1->Branch("weight_hm",&weight_hm,"data/D");
-    t1->Branch("weight_in",&weight_in,"data/D");
-    
-    t1->Branch("D_fav", &D_fav, "D_fav/D");
-    t1->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t1->Branch("D_s", &D_s, "D_s/D");
-    t1->Branch("D_g", &D_g, "D_g/D");
-    /*}}}*/
-
-    TFile *file2= new TFile(new_filename[1],"RECREATE");
-    TTree *t2 = new TTree("T","T");
-    t2->SetDirectory(file2);
-    t2->Branch("Q2",&Q2,"data/D");/*{{{*/
-    t2->Branch("W",&W,"data/D");
-    t2->Branch("Wp",&Wp,"data/D");
-    t2->Branch("x",&x,"data/D");
-    t2->Branch("y",&y,"data/D");
-    t2->Branch("z",&z,"data/D");
-    t2->Branch("nu",&nu,"data/D");
-    t2->Branch("s",&s,"data/D");
-    t2->Branch("pt",&pt,"data/D");
-    t2->Branch("weight_hp",&weight_hp,"data/D");
-    t2->Branch("weight_hm",&weight_hm,"data/D");
-    t2->Branch("weight_in",&weight_in,"data/D");
-    t2->Branch("rapidity",&rapidity,"data/D");
-    t2->Branch("theta_q",&theta_q,"data/D");
-    t2->Branch("theta_s",&theta_s,"data/D");
-    t2->Branch("phi_h",&phi_h,"data/D");
-    t2->Branch("phi_s",&phi_s,"data/D");
-    t2->Branch("jacoF",&jacoF,"jacoF/D");
-    t2->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
-    t2->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t2->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
-    t2->Branch("mom_ele",&mom_ele,"mom_ele/D");
-    t2->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
-    t2->Branch("mom_had",&mom_had,"mom_had/D");
-    t2->Branch("mom_gen_had",&mom_gen_had,"mom_gen_had/D");
-    t2->Branch("theta_ele",&theta_ele,"theta_ele/D");
-    t2->Branch("theta_gen_ele",&theta_gen_ele,"theta_gen_ele/D");
-    t2->Branch("theta_had",&theta_had,"theta_had/D");
-    t2->Branch("theta_gen_had",&theta_gen_had,"theta_gen_had/D");
-    t2->Branch("phi_ele",&phi_ele,"phi_ele/D");
-    t2->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
-    t2->Branch("phi_had",&phi_had,"phi_had/D");
-    t2->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t2->Branch("nsim",&nsim,"nsim/l");
-    t2->Branch("dilute_p",&dilute_hp,"data/D");
-    t2->Branch("dilute_m",&dilute_hm ,"data/D");
-    t2->Branch("px_ele",&px_ele, "px_ele/D");
-    t2->Branch("py_ele",&py_ele, "py_ele/D");
-    t2->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t2->Branch("E_ele",&E_ele, "E_ele/D");
-    t2->Branch("px_had",&px_had, "px_had/D");
-    t2->Branch("py_had",&py_had, "py_had/D");
-    t2->Branch("pz_had",&pz_had, "pz_had/D");
-    t2->Branch("E_had",&E_had, "E_had/D");
-    t2->Branch("vx_ele",&vx_ele, "vx_ele/D");
-    t2->Branch("vy_ele",&vy_ele, "vy_ele/D");
-    t2->Branch("vz_ele",&vz_ele, "vz_ele/D");
-    t2->Branch("vx_had",&vx_had, "vx_had/D");
-    t2->Branch("vy_had",&vy_had, "vy_had/D");
-    t2->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t2->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t2->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t2->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t2->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t2->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t2->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t2->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    
-    t2->Branch("D_fav", &D_fav, "D_fav/D");
-    t2->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t2->Branch("D_s", &D_s, "D_s/D");
-    t2->Branch("D_g", &D_g, "D_g/D");
-  /*}}}*/
-
-    TFile *file3= new TFile(new_filename[2],"RECREATE");
-    TTree *t3 = new TTree("T","T");
-    t3->SetDirectory(file3);
-    t3->Branch("Q2",&Q2,"data/D");/*{{{*/
-    t3->Branch("W",&W,"data/D");
-    t3->Branch("Wp",&Wp,"data/D");
-    t3->Branch("x",&x,"data/D");
-    t3->Branch("y",&y,"data/D");
-    t3->Branch("z",&z,"data/D");
-    t3->Branch("nu",&nu,"data/D");
-    t3->Branch("s",&s,"data/D");
-    t3->Branch("pt",&pt,"data/D");
-    t3->Branch("weight_hp",&weight_hp,"data/D");
-    t3->Branch("weight_hm",&weight_hm,"data/D");
-    t3->Branch("weight_in",&weight_in,"data/D");
-    t3->Branch("rapidity",&rapidity,"data/D");
-    t3->Branch("theta_q",&theta_q,"data/D");
-    t3->Branch("theta_s",&theta_s,"data/D");
-    t3->Branch("phi_h",&phi_h,"data/D");
-    t3->Branch("phi_s",&phi_s,"data/D");
-    t3->Branch("jacoF",&jacoF,"jacoF/D");
-    t3->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
-    t3->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t3->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
-    t3->Branch("mom_ele",&mom_ele,"mom_ele/D");
-    t3->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
-    t3->Branch("mom_had",&mom_had,"mom_had/D");
-    t3->Branch("mom_gen_had",&mom_gen_had,"mom_gen_had/D");
-    t3->Branch("theta_ele",&theta_ele,"theta_ele/D");
-    t3->Branch("theta_gen_ele",&theta_gen_ele,"theta_gen_ele/D");
-    t3->Branch("theta_had",&theta_had,"theta_had/D");
-    t3->Branch("theta_gen_had",&theta_gen_had,"theta_gen_had/D");
-    t3->Branch("phi_ele",&phi_ele,"phi_ele/D");
-    t3->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
-    t3->Branch("phi_had",&phi_had,"phi_had/D");
-    t3->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t3->Branch("nsim",&nsim,"nsim/l");
-    t3->Branch("dilute_p",&dilute_hp,"data/D");
-    t3->Branch("dilute_m",&dilute_hm ,"data/D");
-    t3->Branch("px_ele",&px_ele, "px_ele/D");
-    t3->Branch("py_ele",&py_ele, "py_ele/D");
-    t3->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t3->Branch("E_ele",&E_ele, "E_ele/D");
-    t3->Branch("px_had",&px_had, "px_had/D");
-    t3->Branch("py_had",&py_had, "py_had/D");
-    t3->Branch("pz_had",&pz_had, "pz_had/D");
-    t3->Branch("E_had",&E_had, "E_had/D");
-    t3->Branch("vx_ele",&vx_ele, "vx_ele/D");
-    t3->Branch("vy_ele",&vy_ele, "vy_ele/D");
-    t3->Branch("vz_ele",&vz_ele, "vz_ele/D");
-    t3->Branch("vx_had",&vx_had, "vx_had/D");
-    t3->Branch("vy_had",&vy_had, "vy_had/D");
-    t3->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t3->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t3->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t3->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t3->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t3->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t3->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t3->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-   
-    t3->Branch("D_fav", &D_fav, "D_fav/D");
-    t3->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t3->Branch("D_s", &D_s, "D_s/D");
-    t3->Branch("D_g", &D_g, "D_g/D");
-   /*}}}*/
-
-    TFile *file4= new TFile(new_filename[3],"RECREATE");
-    TTree *t4 = new TTree("T","T");
-    t4->SetDirectory(file4);
-    t4->Branch("Q2",&Q2,"data/D");/*{{{*/
-    t4->Branch("W",&W,"data/D");
-    t4->Branch("Wp",&Wp,"data/D");
-    t4->Branch("x",&x,"data/D");
-    t4->Branch("y",&y,"data/D");
-    t4->Branch("z",&z,"data/D");
-    t4->Branch("nu",&nu,"data/D");
-    t4->Branch("s",&s,"data/D");
-    t4->Branch("pt",&pt,"data/D");
-    t4->Branch("weight_hp",&weight_hp,"data/D");
-    t4->Branch("weight_hm",&weight_hm,"data/D");
-    t4->Branch("weight_in",&weight_in,"data/D");
-    t4->Branch("rapidity",&rapidity,"data/D");
-    t4->Branch("theta_q",&theta_q,"data/D");
-    t4->Branch("theta_s",&theta_s,"data/D");
-    t4->Branch("phi_h",&phi_h,"data/D");
-    t4->Branch("phi_s",&phi_s,"data/D");
-    t4->Branch("jacoF",&jacoF,"jacoF/D");
-    t4->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
-    t4->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t4->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
-    t4->Branch("mom_ele",&mom_ele,"mom_ele/D");
-    t4->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
-    t4->Branch("mom_had",&mom_had,"mom_had/D");
-    t4->Branch("mom_gen_had",&mom_gen_had,"mom_gen_had/D");
-    t4->Branch("theta_ele",&theta_ele,"theta_ele/D");
-    t4->Branch("theta_gen_ele",&theta_gen_ele,"theta_gen_ele/D");
-    t4->Branch("theta_had",&theta_had,"theta_had/D");
-    t4->Branch("theta_gen_had",&theta_gen_had,"theta_gen_had/D");
-    t4->Branch("phi_ele",&phi_ele,"phi_ele/D");
-    t4->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
-    t4->Branch("phi_had",&phi_had,"phi_had/D");
-    t4->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t4->Branch("nsim",&nsim,"nsim/l");
-    t4->Branch("dilute_p",&dilute_hp,"data/D");
-    t4->Branch("dilute_m",&dilute_hm ,"data/D");
-    t4->Branch("px_ele",&px_ele, "px_ele/D");
-    t4->Branch("py_ele",&py_ele, "py_ele/D");
-    t4->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t4->Branch("E_ele",&E_ele, "E_ele/D");
-    t4->Branch("px_had",&px_had, "px_had/D");
-    t4->Branch("py_had",&py_had, "py_had/D");
-    t4->Branch("pz_had",&pz_had, "pz_had/D");
-    t4->Branch("E_had",&E_had, "E_had/D");
-    t4->Branch("vx_ele",&vx_ele, "vx_ele/D");
-    t4->Branch("vy_ele",&vy_ele, "vy_ele/D");
-    t4->Branch("vz_ele",&vz_ele, "vz_ele/D");
-    t4->Branch("vx_had",&vx_had, "vx_had/D");
-    t4->Branch("vy_had",&vy_had, "vy_had/D");
-    t4->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t4->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t4->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t4->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t4->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t4->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t4->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t4->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    t4->Branch("D_fav", &D_fav, "D_fav/D");
-    t4->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t4->Branch("D_s", &D_s, "D_s/D");
-    t4->Branch("D_g", &D_g, "D_g/D");
-  /*}}}*/
-
-    TFile *file5= new TFile(new_filename[4],"RECREATE");
-    TTree *t5 = new TTree("T","T");
-    t5->SetDirectory(file5);
-    t5->Branch("Q2",&Q2,"data/D");/*{{{*/
-    t5->Branch("W",&W,"data/D");
-    t5->Branch("Wp",&Wp,"data/D");
-    t5->Branch("x",&x,"data/D");
-    t5->Branch("y",&y,"data/D");
-    t5->Branch("z",&z,"data/D");
-    t5->Branch("nu",&nu,"data/D");
-    t5->Branch("s",&s,"data/D");
-    t5->Branch("pt",&pt,"data/D");
-    t5->Branch("weight_hp",&weight_hp,"data/D");
-    t5->Branch("weight_hm",&weight_hm,"data/D");
-    t5->Branch("weight_in",&weight_in,"data/D");
-    t5->Branch("rapidity",&rapidity,"data/D");
-    t5->Branch("theta_q",&theta_q,"data/D");
-    t5->Branch("theta_s",&theta_s,"data/D");
-    t5->Branch("phi_h",&phi_h,"data/D");
-    t5->Branch("phi_s",&phi_s,"data/D");
-    t5->Branch("jacoF",&jacoF,"jacoF/D");
-    t5->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
-    t5->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t5->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
-    t5->Branch("mom_ele",&mom_ele,"mom_ele/D");
-    t5->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
-    t5->Branch("mom_had",&mom_had,"mom_had/D");
-    t5->Branch("mom_gen_had",&mom_gen_had,"mom_gen_had/D");
-    t5->Branch("theta_ele",&theta_ele,"theta_ele/D");
-    t5->Branch("theta_gen_ele",&theta_gen_ele,"theta_gen_ele/D");
-    t5->Branch("theta_had",&theta_had,"theta_had/D");
-    t5->Branch("theta_gen_had",&theta_gen_had,"theta_gen_had/D");
-    t5->Branch("phi_ele",&phi_ele,"phi_ele/D");
-    t5->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
-    t5->Branch("phi_had",&phi_had,"phi_had/D");
-    t5->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t5->Branch("nsim",&nsim,"nsim/l");
-    t5->Branch("dilute_p",&dilute_hp,"data/D");
-    t5->Branch("dilute_m",&dilute_hm ,"data/D");
-    t5->Branch("px_ele",&px_ele, "px_ele/D");
-    t5->Branch("py_ele",&py_ele, "py_ele/D");
-    t5->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t5->Branch("E_ele",&E_ele, "E_ele/D");
-    t5->Branch("px_had",&px_had, "px_had/D");
-    t5->Branch("py_had",&py_had, "py_had/D");
-    t5->Branch("pz_had",&pz_had, "pz_had/D");
-    t5->Branch("E_had",&E_had, "E_had/D");
-    t5->Branch("vx_ele",&vx_ele, "vx_ele/D");
-    t5->Branch("vy_ele",&vy_ele, "vy_ele/D");
-    t5->Branch("vz_ele",&vz_ele, "vz_ele/D");
-    t5->Branch("vx_had",&vx_had, "vx_had/D");
-    t5->Branch("vy_had",&vy_had, "vy_had/D");
-    t5->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t5->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t5->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t5->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t5->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t5->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t5->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t5->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    t5->Branch("D_fav", &D_fav, "D_fav/D");
-    t5->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t5->Branch("D_s", &D_s, "D_s/D");
-    t5->Branch("D_g", &D_g, "D_g/D");
-   /*}}}*/
-
-    TFile *file6= new TFile(new_filename[5],"RECREATE");
-    TTree *t6 = new TTree("T","T");
-    t6->SetDirectory(file6);
-    t6->Branch("Q2",&Q2,"data/D");/*{{{*/
-    t6->Branch("W",&W,"data/D");
-    t6->Branch("Wp",&Wp,"data/D");
-    t6->Branch("x",&x,"data/D");
-    t6->Branch("y",&y,"data/D");
-    t6->Branch("z",&z,"data/D");
-    t6->Branch("nu",&nu,"data/D");
-    t6->Branch("s",&s,"data/D");
-    t6->Branch("pt",&pt,"data/D");
-    t6->Branch("weight_hp",&weight_hp,"data/D");
-    t6->Branch("weight_hm",&weight_hm,"data/D");
-    t6->Branch("weight_in",&weight_in,"data/D");
-    t6->Branch("rapidity",&rapidity,"data/D");
-    t6->Branch("theta_q",&theta_q,"data/D");
-    t6->Branch("theta_s",&theta_s,"data/D");
-    t6->Branch("phi_h",&phi_h,"data/D");
-    t6->Branch("phi_s",&phi_s,"data/D");
-    t6->Branch("jacoF",&jacoF,"jacoF/D");
-    t6->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
-    t6->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t6->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
-    t6->Branch("mom_ele",&mom_ele,"mom_ele/D");
-    t6->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
-    t6->Branch("mom_had",&mom_had,"mom_had/D");
-    t6->Branch("mom_gen_had",&mom_gen_had,"mom_gen_had/D");
-    t6->Branch("theta_ele",&theta_ele,"theta_ele/D");
-    t6->Branch("theta_gen_ele",&theta_gen_ele,"theta_gen_ele/D");
-    t6->Branch("theta_had",&theta_had,"theta_had/D");
-    t6->Branch("theta_gen_had",&theta_gen_had,"theta_gen_had/D");
-    t6->Branch("phi_ele",&phi_ele,"phi_ele/D");
-    t6->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
-    t6->Branch("phi_had",&phi_had,"phi_had/D");
-    t6->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t6->Branch("nsim",&nsim,"nsim/l");
-    t6->Branch("dilute_p",&dilute_hp,"data/D");
-    t6->Branch("dilute_m",&dilute_hm ,"data/D");
-    t6->Branch("px_ele",&px_ele, "px_ele/D");
-    t6->Branch("py_ele",&py_ele, "py_ele/D");
-    t6->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t6->Branch("E_ele",&E_ele, "E_ele/D");
-    t6->Branch("px_had",&px_had, "px_had/D");
-    t6->Branch("py_had",&py_had, "py_had/D");
-    t6->Branch("pz_had",&pz_had, "pz_had/D");
-    t6->Branch("E_had",&E_had, "E_had/D");
-    t6->Branch("vx_ele",&vx_ele, "vx_ele/D");
-    t6->Branch("vy_ele",&vy_ele, "vy_ele/D");
-    t6->Branch("vz_ele",&vz_ele, "vz_ele/D");
-    t6->Branch("vx_had",&vx_had, "vx_had/D");
-    t6->Branch("vy_had",&vy_had, "vy_had/D");
-    t6->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t6->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t6->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t6->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t6->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t6->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t6->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t6->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    t6->Branch("D_fav", &D_fav, "D_fav/D");
-    t6->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t6->Branch("D_s", &D_s, "D_s/D");
-    t6->Branch("D_g", &D_g, "D_g/D");
-  /*}}}*/
-
-    TFile *file7= new TFile(new_filename[6],"RECREATE");
-    TTree *t7 = new TTree("T","T");
-    t7->SetDirectory(file7);
-    t7->Branch("Q2",&Q2,"data/D");/*{{{*/
-    t7->Branch("W",&W,"data/D");
-    t7->Branch("Wp",&Wp,"data/D");
-    t7->Branch("x",&x,"data/D");
-    t7->Branch("y",&y,"data/D");
-    t7->Branch("z",&z,"data/D");
-    t7->Branch("nu",&nu,"data/D");
-    t7->Branch("s",&s,"data/D");
-    t7->Branch("pt",&pt,"data/D");
-    t7->Branch("weight_hp",&weight_hp,"data/D");
-    t7->Branch("weight_hm",&weight_hm,"data/D");
-    t7->Branch("weight_in",&weight_in,"data/D");
-    t7->Branch("rapidity",&rapidity,"data/D");
-    t7->Branch("theta_q",&theta_q,"data/D");
-    t7->Branch("theta_s",&theta_s,"data/D");
-    t7->Branch("phi_h",&phi_h,"data/D");
-    t7->Branch("phi_s",&phi_s,"data/D");
-    t7->Branch("jacoF",&jacoF,"jacoF/D");
-    t7->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
-    t7->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t7->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
-    t7->Branch("mom_ele",&mom_ele,"mom_ele/D");
-    t7->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
-    t7->Branch("mom_had",&mom_had,"mom_had/D");
-    t7->Branch("mom_gen_had",&mom_gen_had,"mom_gen_had/D");
-    t7->Branch("theta_ele",&theta_ele,"theta_ele/D");
-    t7->Branch("theta_gen_ele",&theta_gen_ele,"theta_gen_ele/D");
-    t7->Branch("theta_had",&theta_had,"theta_had/D");
-    t7->Branch("theta_gen_had",&theta_gen_had,"theta_gen_had/D");
-    t7->Branch("phi_ele",&phi_ele,"phi_ele/D");
-    t7->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
-    t7->Branch("phi_had",&phi_had,"phi_had/D");
-    t7->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t7->Branch("nsim",&nsim,"nsim/l");
-    t7->Branch("dilute_p",&dilute_hp,"data/D");
-    t7->Branch("dilute_m",&dilute_hm ,"data/D");
-    t7->Branch("px_ele",&px_ele, "px_ele/D");
-    t7->Branch("py_ele",&py_ele, "py_ele/D");
-    t7->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t7->Branch("E_ele",&E_ele, "E_ele/D");
-    t7->Branch("px_had",&px_had, "px_had/D");
-    t7->Branch("py_had",&py_had, "py_had/D");
-    t7->Branch("pz_had",&pz_had, "pz_had/D");
-    t7->Branch("E_had",&E_had, "E_had/D");
-    t7->Branch("vx_ele",&vx_ele, "vx_ele/D");
-    t7->Branch("vy_ele",&vy_ele, "vy_ele/D");
-    t7->Branch("vz_ele",&vz_ele, "vz_ele/D");
-    t7->Branch("vx_had",&vx_had, "vx_had/D");
-    t7->Branch("vy_had",&vy_had, "vy_had/D");
-    t7->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t7->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t7->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t7->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t7->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t7->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t7->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t7->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    t7->Branch("D_fav", &D_fav, "D_fav/D");
-    t7->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t7->Branch("D_s", &D_s, "D_s/D");
-    t7->Branch("D_g", &D_g, "D_g/D");
-   /*}}}*/
-
-    TFile *file8= new TFile(new_filename[7],"RECREATE");
-    TTree *t8 = new TTree("T","T");
-    t8->SetDirectory(file8);
-    t8->Branch("Q2",&Q2,"data/D");/*{{{*/
-    t8->Branch("W",&W,"data/D");
-    t8->Branch("Wp",&Wp,"data/D");
-    t8->Branch("x",&x,"data/D");
-    t8->Branch("y",&y,"data/D");
-    t8->Branch("z",&z,"data/D");
-    t8->Branch("nu",&nu,"data/D");
-    t8->Branch("s",&s,"data/D");
-    t8->Branch("pt",&pt,"data/D");
-    t8->Branch("weight_hp",&weight_hp,"data/D");
-    t8->Branch("weight_hm",&weight_hm,"data/D");
-    t8->Branch("weight_in",&weight_in,"data/D");
-    t8->Branch("rapidity",&rapidity,"data/D");
-    t8->Branch("theta_q",&theta_q,"data/D");
-    t8->Branch("theta_s",&theta_s,"data/D");
-    t8->Branch("phi_h",&phi_h,"data/D");
-    t8->Branch("phi_s",&phi_s,"data/D");
-    t8->Branch("jacoF",&jacoF,"jacoF/D");
-    t8->Branch("dxs_hm",&dxs_hm,"dxs_hm/D");
-    t8->Branch("dxs_hp",&dxs_hp,"dxs_hp/D");
-    t8->Branch("dxs_incl",&dxs_incl,"dxs_incl/D");
-    t8->Branch("mom_ele",&mom_ele,"mom_ele/D");
-    t8->Branch("mom_gen_ele",&mom_gen_ele,"mom_gen_ele/D");
-    t8->Branch("mom_had",&mom_had,"mom_had/D");
-    t8->Branch("mom_gen_had",&mom_gen_had,"mom_gen_had/D");
-    t8->Branch("theta_ele",&theta_ele,"theta_ele/D");
-    t8->Branch("theta_gen_ele",&theta_gen_ele,"theta_gen_ele/D");
-    t8->Branch("theta_had",&theta_had,"theta_had/D");
-    t8->Branch("theta_gen_had",&theta_gen_had,"theta_gen_had/D");
-    t8->Branch("phi_ele",&phi_ele,"phi_ele/D");
-    t8->Branch("phi_gen_ele",&phi_gen_ele,"phi_gen_ele/D");
-    t8->Branch("phi_had",&phi_had,"phi_had/D");
-    t8->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
-    t8->Branch("nsim",&nsim,"nsim/l");
-    t8->Branch("dilute_p",&dilute_hp,"data/D");
-    t8->Branch("dilute_m",&dilute_hm ,"data/D");
-    t8->Branch("px_ele",&px_ele, "px_ele/D");
-    t8->Branch("py_ele",&py_ele, "py_ele/D");
-    t8->Branch("pz_ele",&pz_ele, "pz_ele/D");
-    t8->Branch("E_ele",&E_ele, "E_ele/D");
-    t8->Branch("px_had",&px_had, "px_had/D");
-    t8->Branch("py_had",&py_had, "py_had/D");
-    t8->Branch("pz_had",&pz_had, "pz_had/D");
-    t8->Branch("E_had",&E_had, "E_had/D");
-    t8->Branch("vx_ele",&vx_ele, "vx_ele/D");
-    t8->Branch("vy_ele",&vy_ele, "vy_ele/D");
-    t8->Branch("vz_ele",&vz_ele, "vz_ele/D");
-    t8->Branch("vx_had",&vx_had, "vx_had/D");
-    t8->Branch("vy_had",&vy_had, "vy_had/D");
-    t8->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t8->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t8->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t8->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t8->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t8->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t8->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t8->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    t8->Branch("D_fav", &D_fav, "D_fav/D");
-    t8->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t8->Branch("D_s", &D_s, "D_s/D");
-    t8->Branch("D_g", &D_g, "D_g/D");
-    /*}}}*/
-    /*}}}*/
-
-    const double xbj_min = 0.0;
-    const double xbj_max = 0.35;
-    const int Q2bin=8;
-    const double Q2_log[9] = {0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6};
-    //const int Q2bin=4;
-    //const double Q2_log[5] = {0.0, 0.4, 0.8, 1.2, 1.6};
-    double Q2_Cut[9];
-    for (Int_t j=0;j<Q2bin+1;j++){
-        //Q2_Cut[j] = pow(10., Q2_log[j]);
-        Q2_Cut[j] = Q2_log[j];
-    }
-
-    for (ULong64_t i=0;i<N_Total;i++){
-        T->GetEntry(i);
-        if (x>=xbj_min&&x<xbj_max&&log10(Q2)>=Q2_Cut[0]&&log10(Q2)<Q2_Cut[1])  t1->Fill();
-        if (x>=xbj_min&&x<xbj_max&&log10(Q2)>=Q2_Cut[1]&&log10(Q2)<Q2_Cut[2])  t2->Fill();
-        if (x>=xbj_min&&x<xbj_max&&log10(Q2)>=Q2_Cut[2]&&log10(Q2)<Q2_Cut[3])  t3->Fill();
-        if (x>=xbj_min&&x<xbj_max&&log10(Q2)>=Q2_Cut[3]&&log10(Q2)<Q2_Cut[4])  t4->Fill();
-        if (x>=xbj_min&&x<xbj_max&&log10(Q2)>=Q2_Cut[4]&&log10(Q2)<Q2_Cut[5])  t5->Fill();
-        if (x>=xbj_min&&x<xbj_max&&log10(Q2)>=Q2_Cut[5]&&log10(Q2)<Q2_Cut[6])  t6->Fill();
-        if (x>=xbj_min&&x<xbj_max&&log10(Q2)>=Q2_Cut[6]&&log10(Q2)<Q2_Cut[7])  t7->Fill();
-        if (x>=xbj_min&&x<xbj_max&&log10(Q2)>=Q2_Cut[7]&&log10(Q2)<Q2_Cut[8])  t8->Fill();
-
-        if(!(i%10000))
-            cerr<<Form("--- Working on evt=%d",i)<<"\r";
-    }
-
-    file1->Write();  file1->Close();
-    file2->Write();  file2->Close();
-    file3->Write();  file3->Close();
-    file4->Write();  file4->Close();
-    file5->Write();  file5->Close();
-    file6->Write();  file6->Close();
-    file7->Write();  file7->Close();
-    file8->Write();  file8->Close();
-}
-
