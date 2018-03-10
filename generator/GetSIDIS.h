@@ -119,8 +119,8 @@ const Double_t EIC_Mom_Min_h = 0.0;
 const Double_t EIC_Mom_Max_h = 10.0;
 
 const Double_t EIC_Th_Min_e = 0.0;  
-//const Double_t EIC_Th_Max_e  = 180.0;            
-const Double_t EIC_Th_Max_e  = 140.0;            
+const Double_t EIC_Th_Max_e  = 180.0;            
+//const Double_t EIC_Th_Max_e  = 140.0;            
 const Double_t EIC_Th_Min_h = 0.0;  
 const Double_t EIC_Th_Max_h  = 180.0;
 
