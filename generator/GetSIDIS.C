@@ -121,7 +121,7 @@ int main(Int_t argc, char *argv[]){
    
     //A rough guess but people claim EIC to be a full-acceptance device!
     else if(config=="EIC" ){/*{{{*/
-        Mom_Min_e = EIC_Mom_Min_e;  Mom_Max_e =  momentum_ele * 3.0; 
+        Mom_Min_e = EIC_Mom_Min_e;  Mom_Max_e =  abs(momentum_ele - momentum_ion);//allow the max mom of the ele to be the total momentum 
         Mom_Min_h = EIC_Mom_Min_h;  Mom_Max_h = EIC_Mom_Max_h;
         Th_Min_e = EIC_Th_Min_e; Th_Max_e = EIC_Th_Max_e; 
         Th_Min_h = EIC_Th_Min_h; Th_Max_h = EIC_Th_Max_h;    
