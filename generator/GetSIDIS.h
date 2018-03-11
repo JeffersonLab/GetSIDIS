@@ -113,14 +113,13 @@ const Double_t CLAS12_Target_Length = 40.0 *cm;
 ////////////////////////
 //A rough guess but people claim EIC to be a full-acceptance device!
 const Double_t EIC_Mom_Min_e = 0.5;  
-const Double_t EIC_Mom_Max_e = 3.*10.0; //not in use 
+const Double_t EIC_Mom_Max_e = 3.*10.0; //not in use but chose to be 3-times the beam energy 
 const Double_t EIC_Mom_Min_h = 0.0;  
-//const Double_t EIC_Mom_Max_h = 50.0;
-const Double_t EIC_Mom_Max_h = 10.0;
+const Double_t EIC_Mom_Max_h = 30.0;
+//const Double_t EIC_Mom_Max_h = 10.0;
 
 const Double_t EIC_Th_Min_e = 0.0;  
 const Double_t EIC_Th_Max_e  = 180.0;            
-//const Double_t EIC_Th_Max_e  = 140.0;            
 const Double_t EIC_Th_Min_h = 0.0;  
 const Double_t EIC_Th_Max_h  = 180.0;
 
