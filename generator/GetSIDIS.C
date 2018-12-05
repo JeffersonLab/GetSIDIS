@@ -724,7 +724,9 @@ int main(Int_t argc, char *argv[]){
                 dxs_hm_sidis = sidis->GetXS_HM_SIDIS();
                 dilute_hp = sidis->GetDilute_HP();
                 dilute_hm = sidis->GetDilute_HM();
-                
+                isphy_hp = sidis->IsPhy_HP();
+                isphy_hm = sidis->IsPhy_HM();
+ 
                 u_pdf = sidis->get_uA();
                 d_pdf = sidis->get_dA();
                 s_pdf = sidis->get_s();
