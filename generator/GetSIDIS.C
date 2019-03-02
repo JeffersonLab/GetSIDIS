@@ -702,18 +702,21 @@ int main(Int_t argc, char *argv[]){
             /*}}}*/
         }else{
             /*Generate Events Uniformly{{{*/
-            if ( x>0.0&&x<1.0&&Q2>1.0 && W>2.0 &&  (config=="EIC" && z>0.0&&z<1.0
-                        &&(   (count[0]<number_of_events&&pt<=1.0&&Q2<=Q2_CutOff)
-                            ||(count[1]<number_of_events&&pt>1.0&&Q2<=Q2_CutOff)
-                            ||(count[2]<number_of_events&&pt<=1.0&&Q2>Q2_CutOff)
-                            ||(count[3]<number_of_events&&pt>1.0&&Q2>Q2_CutOff))
-                    ||((config=="SoLID"||config=="CLAS12") && z>0.0&&z<1.0 
-                        &&(   (count[0]<number_of_events&&pt<=1.0)
-                            ||(count[1]<number_of_events&&pt>1.0)))
-                    ||(config=="SPECT" && z>0.0&&z<1.0 && count[0]<number_of_events) ))
-            {
-                if(x<0.08 && x >0.12) cerr<<"*** Something is wrong?! x="<<x<<endl; //Add a cut here to only select events in the anti-shadowing region, Z. Ye 09/10/2018
-
+            if(Q2>1.0&&W>2.0&&Wp>1.6&&y>0.05&&y<0.95 && z>0.2&&z<0.8 &&(
+                    ((config=="EIC")&&
+                           ((count[0]<number_of_events&&pt<=1.0&&Q2<=Q2_CutOff)
+                          ||(count[1]<number_of_events&&pt>1.0&&Q2<=Q2_CutOff)
+                          ||(count[2]<number_of_events&&pt<=1.0&&Q2>Q2_CutOff)
+                          ||(count[3]<number_of_events&&pt>1.0&&Q2>Q2_CutOff))
+                     )
+                  ||((config=="SoLID"||config=="CLAS12") &&
+                          ((count[0]<number_of_events&&pt<=1.0)
+                         ||(count[1]<number_of_events&&pt>1.0))
+                    )
+                  ||((config=="SPECT") &&
+                          (count[0]<number_of_events)
+                    )
+             )){
                 sidis->CalcXS();/*{{{*/
                 dxs_incl = sidis->GetXS_Inclusive();
                 dxs_hp = sidis->GetXS_HP();
