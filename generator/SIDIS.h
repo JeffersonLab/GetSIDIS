@@ -157,7 +157,7 @@ class SIDIS
                 pdfSet=nnPDF+"Ca40";
             else if (fA==56 && fZ==26)
                 pdfSet=nnPDF+"Fe56";
-            else if (fA==64 && fZ==6)
+            else if (fA==64 && fZ==29)
                 pdfSet=nnPDF+"Cu64";
             else
                 pdfSet="CJ15lo";
