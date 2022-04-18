@@ -6,8 +6,6 @@
 //   easily embeded by other programs.                                     //
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
-#include "cteqpdf.h"
-#include "eps09.h"
 #include "Lsidis.h" //Tianbo Liu's SIDIS model
 
 using namespace std;
@@ -15,33 +13,17 @@ using namespace std;
 const double DEG=180./3.1415926;
 const double PI=3.1415926;
 const double GeV2_to_nbarn = 0.3894 * 1e6; //GeV^2 to nbarn
-//ofstream outlog("pdf_check.dat");
 class SIDIS
 {
     public:
-        SIDIS(TString kModel){/*{{{*/
-            fModel = kModel;
-            fOrder = 0;
+        SIDIS(TString kPDFSet, TString kFFSet){/*{{{*/
+            fPDFSet= kPDFSet;
+            fFFSet= kFFSet;
             fDebug=false;
-            if(fModel=="EPS09"){
-                //1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, 
-                fOrder = 1;
-                SetEPS09();
-            }
-            else if(fModel=="CTEQPDF"){
-                //3->free L0 CTEQ6L1 PDF, 4->free NL0 CTEQ6.1M PDF
-                fOrder = 3;
-                SetCTEQ();
-            }
-            else{
-                cerr<<"*** ERROR, I don't understand the XS model (not EPS09) :"<<fModel.Data()<<endl;
-                exit(-2);
-            } 
         }/*}}}*/
 
         virtual ~SIDIS(){/*{{{*/
-            if(fModel=="CTEQPDF"||fModel=="EPS09") 
-                cteq_pdf_free(fPDF);
+        
         }/*}}}*/
 
         /*void Print(){{{*/
@@ -54,10 +36,6 @@ class SIDIS
             cerr<<"      2, CalcXS() --> Calculated dxs_hp and dxs_hm; "<<endl; 
             cerr<<"      3, GetXS_HP() --> Get SIDIS XS of Pion+ or Kaon+ ,"<<endl;
             cerr<<"         GetXS_HM() --> Get SIDIS XS of Pion- or Kaon- ,"<<endl;
-            cerr<<"         GetXS_HP_SIDIS() --> Another SIDIS XS of Pion- or Kaon- ,"<<endl;
-            cerr<<"         GetXS_HM_SIDIS() --> Another SIDIS XS of Pion- or Kaon- ,"<<endl;
-            cerr<<"         GetDilute_HP() --> Get Dilution of Pion+ or Kaon+ ,"<<endl;
-            cerr<<"         GetDilute_HM() --> Get Dilution of Pion- or Kaon- ,"<<endl;
             cerr<<"      4, Other Output Quantities can be calculated after running CalcXS: "<<endl;
             cerr<<"           Q2, W, Wp, x, y, z, pt, nu, s, gamma, epsilon, jacoF "<<endl;
             cerr<<"===================================================================================================="<<endl;	
@@ -65,47 +43,10 @@ class SIDIS
         }
         /*}}}*/
 
-        void SetCTEQ(int mode){/*{{{*/
-            //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
-            fPDF = cteq_pdf_alloc_id(mode);
-        }/*}}}*/
-        
-        void SetCTEQ(){/*{{{*/
-            int mode = 0;
-            if(fOrder==1||fOrder==3)
-                mode = 4; //CTEQ6L1, see JHEP04 (2009) 065
-            else if(fOrder==2||fOrder==4)
-                mode = 200; //CTEQ6.1M, see JHEP04 (2009) 065
-
-             //set ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
-            fPDF = cteq_pdf_alloc_id(mode);
-        }/*}}}*/
-
-        void SetEPS09(){/*{{{*/
-            fErrSet = 1;
-            SetCTEQ();
-        }/*}}}*/
-
-        void SetCTEQOrder(int kOrder){/*{{{*/
-            fOrder = kOrder;
-
-            //Reinitialize:
-            if(fModel=="EPS09"){
-                if(fOrder!=1 && fOrder!=2)
-                    fOrder = 2;//default is 2 if neither 1 or 2
-                SetEPS09();
-            }
-            else if(fModel=="CTEQPDF"){
-                if(fOrder!=3 && fOrder!=4)
-                    fOrder = 4;//default is 4 if neither 3 or 4
-                SetCTEQ();
-            }
-        }/*}}}*/
-
         void Init(double kMass_ion,int kA, int kZ,  int kPtcl_flag){/*{{{*/
-            fMass_Ion=kMass_ion;
             fA = kA;
             fZ = kZ;
+            fMass_Ion=kMass_ion/fA;
             particle_flag = kPtcl_flag;
  
             double mass_pi = 0.13957;
@@ -131,12 +72,14 @@ class SIDIS
                 sidis_hp.SetHadron("K+");
                 sidis_hm.SetHadron("K-");
             }
-            
-            sidis_hp.SetPDFset("CJ15lo");
-            sidis_hm.SetPDFset("CJ15lo");
-          
-            sidis_hp.SetFFset("DSSFFlo");
-            sidis_hm.SetFFset("DSSFFlo");
+           
+            //Define PDF sets
+            sidis_hp.SetPDFset(fPDFSet);
+            sidis_hm.SetPDFset(fPDFSet);
+
+            //Define Fragmentation Function sets
+            sidis_hp.SetFFset(fFFSet);
+            sidis_hm.SetFFset(fFFSet);
         }/*}}}*/
 
         /*void SetKin( double mom_beam_ele, double mom_target,...){{{*/
@@ -289,220 +232,33 @@ class SIDIS
 
         /*int CalcXS(){{{*/
         int CalcXS(){
-            double bpt_m=4.694;
-            double bpt_p=4.661;
-            double pt_tmp = 0.0;	
-            double dxs_all[3][4];
-            double dxs_hp = -1000.0;
-            double dxs_hm = -1000.0;
-            double dxs_hp_Lsidis = -1000.0;
-            double dxs_hm_Lsidis = -1000.0;
-
-            /*SIDIS Model from Lsidis{{{*/
+            /*SIDIS Model from Lsidis*/
             if(particle_flag==2){//kaon
                 sidis_hp.ChangeTMDpars(0.604, 0.131);
                 sidis_hm.ChangeTMDpars(0.604, 0.131);
             }  
 
             sidis_hp.CalculateFinalState();
-            dxs_hp_Lsidis = sidis_hp.dsigma(0)*GeV2_to_nbarn*fJacobF;
+            fXS_HP = sidis_hp.dsigma(0)*GeV2_to_nbarn*fJacobF;
             fIsPhy_HP = sidis_hp.CheckIsPhy();
 
             sidis_hm.CalculateFinalState();
-            dxs_hm_Lsidis = sidis_hm.dsigma(0)*GeV2_to_nbarn*fJacobF;
-            fIsPhy_HM = sidis_hm.CheckIsPhy();/*}}}*/
+            fXS_HM = sidis_hm.dsigma(0)*GeV2_to_nbarn*fJacobF;
+            fIsPhy_HM = sidis_hm.CheckIsPhy();
 
-                /*Calculate XS{{{*/
-                double mass_p = 0.938272;
-                double mass_n = 0.939566;
-                double kSinSQ = pow( sin(fTheta_ele*0.5),2);
-                double kCosSQ = pow( cos(fTheta_ele*0.5),2);
-
-                ////This definition is in the CM frame, i.e. dSigma/dx/dy
-                //double xs_p = 2.0*PI*pow(1/137.036,2)*s/fQ2/fQ2*(1+pow(1-fY, 2)) * fF2p * GeV2_to_nbarn;
-                //double xs_n = 2.0*PI*pow(1/137.036,2)*s/fQ2/fQ2*(1+pow(1-fY, 2)) * fF2n * GeV2_to_nbarn;
-
-                ////This definition is in the lab frame, e.g. dSigma/dE'dOmega, where dE'dOmega = 2.*M*E0/E'*PI*fY*dxdy
-                double xs_p= 4.0*pow(1/137.036,2) * fMom_ele*fMom_ele/fQ2/fQ2
-                    * (1./fNu *kCosSQ + 1/mass_p/fXb * kSinSQ) * fF2p * GeV2_to_nbarn;
-                double xs_n= 4.0*pow(1/137.036,2) * fMom_ele*fMom_ele/fQ2/fQ2
-                    * (1./fNu *kCosSQ + 1/mass_n/fXb * kSinSQ) * fF2n * GeV2_to_nbarn;
-
-                fXS_Inclusive = fZ * xs_p + (fA-fZ)*xs_n;//nbarn
-
-                pt_tmp = fPt;
-                if(fPt<0.8){
-                    //first method 	 
-                    bpt_p = 1./(0.2+fZ_h*fZ_h*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
-                    ////Disable the TMD feature temparately, 02/01/2017
-                    //bpt_p = 1./(0.2);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
-                    //bpt_m = bpt_p; // <kt^2> = 0.25 GeV^2 (struck quark internal momentum)
-
-                    //second method  use the original value
-                    // bpt_m=4.694; // HERMES parameterization
-                    // bpt_p=4.661;
-
-                    GetXS(pt_tmp, bpt_m, bpt_p, &dxs_hp, &dxs_hm,dxs_all[0]);
-
-                    fDilute_hp = dxs_all[0][0]/dxs_all[0][1];
-                    fDilute_hm = dxs_all[0][2]/dxs_all[0][3];
-
-                }
-                else{
-                    // this part is to generate factor K
-                    //make sure the DXS is the same at PT= 0.8 GeV
-                    //calculating the TMD part
-                    double K[2],dxs_temp[10];
-                    bpt_p = 1./(0.2+fZ_h*fZ_h*0.25);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
-                    ////Disable the TMD feature temparately, 02/01/2017
-                    //bpt_p = 1./(0.2);// <pt^2> = 0.2 GeV^2 (quark internal momentum)
-                    //bpt_m = bpt_p; // <kt^2> = 0.25 GeV^2 (struck quark internal momentum)
-
-                    //second method  use the original value
-                    // bpt_m=4.694; // HERMES parameterization
-                    // bpt_p=4.661;
-
-                    pt_tmp = 0.8;
-                    GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[0], &dxs_temp[1],dxs_all[0]);	   
-
-                    //calculating the TMD parts using the new vpt_p values
-                    bpt_p = 1./(0.25+fZ_h*fZ_h*0.28);// <pt^2> = 0.25 GeV^2 (quark internal momentum)
-                    ////Disable the TMD feature temparately, 02/01/2017
-                    //bpt_p = 1./(0.25);// <pt^2> = 0.25 GeV^2 (quark internal momentum)
-                    //bpt_m = bpt_p; // <kt^2> = 0.28 GeV^2 (struck quark internal momentum)
-
-                    //taking into account the NLO etc
-                    pt_tmp = 1.0;
-                    GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);	   
-                    GetXS_hPt(pt_tmp, &dxs_temp[4],&dxs_temp[5],dxs_all[2]);
-
-                    K[0] = (dxs_temp[0]-dxs_temp[2])/dxs_temp[4];
-                    K[1] = (dxs_temp[1]-dxs_temp[3])/dxs_temp[5];
-
-                    if (K[0]<0.) K[0] = 0.;
-                    if (K[1]<0.) K[1] = 0.;
-
-                    if (fPt>1.2){
-                        pt_tmp = fPt;
-                        GetXS(pt_tmp,bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);	   
-                        GetXS_hPt(pt_tmp,&dxs_temp[4],&dxs_temp[5],dxs_all[2]);
-
-                        dxs_hp = dxs_temp[2] + K[0]*dxs_temp[4];
-                        dxs_hm = dxs_temp[3] + K[1]*dxs_temp[5];
-
-                        fDilute_hp = (dxs_all[1][0] + K[0]*dxs_all[2][0])/(dxs_all[1][1] + K[0]*dxs_all[2][1]);
-                        fDilute_hm = (dxs_all[1][2] + K[1]*dxs_all[2][2])/(dxs_all[1][3] + K[1]*dxs_all[2][3]);
-
-                    }else{
-                        pt_tmp = 1.2;
-                        GetXS(pt_tmp, bpt_m, bpt_p, &dxs_temp[2], &dxs_temp[3],dxs_all[1]);	   
-                        GetXS_hPt(pt_tmp,&dxs_temp[4],&dxs_temp[5],dxs_all[2]);
-
-                        dxs_temp[2] = dxs_temp[2] + K[0]*dxs_temp[4];
-                        dxs_temp[3] = dxs_temp[3] + K[1]*dxs_temp[5];
-
-                        dxs_temp[4] = (dxs_temp[0]-dxs_temp[2])/(1./0.8/0.8-1./1.2/1.2);
-                        dxs_temp[5] = dxs_temp[0]-dxs_temp[4]/0.8/0.8;
-                        dxs_temp[6] = (dxs_temp[1]-dxs_temp[3])/(1./0.8/0.8-1./1.2/1.2);
-                        dxs_temp[7] = dxs_temp[1]-dxs_temp[6]/0.8/0.8;
-
-                        dxs_hp = dxs_temp[4]/fPt/fPt + dxs_temp[5];
-                        dxs_hm = dxs_temp[6]/fPt/fPt + dxs_temp[7];
-
-                        fDilute_hp = ((dxs_all[1][0] + K[0]*dxs_all[2][0])
-                                /(dxs_all[1][1] + K[0]*dxs_all[2][1])+dxs_all[0][0]/dxs_all[0][1])/2.;
-                        fDilute_hm = ((dxs_all[1][2] + K[1]*dxs_all[2][2])
-                                /(dxs_all[1][3] + K[1]*dxs_all[2][3])+dxs_all[0][2]/dxs_all[0][3])/2.;
-                    }
-                }
-                /*}}}*/
-
-                /*try to take care of the decay{{{*/
-                double decay_part = 0.0;
-                if (abs(particle_flag)==1){
-                    if (fTheta_had>155./DEG){
-                        decay_part = exp(7./cos(fTheta_had)*fMass_Hadron/(2.6*fMom_had*3.0));
-                    }else if (fTheta_had<=155./DEG&&fTheta_had>=140./DEG){
-                        decay_part = exp(4.5/cos(fTheta_had)*fMass_Hadron/(2.6*fMom_had*3.0));
-                    }else if (fTheta_had <140/DEG){
-                        decay_part = exp(-2.5/sin(fTheta_had)*fMass_Hadron/(2.6*fMom_had*3.0));
-                    }
-                }else{
-                    if (fTheta_had>155./DEG){
-                        decay_part = exp(7./cos(fTheta_had)*fMass_Hadron/(1.24*fMom_had*3.0));
-                    }else if (fTheta_had<=155./DEG&&fTheta_had>=140./DEG){
-                        decay_part = exp(4.5/cos(fTheta_had)*fMass_Hadron/(1.24*fMom_had*3.0));
-                    }else if (fTheta_had <140/DEG){
-                        decay_part = exp(-2.5/sin(fTheta_had)*fMass_Hadron/(1.24*fMom_had*3.0));
-                    }
-                }
-                dxs_hp *= decay_part; 
-                dxs_hm *= decay_part;
-                /*}}}*/
-
-            /*Save&Return{{{*/
-            //to avoid some wired behavior in log scale/*{{{*/
-            int err_hp = 0, err_hm= 0;
-            if((fXS_Inclusive)<1e-34) fXS_Inclusive=1e-34;
-            if((dxs_hp)<1e-34) dxs_hp=1e-34;
-            if((dxs_hm)<1e-34) dxs_hm=1e-34;
-            if((fDilute_hp)<1e-34) fDilute_hp=1e-34;
-            if((fDilute_hm)<1e-34) fDilute_hm=1e-34;
-
-            if(isnan(dxs_hp)||isinf(dxs_hp)) {
-                dxs_hp=1e-34;
-                err_hp = 1;
-            }
-            if(isnan(dxs_hm)||isinf(dxs_hm)){
-                dxs_hm=1e-34;
-                err_hm = 1;
-            }
-            if(isnan(fXS_Inclusive)||isinf(fXS_Inclusive)) fXS_Inclusive=1e-34;
-            if(isnan(fDilute_hp)||isinf(fDilute_hp)) fDilute_hp=1e-34;
-            if(isnan(fDilute_hm)||isinf(fDilute_hm)) fDilute_hm=1e-34;
-            /*}}}*/
-            fXS_HP = dxs_hp;
-            fXS_HM = dxs_hm;
-            fXS_HP_SIDIS = dxs_hp_Lsidis;
-            fXS_HM_SIDIS = dxs_hm_Lsidis;
-
-
-            if(err_hp==0&&err_hm==0) 
+            if(fIsPhy_HP && fIsPhy_HM)
                 return 0;
-            else if(err_hp==0&&err_hm==1)
-                return 1;
-            else if(err_hp==1&&err_hm==0)
-                return -1;
             else
-                return 2;
-            /*}}}*/
-
+                return -1;
         } 
         /*}}}*/
 
         /*Return Values{{{*/
-
-        double GetXS_Inclusive(){
-            return fXS_Inclusive;
-        }
-
         double GetXS_HP(){
             return fXS_HP;
         }
         double GetXS_HM(){
             return fXS_HM;
-        }
-        double GetXS_HP_SIDIS(){
-            return fXS_HP_SIDIS;
-        }
-        double GetXS_HM_SIDIS(){
-            return fXS_HM_SIDIS;
-        }
-        double GetDilute_HP(){
-            return fDilute_hp;
-        }
-        double GetDilute_HM(){
-            return fDilute_hm;
         }
         Int_t IsPhy_HP(){
             return fIsPhy_HP;
@@ -510,110 +266,7 @@ class SIDIS
         Int_t IsPhy_HM(){
             return fIsPhy_HM;
         }
-        double get_uA(){ return fuA; }//return the average u
-        double get_dA(){ return fdA; }//return the average d
-        double get_s(){ return fs; }//return the average s
-        double get_g(){ return fg; }//return the average g
-        double get_ubar(){ return fubar; }//return the average u
-        double get_dbar(){ return fdbar; }//return the average d
-        double get_sbar(){ return fsbar; }//return the average s
-        
-        double get_Dfav(){ return fD_fav; }//return the favor Fragmentation Function
-        double get_Dunfav(){ return fD_unfav; }//return the unfavor Fragmentation Function
-        double get_Ds(){ return fD_s; }//return the sea Fragmentation Function
-        double get_Dg(){ return fD_g; }//return the gluon Fragmentation Function
         /*}}}*/
-        
-        /*double RunCTEQPDF(double x,double fQ2){{{*/          
-        void RunCTEQPDF(double ix,double iQ2)          
-        {
-            fubar = Get_CTEQPDF(-1, ix, iQ2);
-            fdbar = Get_CTEQPDF(-2, ix, iQ2);
-            fsbar = Get_CTEQPDF(-3, ix, iQ2);
-            fuA = Get_CTEQPDF(1, ix, iQ2);
-            fdA = Get_CTEQPDF(2, ix, iQ2);
-            fs = Get_CTEQPDF(3, ix, iQ2);
-            fg = Get_CTEQPDF(0, ix, iQ2);
-        }
-        /*}}}*/
-
-        void RunEPS09(int iOrder, int iErrSet,int iA,int iZ, double ix, double iQ2){/*{{{*/
-
-            double iR_uv = 0.0, iR_dv = 0.0, iR_u = 0.0, iR_d = 0.0, iR_s = 0.0, iR_c = 0.0, iR_b = 0.0, iR_g = 0.0; 
-            //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
-            //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
-            if(iA>2){
-                eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
-              /*  int A_EPS09[17] = {4,6,9,12,16,27,40,56,64,108,115,117,184,195,197,208,238};*/
-                //int A1 =0, A2=0, I1=0;
-                //for(int i=0;i<17;i++){
-                    //if(iA<=A_EPS09[i]){ 
-                        //A2 = A_EPS09[i]; 
-                        //I1=i-1; 
-                    //}
-                //}
-                //if(I1>=0) 
-                    //A1 = A_EPS09[I1]; 
-                //else
-                    //A1 = 1;
-
-                //double iR1_uv = 0.0, iR1_dv = 0.0, iR1_u = 0.0, iR1_d = 0.0, iR1_s = 0.0, iR1_c = 0.0, iR1_b = 0.0, iR1_g = 0.0; 
-                //double iR2_uv = 0.0, iR2_dv = 0.0, iR2_u = 0.0, iR2_d = 0.0, iR2_s = 0.0, iR2_c = 0.0, iR2_b = 0.0, iR2_g = 0.0; 
-                //eps09(iOrder, iErrSet, A2, ix, sqrt(iQ2), iR2_uv, iR2_dv, iR2_u, iR2_d, iR2_s, iR2_c,iR2_b,iR2_g);
-                //if(A1>1){
-                    ////eps09(iOrder, iErrSet, A1, ix, sqrt(iQ2), iR1_uv, iR1_dv, iR1_u, iR1_d, iR1_s, iR1_c,iR1_b,iR1_g);
-                    //iR1_uv = 1.0; iR1_dv = 1.0; iR1_u = 1.0; iR1_d = 1.0; iR1_s = 1.0; iR1_c = 1.0; iR1_b = 1.0; iR1_g = 1.0; 
-                //}else{
-                    //iR1_uv = 1.0; iR1_dv = 1.0; iR1_u = 1.0; iR1_d = 1.0; iR1_s = 1.0; iR1_c = 1.0; iR1_b = 1.0; iR1_g = 1.0; 
-                //}
-            
-                ////Use linear extrapolation for A1<iA<A2
-                //double AR = (iA-A1)/(A2-A1);
-                //iR_uv = iR1_uv + AR * (iR2_uv - iR1_uv);
-                //iR_dv = iR1_dv + AR * (iR2_dv - iR1_dv);
-                //iR_u  = iR1_u  + AR * (iR2_u  - iR1_u );
-                //iR_d  = iR1_d  + AR * (iR2_d  - iR1_d );
-                //iR_s  = iR1_s  + AR * (iR2_s  - iR1_s );
-                //iR_c  = iR1_c  + AR * (iR2_c  - iR1_c );
-                //iR_b  = iR1_b  + AR * (iR2_b  - iR1_b );
-                /*iR_g  = iR1_g  + AR * (iR2_g  - iR1_g );*/
-            }
-            else{
-                iR_uv = 1.0; iR_dv = 1.0; iR_u = 1.0; iR_d = 1.0; iR_s = 1.0; iR_c = 1.0; iR_b = 1.0; iR_g = 1.0; 
-            }
-
-            double ubar = Get_CTEQPDF(-1, ix, iQ2);
-            double dbar = Get_CTEQPDF(-2, ix, iQ2);
-            double sbar = Get_CTEQPDF(-3, ix, iQ2);
-            double cbar = Get_CTEQPDF(-4, ix, iQ2);
-            double bbar = Get_CTEQPDF(-5, ix, iQ2);
-            double u = Get_CTEQPDF(1, ix, iQ2);
-            double d = Get_CTEQPDF(2, ix, iQ2);
-            double s = Get_CTEQPDF(3, ix, iQ2);
-            double c = Get_CTEQPDF(4, ix, iQ2);
-            double b = Get_CTEQPDF(5, ix, iQ2);
-            double g = Get_CTEQPDF(0, ix, iQ2);
-
-            double uv = u-ubar;//uv = u - usea
-            double dv = d-dbar;//dv = d - dsea
-
-            fuA = iR_uv * uv + iR_u * ubar;
-            fdA = iR_dv * dv + iR_d * dbar;
-
-            fubar =  iR_u * ubar;
-            fdbar =  iR_d * dbar;
-
-            fs =  iR_s * s;
-            fsbar =  iR_s *sbar;
-
-            fc =  iR_c * c;
-            fcbar =  iR_c *cbar;
-
-            fb =  iR_b * b;
-            fbbar =  iR_b *bbar;
-
-            fg =  iR_g * g;
-        }/*}}}*/
 
     private:
         /*double Azimuthalphi(double vx, double vy){{{*/
@@ -773,349 +426,6 @@ class SIDIS
         }
         /*}}}*/
 
-        /*void GetXS(double x, double y, double Q2, ...){{{*/
-        //////////////////////////////////////////////////////////////////////////////////////////////////
-        // This subroutine is called to compute new XS for any nuclear A
-        // where the PDFs contain the free PDF from CTEQ and the nulcear-medium-modification from  EPS09
-        // -- Zhihong Ye, 06/27/2016
-        //////////////////////////////////////////////////////////////////////////////////////////////////
-        void GetXS(double pt_tmp,double bpt_m, double bpt_p, double* kXS_HP, double* kXS_HM,double* kXS_All){
-            double qu=2./3.;
-            double qd=-1./3.;
-            double qs=-1./3.;
-
-            double dxs_hp_temp = 1./137.035/137.035/fXb/fY/fQ2 *fY*fY/(2*(1-fEpsilon))*(1+fGamma*fGamma/2./fXb)*GeV2_to_nbarn*fJacobF;
-            double dxs_hm_temp = dxs_hp_temp;
-
-            ////Temparetly set to zero, 02/10/2017
-            //dxs_hp_temp *= fXb;
-            //dxs_hm_temp *= fXb; 
-
-            dxs_hp_temp *= bpt_p/PI*exp(-bpt_p*pt_tmp*pt_tmp)*fXb;
-            dxs_hm_temp *= bpt_m/PI*exp(-bpt_m*pt_tmp*pt_tmp)*fXb;
-
-            double df_p_hp=0,df_p_hm=0;
-            double df_n_hp=0,df_n_hm=0;
-
-            double uquark=0.0,dquark=0.0,squark=0.0,ubarquark=0.0,dbarquark=0.0,sbarquark=0.0;
-            if(fOrder==1 || fOrder==2){
-                //Calculate medium modified PDFs:
-                RunEPS09(fOrder, fErrSet, fA, fZ, fXb, fQ2);
-            }
-            else if(fOrder==3 || fOrder==4){
-               //free PDF from CTEQ
-                RunCTEQPDF(fXb, fQ2);         
-            }
-
-            uquark = fuA;
-            ubarquark = fubar;
-            dquark = fdA;
-            dbarquark = fdbar;
-            squark = fs;
-            sbarquark = fsbar;
-
-            //calculate F2p and F2n for inclusive XS calculations
-            fF2p = pow(qu,2) * (uquark+ubarquark) + pow(qd,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); 
-            fF2n = pow(qd,2) * (uquark+ubarquark) + pow(qu,2)*(dquark+dbarquark) + pow(qs,2)*(squark+sbarquark); //u-->d, d-->u, 
-
-            double D_fav,D_unfav,D_s,D_g;
-            if (fabs(particle_flag)==1) {
-                //pion fragmentation functions
-                GetFF_Unpol(1,fZ_h,fQ2,&D_fav,&D_unfav,&D_s,&D_g);
-
-                //proton
-                df_p_hp = qu*qu*uquark*D_fav + qu*qu*ubarquark*D_unfav + qd*qd*dquark*D_unfav + qd*qd*dbarquark*D_fav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s;
-                df_p_hm = qu*qu*uquark*D_unfav + qu*qu*ubarquark*D_fav + qd*qd*dquark*D_fav + qd*qd*dbarquark*D_unfav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s;
-
-                //neutron
-                //u->d, d->u, ubar->dbar, dbar->ubar
-                df_n_hp = qu*qu*dquark*D_fav + qu*qu*dbarquark*D_unfav + qd*qd*uquark*D_unfav + qd*qd*ubarquark*D_fav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s;
-                df_n_hm = qu*qu*dquark*D_unfav + qu*qu*dbarquark*D_fav + qd*qd*uquark*D_fav + qd*qd*ubarquark*D_unfav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s;
-            }else{
-                //kaon, fragmentation functions
-                GetFF_Unpol(2,fZ_h,fQ2,&D_fav,&D_unfav,&D_s,&D_g);
-
-                //proton
-                df_p_hp = qu*qu*uquark*D_fav + qu*qu*ubarquark*D_unfav + qd*qd*dquark*D_s + qd*qd*dbarquark*D_s + qs*qs *squark * D_unfav + qs*qs*sbarquark*D_fav;
-                df_p_hm = qu*qu*uquark*D_unfav + qu*qu*ubarquark*D_fav + qd*qd*dquark*D_s + qd*qd*dbarquark*D_s + qs*qs *squark * D_fav + qs*qs*sbarquark*D_unfav;
-
-                //neutron
-                //u->d, d->u, ubar->dbar, dbar->ubar
-                df_n_hp = qu*qu*dquark*D_fav   + qu*qu*dbarquark*D_unfav + qd*qd*uquark*D_s + qd*qd*ubarquark*D_s + qs*qs *squark * D_unfav + qs*qs*sbarquark*D_fav;
-                df_n_hm = qu*qu*dquark*D_unfav + qu*qu*dbarquark*D_fav   + qd*qd*uquark*D_s + qd*qd*ubarquark*D_s + qs*qs *squark * D_fav   + qs*qs*sbarquark*D_unfav;
-            }
-            fD_unfav = D_unfav;
-            fD_fav = D_fav;
-            fD_s = D_s;
-            fD_g = D_g;
-
-            *(kXS_All+0) = dxs_hp_temp * df_p_hp/fXb;
-            *(kXS_All+1) = dxs_hp_temp * df_n_hp/fXb;
-            *(kXS_All+2) = dxs_hm_temp * df_p_hm/fXb;
-            *(kXS_All+3) = dxs_hm_temp * df_n_hm/fXb;
-
-            *kXS_HP = dxs_hp_temp * (df_p_hp*fZ+df_n_hp*(fA-fZ))/fXb;
-            *kXS_HM = dxs_hm_temp * (df_p_hm*fZ+df_n_hm*(fA-fZ))/fXb;
-        }
-        /*}}}*/
-
-        /*void GetXS_hPt(double pt_tmp, double* dxs_hp,...){{{*/
-        void GetXS_hPt(double pt_tmp, double* kXS_HP, double* kXS_HM,double* kXS_All){
-
-            double alpha_s = 0.0;
-            alpha_s = cteq_pdf_evolveas(fPDF, sqrt(fQ2) );
-
-
-            //cout << fY << "\t" << fQ2 << endl;
-            //cout << alpha_s << endl;
-
-            double dxs_hp_temp = 1./137.035/137.035/16./PI/PI/fQ2/fQ2*fY/4./PI*(197.3*197.3/100.*1.0e9)*alpha_s/1000000.*fJacobF;
-            double dxs_hm_temp = dxs_hp_temp;
-
-            double qu=2./3.;
-            double qd=-1./3.;
-            double qs=-1./3.;
-
-            double Pqq, Pqg, Pgq;
-            double zp,xp;
-            double df_p_hp = 0,df_p_hm = 0,df_n_hp = 0,df_n_hm = 0;
-
-            double uquark=0.0,dquark=0.0,squark=0.0,ubarquark=0.0,dbarquark=0.0,sbarquark=0.0, gluon=0.0;
-            double D_fav,D_unfav,D_s,D_g;
-            // doing the integral
-            for (Int_t i=0;i!=100;i++){
-                xp = fXb + (1-fXb)/100.*(i+0.5);
-                zp =  fZ_h / (fZ_h + xp*pt_tmp*pt_tmp/fZ_h/(1-xp)/fQ2);
-                if (fZ_h/zp>1) continue;
-
-                Pqq = 64*PI/3.*fQ2/fY/fY*((1+(1-fY)*(1-fY))*((1-xp)*(1-zp) + (1+xp*xp*zp*zp)/(1-xp)/(1-zp)) 
-                        + 8*xp*zp*(1-fY) //- 4 *sqrt(xp*zp*(1-fY)/(1-xp)/(1-zp))*(2-fY)*(xp*zp+(1-xp)*(1-zp))*cos(fPhi_h)
-                        //+ 4*xp*zp*(1-fY)*cos(2. * fPhi_h)
-                        ) *(1-fXb)/100. /(xp*pt_tmp*pt_tmp+fZ_h*fZ_h*(1-xp)*fQ2); //13
-
-                Pqg = 64*PI/3.*fQ2/fY/fY*( (1+(1-fY)*(1-fY))*((1-xp)*zp + (1+xp*xp*(1-zp)*(1-zp))/(1-xp)/zp) 
-                        + 8*xp*(1-fY)*(1-zp) 
-                        //+ 4.*sqrt(xp*(1-fY)*(1-zp)/(1-xp)/zp)*(2-fY)*(xp*(1-zp)+(1-xp)*zp)*cos(fPhi_h)
-                        //+ 4.*xp*(1-fY)*(1-zp)*cos(2.*fPhi_h)
-                        )*(1-fXb)/100. /(xp*pt_tmp*pt_tmp+fZ_h*fZ_h*(1-xp)*fQ2);  //14
-
-                Pgq = 8.*PI*fQ2/fY/fY*((1+(1-fY)*(1-fY))*(xp*xp+(1-xp)*(1-xp))*(zp*zp+(1-zp)*(1-zp))/zp/(1-zp) 
-                        + 16*xp*(1-xp)*(1-fY)
-                        //-4.*sqrt(xp*(1-xp)*(1-fY)/zp/(1-zp))*(2-fY)*(1-2*xp)*(1-2.*zp)*cos(fPhi_h)
-                        //+ 8*xp*(1-xp)*(1-fY)*cos(2.*fPhi_h)
-                        )*(1-fXb)/100. /(xp*pt_tmp*pt_tmp+fZ_h*fZ_h*(1-xp)*fQ2);  //15
-
-                //cout << xp << "\t" << zp << "\t" << fZ_h/zp << "\t" << fXb/xp << "\t" << Pqq << "\t" << Pqg << "\t" << Pgq <<"\t" << (1-fXb)/100./(xp*pt_tmp*pt_tmp+fZ_h*fZ_h*(1-xp)*fQ2)<<  endl;
-                // Pqq = 1.;
-                //     Pqg = 0.;
-                //     Pgq = 0.;
-
-                if(fOrder==1 || fOrder==2){
-                    //Don't call RunEPS09DF(fXb, fQ2) again since now we are only dealing with hPt corrections         
-                    uquark = Get_EPS09(fOrder, fErrSet, fA, fZ, 1, fXb, fQ2);
-                    dquark = Get_EPS09(fOrder, fErrSet, fA, fZ, 2, fXb, fQ2);
-                    squark = Get_EPS09(fOrder, fErrSet, fA, fZ, 3, fXb, fQ2);
-                    ubarquark = Get_EPS09(fOrder, fErrSet, fA, fZ,-1, fXb, fQ2);
-                    dbarquark = Get_EPS09(fOrder, fErrSet, fA, fZ,-2, fXb, fQ2);
-                    sbarquark = Get_EPS09(fOrder, fErrSet, fA, fZ,-3, fXb, fQ2);
-                    gluon = Get_EPS09(fOrder, fErrSet, fA, fZ, 0, fXb, fQ2);
-                }
-                else if(fOrder==3 || fOrder==4){
-                    //free PDF from CTEQ
-                    //Don't call RunCTEQPDF(fXb, fQ2) again since now we are only dealing with hPt corrections         
-                    uquark = Get_CTEQPDF(1,fXb/xp,fQ2);
-                    dquark = Get_CTEQPDF(2,fXb/xp,fQ2);
-                    squark = Get_CTEQPDF(3,fXb/xp,fQ2);
-                    ubarquark = Get_CTEQPDF(-1,fXb/xp,fQ2);
-                    dbarquark = Get_CTEQPDF(-2,fXb/xp,fQ2);
-                    sbarquark = Get_CTEQPDF(-3,fXb/xp,fQ2);
-                    gluon = Get_CTEQPDF(0,fXb/xp,fQ2);
-                }
-
-                if (fabs(particle_flag)==1){
-                    //pion fragmentation function
-                    GetFF_Unpol(1,fZ_h/zp,fQ2,&D_fav,&D_unfav,&D_s,&D_g);
-                    //proton
-                    df_p_hp += Pqq*(qu*qu*uquark*D_fav + qu*qu*ubarquark*D_unfav + qd*qd*dquark*D_unfav + qd*qd*dbarquark*D_fav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s) + Pqg*(qu*qu*uquark + qu*qu*ubarquark + qd*qd*dquark + qd*qd*dbarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_fav + qu*qu*D_unfav + qd*qd*D_unfav + qd*qd*D_fav + qs*qs*D_s + qs*qs*D_s);
-                    df_p_hm += Pqq*(qu*qu*uquark*D_unfav + qu*qu*ubarquark*D_fav + qd*qd*dquark*D_fav + qd*qd*dbarquark*D_unfav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s) + Pqg*(qu*qu*uquark + qu*qu*ubarquark + qd*qd*dquark + qd*qd*dbarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_fav + qd*qd*D_unfav + qs*qs*D_s + qs*qs*D_s);
-
-                    //neutron
-                    //u->d, d->u, ubar->dbar, dbar->ubar
-                    df_n_hp += Pqq*(qu*qu*dquark*D_fav + qu*qu*dbarquark*D_unfav + qd*qd*uquark*D_unfav + qd*qd*ubarquark*D_fav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s) + Pqg*(qu*qu*dquark + qu*qu*dbarquark + qd*qd*uquark + qd*qd*ubarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_fav + qu*qu*D_unfav + qd*qd*D_unfav + qd*qd*D_fav + qs*qs*D_s + qs*qs*D_s);
-                    df_n_hm += Pqq*(qu*qu*dquark*D_unfav + qu*qu*dbarquark*D_fav + qd*qd*uquark*D_fav + qd*qd*ubarquark*D_unfav + qs*qs*squark*D_s + qs*qs*sbarquark*D_s) + Pqg*(qu*qu*dquark + qu*qu*dbarquark + qd*qd*uquark + qd*qd*ubarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_fav + qd*qd*D_unfav + qs*qs*D_s + qs*qs*D_s);
-                }else{
-                    //kaon fragmentation functions
-                    GetFF_Unpol(2,fZ_h/zp,fQ2,&D_fav,&D_unfav,&D_s,&D_g);
-
-                    //proton
-                    df_p_hp += Pqq*(qu*qu*uquark*D_fav + qu*qu*ubarquark*D_unfav + qd*qd*dquark*D_s + qd*qd*dbarquark*D_s + qs*qs *squark * D_unfav + qs*qs*sbarquark*D_fav) + Pqg*(qu*qu*uquark + qu*qu*ubarquark + qd*qd*dquark + qd*qd*dbarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_s + qd*qd*D_s + qs*qs*D_fav + qs*qs*D_unfav);
-                    df_p_hm += Pqq*(qu*qu*uquark*D_unfav + qu*qu*ubarquark*D_fav + qd*qd*dquark*D_s + qd*qd*dbarquark*D_s + qs*qs *squark * D_fav + qs*qs*sbarquark*D_unfav) + Pqg*(qu*qu*uquark + qu*qu*ubarquark + qd*qd*dquark + qd*qd*dbarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_s + qd*qd*D_s + qs*qs*D_fav + qs*qs*D_unfav);
-
-                    //neutron
-                    df_n_hp += Pqq*(qu*qu*dquark*D_fav + qu*qu*dbarquark*D_unfav + qd*qd*uquark*D_s + qd*qd*ubarquark*D_s + qs*qs *squark * D_unfav + qs*qs*sbarquark*D_fav) + Pqg*(qu*qu*dquark + qu*qu*dbarquark + qd*qd*uquark + qd*qd*ubarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_s + qd*qd*D_s + qs*qs*D_fav + qs*qs*D_unfav);
-                    df_n_hm += Pqq*(qu*qu*dquark*D_unfav + qu*qu*dbarquark*D_fav + qd*qd*uquark*D_s + qd*qd*ubarquark*D_s + qs*qs *squark * D_fav + qs*qs*sbarquark*D_unfav) + Pqg*(qu*qu*dquark + qu*qu*dbarquark + qd*qd*uquark + qd*qd*ubarquark + qs*qs*squark + qs*qs*sbarquark)*D_g + Pgq*gluon*(qu*qu*D_unfav + qu*qu*D_fav + qd*qd*D_s + qd*qd*D_s + qs*qs*D_fav + qs*qs*D_unfav);
-                }
-            }
-            //cout << *dxs_hp << " \t" << df_hp/fXb << "\t" << fJacobF << endl;
-
-            *(kXS_All+0) = dxs_hp_temp * df_p_hp/fXb;
-            *(kXS_All+1) = dxs_hp_temp * df_n_hp/fXb;
-            *(kXS_All+2) = dxs_hm_temp * df_p_hm/fXb;
-            *(kXS_All+3) = dxs_hm_temp * df_n_hm/fXb;
-
-            *kXS_HP = dxs_hp_temp * (df_p_hp*fZ+df_n_hp*(fA-fZ))/fXb;
-            *kXS_HM = dxs_hm_temp * (df_p_hm*fZ+df_n_hm*(fA-fZ))/fXb;
-        }
-        /*}}}*/
-
-        /*double GetFF_Unpol(int flag, double z, double Q2, double* D_fav, double* D_unfav, double* D_s, double* D_g){{{*/
-        double GetFF_Unpol(int flag, double z, double Q2, double* D_fav, double* D_unfav, double* D_s, double* D_g){
-            //flag ==1 for pion, flag==2 for kaon
-            double Q2zero=2.0;
-            double lambda=0.227;
-
-            if (z>1) z=1;
-
-            double sv = log(log(Q2/lambda/lambda)/log(Q2zero/lambda/lambda));
-
-            if (flag == 1){//pion
-                double N = 1.150 - 1.522*sv + 1.378*pow(sv,2) - 0.527*pow(sv,3);
-                double a1 = -0.740 - 1.680*sv + 1.546*pow(sv,2) - 0.596*pow(sv,3);
-                double a2 = 1.430 + 0.543*sv - 0.023*pow(sv,2);
-                double Ns = 4.250 - 3.147*sv + 0.755*pow(sv,2);
-                double a1s = -0.770 -0.573*sv + 0.117*pow(sv,2);
-                double a2s = 4.48 + 0.890*sv - 0.138*pow(sv,2);
-
-                double Ng = 5.530 - 9.228*sv + 5.192*sv*sv - 0.966 * sv*sv*sv;
-                double a1g = -0.320 + 0.318*sv - 0.561*sv*sv;
-                double a2g = 2.7+2.553*sv-0.907*sv*sv;
-                double a3g = 0.751*sv+0.496*sv*sv;
-
-                double D_sum = N*pow(z,a1)*pow((1.0-z),a2);
-                double D_sum_s = Ns*pow(z,a1s)*pow((1.0-z),a2s);
-                double R_D = pow((1.0-z),0.083583)/pow((1.0+z),1.9838);
-                *D_fav = D_sum/(1.0+R_D);
-                *D_unfav = D_sum/(1.0+1.0/R_D);
-                *D_s = D_sum_s/2.0;
-                *D_g = Ng * pow(z,a1g) *pow(1-z,a2g)*(1+a3g/z)/2.;
-
-            }else{//kaon
-                double N = 0.310 - 0.038*sv - 0.042*pow(sv,2);
-                double a1 = -0.980 - 0.260*sv + 0.008*pow(sv,2);
-                double a2 = 0.970 + 0.978*sv - 0.229*pow(sv,2);
-                double Ns =  1.080 - 0.469*sv + 0.003*pow(sv,2);
-                double a1s = -0.820 -0.240*sv - 0.035*pow(sv,2);
-                double a2s = 2.550 + 1.026*sv - 0.246*pow(sv,2);
-
-                double Ng = 0.310 - 0.325*sv -0.092*sv*sv;
-                double a1g = -0.17 - 0.214*sv-0.184*sv*sv;
-                double a2g = 0.89 + 2.185*sv-0.471*sv*sv;
-                double a3g = 1.154*sv-0.026*sv*sv;
-
-                double D_sum = N*pow(z,a1)*pow((1.0-z),a2);
-                double D_sum_s = Ns*pow(z,a1s)*pow((1.0-z),a2s);
-                double R_D = pow((1.0-z),0.083583)/pow((1.0+z),1.9838);
-                *D_fav = D_sum/(1.0+R_D);
-                *D_unfav = D_sum/(1.0+1.0/R_D);
-                *D_s = D_sum_s/2.0;
-                *D_g = Ng * pow(z,a1g) *pow(1-z,a2g)*(1+a3g/z)/2.;
-            }
-
-            return 0;
-        }
-        /*}}}*/
-
-        /*double Get_CTEQPDF(int iparton,double ix,double iQ2){{{*/          
-        double Get_CTEQPDF(int iprtn,double ix,double iQ2)          
-        {
-            double iQ = sqrt(iQ2);
-
-            /*if(kParton=="g") iprtn = 0;*/
-            //else if(kParton=="u") iprtn = 1;
-            //else if(kParton=="d") iprtn = 2;
-            //else if(kParton=="s") iprtn = 3;
-            //else if(kParton=="c") iprtn = 4;
-            //else if(kParton=="b") iprtn = 5;
-            //else if(kParton=="ubar") iprtn =-1;
-            //else if(kParton=="dbar") iprtn =-2;
-            //else if(kParton=="sbar") iprtn =-3;
-            //else if(kParton=="cbar") iprtn =-4;
-            //else if(kParton=="bbar") iprtn =-5;
-            //else{
-            //cerr<<"***EORROR, in un_Get_CTEQPDF(...), unknown parton name = "<<kParton.Data()<<endl;
-            /*}*/
-
-            double result = cteq_pdf_evolvepdf(fPDF, iprtn, ix, iQ);
-            //cout<<Form("for %d: x=%f, Q2=%f, PDF=%f", iprtn, ix, iQ, result)<<endl;
-            return(result*ix);//return xf(x) instead of f(x)
-        }
-        /*}}}*/
-
-        double Get_EPS09(int iOrder, int iErrSet,int iA,int iZ, int iParton, double ix, double iQ2){/*{{{*/
-
-            double iR_uv = 0.0, iR_dv = 0.0, iR_u = 0.0, iR_d = 0.0, iR_s = 0.0, iR_c = 0.0, iR_b = 0.0, iR_g = 0.0; 
-            //Order; //1->LO use CTEQ6L1, 2->NLO use CETQ6.1M
-            //ErrSet;//1->central fit, 2,3-> err set#1, 4,5->err set#2, ...,30,31->err set#15
-            if(iA>2){
-                eps09(iOrder, iErrSet, iA, ix, sqrt(iQ2), iR_uv, iR_dv, iR_u, iR_d, iR_s, iR_c,iR_b,iR_g);
-            }
-            else{
-                iR_uv = 1.0; iR_dv = 1.0; iR_u = 1.0; iR_d = 1.0; iR_s = 1.0; iR_c = 1.0; iR_b = 1.0; iR_g = 1.0; 
-            }
-
-            if(iParton==1){
-                double u = Get_CTEQPDF(1, ix, iQ2);
-                double ubar = Get_CTEQPDF(-1, ix, iQ2);
-                double uv = u-ubar;//uv = u - usea
-                double uA = iR_uv * uv + iR_u * ubar;
-                return uA;
-            }
-            if(iParton==2){
-                double d = Get_CTEQPDF(2, ix, iQ2);
-                double dbar = Get_CTEQPDF(-2, ix, iQ2);
-                double dv = d-dbar;//dv = d - dsea
-                double dA = iR_dv * dv + iR_d * dbar;
-                return dA;
-            }
-            if(iParton==3){
-                double s = Get_CTEQPDF(3, ix, iQ2);
-                return iR_s * s;
-            }
-            if(iParton==4){
-                double c = Get_CTEQPDF(4, ix, iQ2);
-                return iR_c * c;
-            }
-            if(iParton==5){
-                double b = Get_CTEQPDF(5, ix, iQ2);
-                return iR_b * b;
-            }
-            if(iParton==-1){
-                double ubar = Get_CTEQPDF(-1, ix, iQ2);
-                return iR_u * ubar;
-            }
-            if(iParton==-2){
-                double dbar = Get_CTEQPDF(-2, ix, iQ2);
-                return iR_d * dbar;
-            }
-            if(iParton==-3){
-                double sbar = Get_CTEQPDF(-3, ix, iQ2);
-                return iR_s * sbar;
-            }
-            if(iParton==-4){
-                double cbar = Get_CTEQPDF(-4, ix, iQ2);
-                return iR_c * cbar;
-            }
-            if(iParton==-5){
-                double bbar = Get_CTEQPDF(-5, ix, iQ2);
-                return iR_b * bbar;
-            }
-            if(iParton==0){
-                double g = Get_CTEQPDF(0, ix, iQ2);
-                return iR_g * g;
-            }
-        }
-/*}}}*/
-
         /*Kinematic Quantties{{{*/
     private:
         double fMass_Hadron;
@@ -1124,37 +434,11 @@ class SIDIS
         int fA;
         int fZ;
         
-        cteq_pdf_t *fPDF;
-        double fuA;
-        double fdA;
-        double fs;
-        double fc;
-        double fb;
-        double fg;
-        double fubar;
-        double fdbar;
-        double fsbar;
-        double fcbar;
-        double fbbar;
-        double fF2p;
-        double fF2n;
-        double fD_unfav;
-        double fD_fav;
-        double fD_s;
-        double fD_g;
-
-        double fXS_Inclusive;
         double fXS_HP;
         double fXS_HM;
-        double fXS_HP_SIDIS;
-        double fXS_HM_SIDIS;
-        double fDilute_hp;
-        double fDilute_hm;
 
-
-        TString fModel;
-        int fOrder;
-        int fErrSet;
+        TString fPDFSet;
+        TString fFFSet;
 
         Lsidis sidis_hp;
         Lsidis sidis_hm;

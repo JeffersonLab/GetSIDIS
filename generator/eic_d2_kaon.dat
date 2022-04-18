@@ -10,7 +10,7 @@
 ## 2), int, Target Z
  1
 ## 3), int , Particle Flag: 1->pion, 2->kaon
- 1
+ 2
 ## 4), double, Electron Momentum (GeV/c)
  3.5
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets

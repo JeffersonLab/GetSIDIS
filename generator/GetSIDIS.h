@@ -177,8 +177,8 @@ Int_t FileNo = 0;//FileNo is the file number of output, used for batch
 Int_t number_of_events = 1000;//events is number of event in each file
 TString config = "SoLID";//config is 'EIC' or 'SoLID' which needs ion_mom=0
 
-TString model = "EPS09";
-//TString model = "LHAPDF";
+TString pdf_set= "CJ15lo";
+TString ff_set= "DSSFFlo";
 Double_t cdxs_max =1000.;
 
 Bool_t bLUND=kFALSE;

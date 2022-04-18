@@ -6,11 +6,11 @@
 ## ---, Z. Ye, 08/09/2016
 ###############################
 ## 1), int,  Target A
- 2
+ 12
 ## 2), int, Target Z
- 1
+ 6
 ## 3), int , Particle Flag: 1->pion, 2->kaon
- 1
+ 2
 ## 4), double, Electron Momentum (GeV/c)
  3.5
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
@@ -29,9 +29,9 @@
 ## 8), string, Configuration, "EIC" or "SoLID". Can add CLAS12 as well but not now
  EIC
 ## 9), string, PDF Set, e.g "CJ15lo" 
- CJ15lo
+ nCTEQ15_12_6
 ## 10), string, FF Set, e.g "DSSFFlo" 
- DSSFFlo 
+ DSSFFlo
 ## 11), Maximum Cross Section Value
 ##      0nly useful when generating LUND format or save root files based on XS distribution
  10000.0

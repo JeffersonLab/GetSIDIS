@@ -7,25 +7,20 @@ ROOTGLIBS     = $(shell root-config --glibs)
 ROOTINC       = $(shell root-config --incdir)
 LHAPDFLIBS    = $(shell lhapdf-config --cflags --ldflags)
 CXXFLAGS      = -Wall -g -frtti -fexceptions -fPIC \
-                   -DLINUXVERS -O
-
-
-EPS09=../eps09_cxx/
-#CTEQPDF=/home/yez/work/cteq-pdf-1.0.4
-CTEQPDF=../CTEQ6/cteq-pdf-1.0.4
+                   -DLINUXVERS -O -std=c++11 -Wstatic-float-init
 
 O=GetSIDIS
 
 # Linux with g++
-INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(EPS09)/ -I$(CTEQPDF)/include/cteq/ -I$(LHAPDF)/include
+INCLUDES      = -I$(ROOTSYS)/include -I/opt/local/include -I$(ROOTINC) -I$(LHAPDF)/include
 #CXX           = clang++
 CXX           = g++
 #LD            = clang++
 LD            = g++
 LDFLAGS       = 
 
-LIBS          = $(ROOTLIBS)  -L/usr/lib/ -lcteqpdf -L$(CTEQPDF)/lib -L$(LHAPDF)/lib  -lLHAPDF
-GLIBS         = $(ROOTGLIBS) -L/usr/X11/lib -L/usr/lib/ -lXpm -lX11
+LIBS          = $(ROOTLIBS)  -L/usr/lib/  -L$(LHAPDF)/lib  -lLHAPDF
+GLIBS         = $(ROOTGLIBS) 
 
 ALL_LIBS =  $(GLIBS) $(LIBS) $(LHAPDFLIBS)
 
@@ -39,9 +34,9 @@ SCALER_OBJS = $(SRC:.C=.o)
 # Test code executibles
 PROGS = $(O)
 
-$(O): $(EPS09)/eps09.h eps09.o $(O).o $(O).C
+$(O):  $(O).o $(O).C
 	rm -f $@
-	$(CXX) $(CXXFLAGS) $(INCLUDES)  -o $@ eps09.o $(O).o $(ALL_LIBS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES)  -o $@  $(O).o $(ALL_LIBS)
 
          
 clean:
@@ -56,9 +51,6 @@ realclean:  clean
 .SUFFIXES: .c .cc .cpp .C .o .d
 
 ###Adding the EPS09 code
-eps09.o: $(EPS09)/eps09.cxx 
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(EPS09)/eps09.cxx
-
 %.o:	%.C
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $<
 

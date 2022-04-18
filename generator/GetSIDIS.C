@@ -40,7 +40,6 @@ int main(Int_t argc, char *argv[]){
     }    
 
     //define output file
-    Int_t target_flag = A;
     TString prefix=config.Data();
     prefix += Form("_A%d_Z%d", A, Z);
 
@@ -73,10 +72,8 @@ int main(Int_t argc, char *argv[]){
     Double_t theta_gen_ele,theta_gen_had;
     Double_t phi_gen_ele,phi_gen_had;
     Double_t theta_q, theta_s,phi_h,phi_s,mom_ele,mom_had,theta_ele, theta_had,phi_ele,phi_had;
-    Double_t dxs_incl,dxs_hm,dxs_hp,dxs_hm_sidis,dxs_hp_sidis,dilute_hp,dilute_hm;
+    Double_t dxs_hm,dxs_hp, dxs_hm_sidis,dxs_hp_sidis, dxs_incl;
     Double_t px_ele, py_ele,pz_ele, px_had, py_had, pz_had, E_ele,E_had;
-    Double_t u_pdf, d_pdf, s_pdf, g_pdf, ubar_pdf, dbar_pdf, sbar_pdf;
-    Double_t D_fav, D_unfav, D_s, D_g;
     ULong64_t nsim = 0, Nsim1 = 0, Nsim2 = 0, Nsim3 = 0,Nsim4 = 0;
     //For Beam Position and Vertex info
     Double_t vx_ele, vy_ele, vz_ele, vx_had, vy_had, vz_had;
@@ -211,8 +208,6 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("phi_had",&phi_had,"phi_had/D");
     t1->Branch("phi_gen_had",&phi_gen_had,"phi_gen_had/D");
     t1->Branch("nsim",&nsim,"nsim/l");
-    t1->Branch("dilute_p",&dilute_hp,"data/D");
-    t1->Branch("dilute_m",&dilute_hm ,"data/D");
     t1->Branch("px_ele",&px_ele, "px_ele/D");
     t1->Branch("py_ele",&py_ele, "py_ele/D");
     t1->Branch("pz_ele",&pz_ele, "pz_ele/D");
@@ -227,19 +222,6 @@ int main(Int_t argc, char *argv[]){
     t1->Branch("vx_had",&vx_had, "vx_had/D");
     t1->Branch("vy_had",&vy_had, "vy_had/D");
     t1->Branch("vz_had",&vz_had, "vz_had/D");
-    
-    t1->Branch("u_pdf", &u_pdf, "u_pdf/D");
-    t1->Branch("d_pdf", &d_pdf, "d_pdf/D");
-    t1->Branch("s_pdf", &s_pdf, "s_pdf/D");
-    t1->Branch("g_pdf", &g_pdf, "g_pdf/D");
-    t1->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-    t1->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-    t1->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-    
-    t1->Branch("D_fav", &D_fav, "D_fav/D");
-    t1->Branch("D_unfav", &D_unfav, "D_unfav/D");
-    t1->Branch("D_s", &D_s, "D_s/D");
-    t1->Branch("D_g", &D_g, "D_g/D");
     /*}}}*/
 
     TString filename2 = Form("%s_2_%d.root",filename0.Data(), Int_t(FileNo));
@@ -281,8 +263,6 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("phi_ele",&phi_ele,"phi_ele/D");
         t2->Branch("phi_had",&phi_had,"phi_had/D");
         t2->Branch("nsim",&nsim,"nsim/l");
-        t2->Branch("dilute_p",&dilute_hp ,"data/D");
-        t2->Branch("dilute_m",&dilute_hm ,"data/D");
         t2->Branch("px_ele",&px_ele, "px_ele/D");
         t2->Branch("py_ele",&py_ele, "py_ele/D");
         t2->Branch("pz_ele",&pz_ele, "pz_ele/D");
@@ -297,17 +277,6 @@ int main(Int_t argc, char *argv[]){
         t2->Branch("vx_had",&vx_had, "vx_had/D");
         t2->Branch("vy_had",&vy_had, "vy_had/D");
         t2->Branch("vz_had",&vz_had, "vz_had/D");
-        t2->Branch("u_pdf", &u_pdf, "u_pdf/D");
-        t2->Branch("d_pdf", &d_pdf, "d_pdf/D");
-        t2->Branch("s_pdf", &s_pdf, "s_pdf/D");
-        t2->Branch("g_pdf", &g_pdf, "g_pdf/D");
-        t2->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-        t2->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-        t2->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-        t2->Branch("D_fav", &D_fav, "D_fav/D");
-        t2->Branch("D_unfav", &D_unfav, "D_unfav/D");
-        t2->Branch("D_s", &D_s, "D_s/D");
-        t2->Branch("D_g", &D_g, "D_g/D");
         /*}}}*/
     }
 
@@ -354,8 +323,6 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("phi_ele",&phi_ele,"phi_ele/D");
         t3->Branch("phi_had",&phi_had,"phi_had/D");
         t3->Branch("nsim",&nsim,"nsim/l");
-        t3->Branch("dilute_p",&dilute_hp ,"data/D");
-        t3->Branch("dilute_m",&dilute_hm ,"data/D");
         t3->Branch("px_ele",&px_ele, "px_ele/D");
         t3->Branch("py_ele",&py_ele, "py_ele/D");
         t3->Branch("pz_ele",&pz_ele, "pz_ele/D");
@@ -370,17 +337,6 @@ int main(Int_t argc, char *argv[]){
         t3->Branch("vx_had",&vx_had, "vx_had/D");
         t3->Branch("vy_had",&vy_had, "vy_had/D");
         t3->Branch("vz_had",&vz_had, "vz_had/D");
-        t3->Branch("u_pdf", &u_pdf, "u_pdf/D");
-        t3->Branch("d_pdf", &d_pdf, "d_pdf/D");
-        t3->Branch("s_pdf", &s_pdf, "s_pdf/D");
-        t3->Branch("g_pdf", &g_pdf, "g_pdf/D");
-        t3->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-        t3->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-        t3->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-        t3->Branch("D_fav", &D_fav, "D_fav/D");
-        t3->Branch("D_unfav", &D_unfav, "D_unfav/D");
-        t3->Branch("D_s", &D_s, "D_s/D");
-        t3->Branch("D_g", &D_g, "D_g/D");
         /*}}}*/
 
         t4->Branch("Q2",&Q2,"data/D");/*{{{*/
@@ -415,8 +371,6 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("phi_ele",&phi_ele,"phi_ele/D");
         t4->Branch("phi_had",&phi_had,"phi_had/D");
         t4->Branch("nsim",&nsim,"nsim/l");
-        t4->Branch("dilute_p",&dilute_hp ,"data/D");
-        t4->Branch("dilute_m",&dilute_hm ,"data/D");
         t4->Branch("px_ele",&px_ele, "px_ele/D");
         t4->Branch("py_ele",&py_ele, "py_ele/D");
         t4->Branch("pz_ele",&pz_ele, "pz_ele/D");
@@ -431,18 +385,7 @@ int main(Int_t argc, char *argv[]){
         t4->Branch("vx_had",&vx_had, "vx_had/D");
         t4->Branch("vy_had",&vy_had, "vy_had/D");
         t4->Branch("vz_had",&vz_had, "vz_had/D");
-        t4->Branch("u_pdf", &u_pdf, "u_pdf/D");
-        t4->Branch("d_pdf", &d_pdf, "d_pdf/D");
-        t4->Branch("s_pdf", &s_pdf, "s_pdf/D");
-        t4->Branch("g_pdf", &g_pdf, "g_pdf/D");
-        t4->Branch("ubar_pdf", &ubar_pdf, "ubar_pdf/D");
-        t4->Branch("dbar_pdf", &dbar_pdf, "dbar_pdf/D");
-        t4->Branch("sbar_pdf", &sbar_pdf, "sbar_pdf/D");
-       t4->Branch("D_fav", &D_fav, "D_fav/D");
-       t4->Branch("D_unfav", &D_unfav, "D_unfav/D");
-       t4->Branch("D_s", &D_s, "D_s/D");
-       t4->Branch("D_g", &D_g, "D_g/D");
-       /*}}}*/
+        /*}}}*/
     }
 
     /*}}}*/
@@ -456,29 +399,8 @@ int main(Int_t argc, char *argv[]){
     }/*}}}*/
 
     //Initialize XS Model here/*{{{*/
-    //CTEQPDF or EPS09
-    SIDIS *sidis = new SIDIS(model);
+    SIDIS *sidis = new SIDIS(pdf_set, ff_set);
     sidis->Init(ion_mass, A, Z, particle_flag);
-
-    ////////////////////////////////
-    //*** If using EPS09, two CTEQ PDF sets are used for LO and NLO EPS09 sets
-    //*** 1->LO need CTEQ6L1,  2->NLO need CTEQ6.1M, default is 2
-    //////////
-    //sidis->SetEPS09(2);
-    ////////////////////////////////
-   
-    ////////////////////////////////
-    /////////////
-    //*** If using CTEQPDF, default is CTEQ6.1M, but you can specify the name of the PDF sets
-    //*** For exmaple, 4--> CTEQ6L1 (LO), 200-->CTEQ6.1M (NLO)
-    //*** See ./cteq-pdf-1.0.4/Cteq6Pdf-2008.txt for details
-    /////////////
-    //SetCTEQ( mode);
-    ////////////////////////////////
-       
-    ////*** Or if using nCTEQ, add this to specify the associated PDF set of the target
-    //sidis->SetLHAPDF(A, Z); 
-    ////////////////////////////////
     /*}}}*/
 
     /*Start to generate events{{{*/
@@ -534,34 +456,16 @@ int main(Int_t argc, char *argv[]){
                     ||(config=="SPECT" && count[0]<number_of_events)){
 
                 sidis->CalcXS();/*{{{*/
-                dxs_incl = sidis->GetXS_Inclusive();
                 dxs_hp = sidis->GetXS_HP();
                 dxs_hm = sidis->GetXS_HM();
-                dxs_hp_sidis = sidis->GetXS_HP_SIDIS();
-                dxs_hm_sidis = sidis->GetXS_HM_SIDIS();
-                dilute_hp = sidis->GetDilute_HP();
-                dilute_hm = sidis->GetDilute_HM();
                 isphy_hp = sidis->IsPhy_HP();
                 isphy_hm = sidis->IsPhy_HM();
-
-                u_pdf = sidis->get_uA();
-                d_pdf = sidis->get_dA();
-                s_pdf = sidis->get_s();
-                g_pdf = sidis->get_g();
-                ubar_pdf = sidis->get_ubar();
-                dbar_pdf = sidis->get_dbar();
-                sbar_pdf = sidis->get_sbar();
-                
-                D_fav = sidis->get_Dfav();
-                D_unfav = sidis->get_Dunfav();
-                D_s = sidis->get_Ds();
-                D_g = sidis->get_Dg();
                 /*}}}*/
 
                 /*LUND For Positive Hadron{{{*/
                 //These section will save events based on their XS distributions
                 Double_t cdxs_max_rndm_hp = cdxs_max * gRandom->Uniform(0, 1);
-                if(bLUND&&dxs_hp_sidis > cdxs_max_rndm_hp){
+                if(bLUND&&dxs_hp > cdxs_max_rndm_hp){
                     //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                     pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
@@ -573,7 +477,7 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hp_sidis						
+                            dxs_hp						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
@@ -616,7 +520,7 @@ int main(Int_t argc, char *argv[]){
                 /*LUND For Negative Hadron{{{*/
                 //These section will save events based on their XS distributions
                 Double_t cdxs_max_rndm_hm = cdxs_max * gRandom->Uniform(0, 1);
-                if(bLUND&&dxs_hm_sidis > cdxs_max_rndm_hm){
+                if(bLUND&&dxs_hm > cdxs_max_rndm_hm){
                     //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                     neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
@@ -628,7 +532,7 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hm_sidis						
+                            dxs_hm						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
@@ -669,7 +573,7 @@ int main(Int_t argc, char *argv[]){
                 /*}}}*/
 
                 /*Save PI+ ROOT file based on XS distribution{{{*/
-                if(dxs_hp_sidis > cdxs_max_rndm_hp){
+                if(dxs_hp > cdxs_max_rndm_hp){
                     t1->Fill();
                     //Just save events in one root files in this case
                     count[0] ++;//cout << 0 << " " << count[0] << endl;
@@ -679,7 +583,7 @@ int main(Int_t argc, char *argv[]){
                 /*}}}*/
 
                 /*Save PI- ROOT file based on XS distribution{{{*/
-                if(dxs_hm_sidis > cdxs_max_rndm_hm){
+                if(dxs_hm > cdxs_max_rndm_hm){
                     t2->Fill();
                     //Just save events in one root files in this case
                     count[1] ++;//cout << 0 << " " << count[0] << endl;
@@ -718,34 +622,16 @@ int main(Int_t argc, char *argv[]){
                     )
              )){
                 sidis->CalcXS();/*{{{*/
-                dxs_incl = sidis->GetXS_Inclusive();
                 dxs_hp = sidis->GetXS_HP();
                 dxs_hm = sidis->GetXS_HM();
-                dxs_hp_sidis = sidis->GetXS_HP_SIDIS();
-                dxs_hm_sidis = sidis->GetXS_HM_SIDIS();
-                dilute_hp = sidis->GetDilute_HP();
-                dilute_hm = sidis->GetDilute_HM();
                 isphy_hp = sidis->IsPhy_HP();
                 isphy_hm = sidis->IsPhy_HM();
-
-                u_pdf = sidis->get_uA();
-                d_pdf = sidis->get_dA();
-                s_pdf = sidis->get_s();
-                g_pdf = sidis->get_g();
-                ubar_pdf = sidis->get_ubar();
-                dbar_pdf = sidis->get_dbar();
-                sbar_pdf = sidis->get_sbar();
-                
-                D_fav = sidis->get_Dfav();
-                D_unfav = sidis->get_Dunfav();
-                D_s = sidis->get_Ds();
-                D_g = sidis->get_Dg();
                 /*}}}*/
 
                 /*LUND For Positive Hadron{{{*/
                 //These section will save events based on their XS distributions
                 Double_t cdxs_max_rndm_hp = cdxs_max * gRandom->Uniform(0, 1);
-                if(bLUND&&dxs_hp_sidis > cdxs_max_rndm_hp){
+                if(bLUND&&dxs_hp > cdxs_max_rndm_hp){
                     //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                     pos_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
@@ -757,7 +643,7 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hp_sidis						
+                            dxs_hp						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
@@ -800,7 +686,7 @@ int main(Int_t argc, char *argv[]){
                 /*LUND For Negative Hadron{{{*/
                 //These section will save events based on their XS distributions
                 Double_t cdxs_max_rndm_hm = cdxs_max * gRandom->Uniform(0, 1);
-                if(bLUND&&dxs_hm_sidis > cdxs_max_rndm_hm){
+                if(bLUND&&dxs_hm > cdxs_max_rndm_hm){
                     //Header:      1#part. 2#x 3#z 4#pt 5#Pol 6#Q2 7#W 8#cxs 9#phi_s 10#phi_h
                     neg_gemc<<Form("    %2d \t %10.4e \t %10.4e \t %10.4e \t %4.3f \t %10.4e \t %10.4e \t %10.4e \t %10.4e \t %10.4e",/*{{{*/
                             2, //ele+had
@@ -812,7 +698,7 @@ int main(Int_t argc, char *argv[]){
                             W,
                             phi_s,
                             phi_h,
-                            dxs_hm_sidis						
+                            dxs_hm						
                             )<<endl;
 
                     //electron info: 1#index. 2#charge 3#type 4#pid 5#mpid 6#daughter 7#px 8#py 9#pz 10#E 11#mass 12#vx 13#vy 14#vz
@@ -936,8 +822,8 @@ int main(Int_t argc, char *argv[]){
         TFile *f1 = new TFile(filename1.Data(), "update");
         TTree *T1=(TTree*) f1->Get("T");
         ULong64_t N1=T1->GetEntries();
-        T1->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
-        T1->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
+        T1->SetBranchAddress("dxs_hp",&dxs_hp);
+        T1->SetBranchAddress("dxs_hm",&dxs_hm);
         T1->SetBranchAddress("dxs_incl",&dxs_incl);
         ULong64_t nsim1; 
         T1->SetBranchAddress("nsim",&nsim1);
@@ -955,8 +841,8 @@ int main(Int_t argc, char *argv[]){
             T1->GetEntry(i);
             //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
             weight_in=dxs_incl*electron_phase_space/Nsim1;   
-            weight_hp=dxs_hp_sidis*Phase_space/Nsim1;   
-            weight_hm=dxs_hm_sidis*Phase_space/Nsim1;
+            weight_hp=dxs_hp*Phase_space/Nsim1;   
+            weight_hm=dxs_hm*Phase_space/Nsim1;
 
             if((weight_in)<1e-34) weight_in=1e-34;
             if((weight_hp)<1e-34) weight_hp=1e-34;
@@ -986,8 +872,8 @@ int main(Int_t argc, char *argv[]){
             TTree *T2=(TTree*) f2->Get("T");
             ULong64_t N2=T2->GetEntries();
             T2->SetBranchAddress("dxs_incl",&dxs_incl);
-            T2->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
-            T2->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
+            T2->SetBranchAddress("dxs_hp",&dxs_hp);
+            T2->SetBranchAddress("dxs_hm",&dxs_hm);
             ULong64_t nsim2; 
             T2->SetBranchAddress("nsim",&nsim2);
             T2->GetEntry(N2-1);          //get nsim for this rootfile
@@ -1004,8 +890,8 @@ int main(Int_t argc, char *argv[]){
                 T2->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim2;   
-                weight_hp=dxs_hp_sidis*Phase_space/Nsim2;   
-                weight_hm=dxs_hm_sidis*Phase_space/Nsim2;
+                weight_hp=dxs_hp*Phase_space/Nsim2;   
+                weight_hm=dxs_hm*Phase_space/Nsim2;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
                 if((weight_hp)<1e-34) weight_hp=1e-34;
@@ -1034,8 +920,8 @@ int main(Int_t argc, char *argv[]){
             TTree *T3=(TTree*) f3->Get("T");
             ULong64_t N3=T3->GetEntries();
             T3->SetBranchAddress("dxs_incl",&dxs_incl);
-            T3->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
-            T3->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
+            T3->SetBranchAddress("dxs_hp",&dxs_hp);
+            T3->SetBranchAddress("dxs_hm",&dxs_hm);
             ULong64_t nsim3; 
             T3->SetBranchAddress("nsim",&nsim3);
             T3->GetEntry(N3-1);          //get nsim for this rootfile
@@ -1053,8 +939,8 @@ int main(Int_t argc, char *argv[]){
                 T3->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim3;   
-                weight_hp=dxs_hp_sidis*Phase_space/Nsim3;   
-                weight_hm=dxs_hm_sidis*Phase_space/Nsim3;
+                weight_hp=dxs_hp*Phase_space/Nsim3;   
+                weight_hm=dxs_hm*Phase_space/Nsim3;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
                 if((weight_hp)<1e-34) weight_hp=1e-34;
@@ -1082,8 +968,8 @@ int main(Int_t argc, char *argv[]){
             TTree *T4=(TTree*) f4->Get("T");
             ULong64_t N4=T4->GetEntries();
             T4->SetBranchAddress("dxs_incl",&dxs_incl);
-            T4->SetBranchAddress("dxs_hp_sidis",&dxs_hp_sidis);
-            T4->SetBranchAddress("dxs_hm_sidis",&dxs_hm_sidis);
+            T4->SetBranchAddress("dxs_hp",&dxs_hp);
+            T4->SetBranchAddress("dxs_hm",&dxs_hm);
             ULong64_t nsim4; 
             T4->SetBranchAddress("nsim",&nsim4);
             T4->GetEntry(N4-1);          //get nsim for this rootfile
@@ -1100,8 +986,8 @@ int main(Int_t argc, char *argv[]){
                 T4->GetEntry(i);
                 //warning: output unit is nbarn   //if calculate rate, should be translate to cm^-2     1nbarn=10^-33 cm^-2
                 weight_in=dxs_incl*electron_phase_space/Nsim4;   
-                weight_hp=dxs_hp_sidis*Phase_space/Nsim4;   
-                weight_hm=dxs_hm_sidis*Phase_space/Nsim4;
+                weight_hp=dxs_hp*Phase_space/Nsim4;   
+                weight_hm=dxs_hm*Phase_space/Nsim4;
 
                 if((weight_in)<1e-34) weight_in=1e-34;
                 if((weight_hp)<1e-34) weight_hp=1e-34;
@@ -1182,7 +1068,8 @@ int main(Int_t argc, char *argv[]){
         number_of_events=atoi(inputdata[k++]);
         FileNo=atoi(inputdata[k++]);
         config= inputdata[k++];
-        model= inputdata[k++];
+        pdf_set= inputdata[k++];
+        ff_set= inputdata[k++];
         cdxs_max=atof(inputdata[k++]);
         bLUND=atoi(inputdata[k++]);
         bXSMode=atoi(inputdata[k++]);
@@ -1197,7 +1084,8 @@ int main(Int_t argc, char *argv[]){
         //FileNo=atoi(inputdata[k++].c_str());
         //number_of_events=atoi(inputdata[k++].c_str());
         //config= inputdata[k++].c_str();
-        //model= inputdata[k++].c_str();
+        //pdf_set = inputdata[k++].c_str();
+        //ff_set= inputdata[k++].c_str();
         //cdxs_max=atof(inputdata[k++].c_str());
         //bLUND=atoi(inputdata[k++].c_str());
         //bXSMode=atoi(inputdata[k++].c_str());
@@ -1219,7 +1107,8 @@ int main(Int_t argc, char *argv[]){
         if(FileNo==0) cout<<" (from command line, e.g. ./GetSIDIS input.data FileNo)"<<endl;
         else cout<<endl;
         cout<<"---- Configs = "<<config.Data()<<endl;
-        cout<<"---- Model = "<<model.Data()<<endl;
+        cout<<"---- PDF Set= "<<pdf_set.Data()<<endl;
+        cout<<"---- FF Set= "<<ff_set.Data()<<endl;
         cout<<"---- Save to LUND? = "<<bLUND<<endl;
         cout<<"---- Save in XSMode? = "<<bXSMode<<endl;
         cout<<"---- Rename files to (*.LUND, *_0.root)= "<<Output_FileName;

@@ -25,24 +25,24 @@
 
 class Lsidis{
     protected:/*{{{*/
-        static const double PI = 3.14159265358979323846264;//math Pi
-        static const double GeVfm = 1.0 / 0.1973269718;//GeV times fm in natural unit
-        static const double GeV2nb = 1.0 / 389379.338;//GeV^2 times nb in natural unit
-        static const double alpha_em = 1.0 / 137.035999074;//EM fine-structure constant
-        static const double eu2 = 4.0 / 9.0;//up type quark charge square
-        static const double ed2 = 1.0 / 9.0;//down type quark charge square
-        static const double Me = 0.000510998928;//electron mass in GeV
-        static const double Mmu = 0.1056583715;//muon mass in GeV
-        static const double Mp = 0.938272081;//proton mass in GeV
-        static const double Mn = 0.939565413;//neutron mass in GeV
-        static const double MLambda = 1.115683;//Lambda mass in GeV
-        static const double MSigmap = 1.18937;//Sigma+ mass in GeV
-        static const double MSigmam = 1.197449;//Sigma- mass in GeV
-        static const double Mpion = 0.13957018;//charged pion mass in GeV
-        static const double Mpi0 = 0.1349766;//neutral pion mass in GeV
-        static const double Mkaon = 0.493677;//charged kaon mass in GeV
-        static const double MK0 = 0.497614;//neutral kaon mass in GeV
-        static const double Meta = 0.77526;//rho mass in GeV}}}
+        static constexpr double PI = 3.14159265358979323846264;//math Pi
+        static constexpr double GeVfm = 1.0 / 0.1973269718;//GeV times fm in natural unit
+        static constexpr double GeV2nb = 1.0 / 389379.338;//GeV^2 times nb in natural unit
+        static constexpr double alpha_em = 1.0 / 137.035999074;//EM fine-structure constant
+        static constexpr double eu2 = 4.0 / 9.0;//up type quark charge square
+        static constexpr double ed2 = 1.0 / 9.0;//down type quark charge square
+        static constexpr double Me = 0.000510998928;//electron mass in GeV
+        static constexpr double Mmu = 0.1056583715;//muon mass in GeV
+        static constexpr double Mp = 0.938272081;//proton mass in GeV
+        static constexpr double Mn = 0.939565413;//neutron mass in GeV
+        static constexpr double MLambda = 1.115683;//Lambda mass in GeV
+        static constexpr double MSigmap = 1.18937;//Sigma+ mass in GeV
+        static constexpr double MSigmam = 1.197449;//Sigma- mass in GeV
+        static constexpr double Mpion = 0.13957018;//charged pion mass in GeV
+        static constexpr double Mpi0 = 0.1349766;//neutral pion mass in GeV
+        static constexpr double Mkaon = 0.493677;//charged kaon mass in GeV
+        static constexpr double MK0 = 0.497614;//neutral kaon mass in GeV
+        static constexpr double Meta = 0.77526;//rho mass in GeV}}}
     private:/*{{{*/
         bool st_nucleus;
         bool st_pdf;
