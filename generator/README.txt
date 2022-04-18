@@ -4,6 +4,13 @@
 *   for SoLID and EIC          *
 *  -- Zhihong Ye, 07/26/2016   *
 ********************************
+
+Update Version in 07/11/2020:
+ Add nNNPDFv2.0 nuclear PDF grids when calculating XS using Lsidis.h.
+ Please download nNNPDFv.20  grids and place them into the LHAPDF/share/ folder.
+ Make sure th grids for the selected nucleus target/beam is availalbe otherwise
+ free proton-PDF set will be used without warning 
+
 Update Version in 02/27/2018:
 1) Add Lsidis.h to calculate the SIDIS XS based on Tianbo Liu's method
 2) Used LHAPDF version 6.2 or above which you have to installed by yourself

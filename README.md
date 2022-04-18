@@ -29,6 +29,15 @@
   *      Use a better sampling method when generating XS based on physical distributions
   *      Add absolute lumi
 
+## Update Version in 07/11/2020:
+ * Add EPPS16 and nNNPDFv2.0 nuclear PDF grids when calculating XS using Lsidis.h.
+ Please download EPPS16 and nNNPDFv.20 grids from LHAPDF site and place them into the 
+ LHAPDF/share/ folder. 
+ * Make sure th grids for the selected nucleus target/beam is availalbe otherwise
+ free proton-PDF set will be used without warning. Note that only a limited list of targets 
+ is given in SIDIS.h::Init(). Please add more (and download the grids!) by editing this file.
+ * To-Do: Define the list of nucleus targets/beams in a structure file for easily maintaining. 
+
 ## Update Version in 02/27/2018:
 * Add Lsidis.h to calculate the SIDIS XS based on Tianbo Liu's method
 * Used LHAPDF version 6.2 or above which you have to installed by yourself
