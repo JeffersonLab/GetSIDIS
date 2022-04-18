@@ -4,11 +4,6 @@
 ## -- Zhihong Ye, 07/26/2016
 
 ## How to use the generator:
-* Compile CTEQ libary:
-```js
-    cd ./CTEQ/cteq-pdf-1.0.4/
-    make
-```
 
 * Install LHAPDF6, download the package and compile it by yourself. 
   Specify the path in Makefile or define it in your system PATH and LIBARAY
