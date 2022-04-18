@@ -74,50 +74,12 @@ class SIDIS
             }
            
             //Define PDF sets
-<<<<<<< HEAD
             sidis_hp.SetPDFset(fPDFSet);
             sidis_hm.SetPDFset(fPDFSet);
 
             //Define Fragmentation Function sets
             sidis_hp.SetFFset(fFFSet);
             sidis_hm.SetFFset(fFFSet);
-=======
-            TString pdfSet="";
-            const TString pdfEPPS="EPPS16nlo_CT14nlo_";
-            const TString pdfNNPDF="nNNPDF20_nlo_as_0118_";
-            const TString nnPDF = pdfNNPDF;
-            if (fA==2 && fZ==1)
-                pdfSet=nnPDF+"D2";
-            else if (fA==4 && fZ==2)
-                pdfSet=nnPDF+"He4";
-            else if (fA==6 && fZ==3)
-                pdfSet=nnPDF+"Li6";
-            else if (fA==9 && fZ==4)
-                pdfSet=nnPDF+"Be9";
-            else if (fA==12 && fZ==6)
-                pdfSet=nnPDF+"C12";
-            else if (fA==14 && fZ==7)
-                pdfSet=nnPDF+"N14";
-            else if (fA==16 && fZ==8)
-                pdfSet=nnPDF+"Li9";
-            else if (fA==27 && fZ==13)
-                pdfSet=nnPDF+"Al27";
-            else if (fA==40 && fZ==20)
-                pdfSet=nnPDF+"Ca40";
-            else if (fA==56 && fZ==26)
-                pdfSet=nnPDF+"Fe56";
-            else if (fA==64 && fZ==29)
-                pdfSet=nnPDF+"Cu64";
-            else
-                pdfSet="CJ15lo";
-
-            sidis_hp.SetPDFset(pdfSet);
-            sidis_hm.SetPDFset(pdfSet);
-
-            //Define Fragmentation Function sets
-            sidis_hp.SetFFset("DSSFFlo");
-            sidis_hm.SetFFset("DSSFFlo");
->>>>>>> personal/master
         }/*}}}*/
 
         /*void SetKin( double mom_beam_ele, double mom_target,...){{{*/
