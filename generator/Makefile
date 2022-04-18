@@ -7,7 +7,9 @@ ROOTGLIBS     = $(shell root-config --glibs)
 ROOTINC       = $(shell root-config --incdir)
 LHAPDFLIBS    = $(shell lhapdf-config --cflags --ldflags)
 CXXFLAGS      = -Wall -g -frtti -fexceptions -fPIC \
-                   -DLINUXVERS -O -std=c++11 -Wstatic-float-init
+                   -DLINUXVERS -O 
+#-std=c++11 
+#-Wstatic-float-init
 
 O=GetSIDIS
 

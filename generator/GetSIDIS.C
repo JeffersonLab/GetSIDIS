@@ -7,13 +7,12 @@
 //////////////////////////////////////////////////////
 #include "GetSIDIS.h"
 #include "SIDIS.h"
-//#include "SIDIS_LO.h"
 
 int main(Int_t argc, char *argv[]){
     cout<<endl;
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
     cout<<"oO0 SIDIS Events Generators for SoLID or CLAS12 or EIC or Spectrometer  0Oo//"<<endl;
-    cout<<"oO0  with nPDF (EPS09) and free-PDF (LHDAPDF) implemented.    0Oo//"<<endl;
+    cout<<"oO0  with LHDAPDF implemented.    0Oo//"<<endl;
     cout<<"oO0  -- Zhihong Ye, updated in 08/12/2016                     0Oo//"<<endl;
     cout<<"oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo oO0Oo"<<endl;
     cout<<endl;

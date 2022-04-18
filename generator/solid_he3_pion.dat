@@ -12,7 +12,7 @@
 ## 3), int , Particle Flag: 1->pion, 2->kaon
  1
 ## 4), double, Electron Momentum (GeV/c)
- 11
+ 10.6
 ## 5), double, Ion Momentum (GeV/c), set to 0 for fixed targets
  0
 ## 6), int, Number of events. 
@@ -28,17 +28,19 @@
  0
 ## 8), string, Configuration, "EIC" or "SoLID". Can add CLAS12 as well but not now
  SoLID
-## 9), string, PDF Model Type, "LHAPDF", "CTEQPDF" or "EPS09" or "nCTEQ15"(available soon)
- CTEQPDF
-## 10), Maximum Cross Section Value
+## 9), string, PDF Set, e.g "CJ15lo" 
+ CJ15lo
+## 10), string, FF Set, e.g "DSSFFlo" 
+ DSSFFlo 
+## 11), Maximum Cross Section Value
 ##      0nly useful when generating LUND format or save root files based on XS distribution
- 1000.0
-## 11), int, LUND output or not, 1-> yes, 0->no
- 1
-## 12), int, save events based on XS or not, 1-> yes, 0->no
- 1
-## 13), string, output file name, useful for batch farm jobs. 
+ 10000.0
+## 12), int, LUND output or not, 1-> yes, 0->no
+ 0
+## 13), int, save events based on XS or not, 1-> yes, 0->no
+ 0
+## 14), string, output file name, useful for batch farm jobs. 
 ##      Set "NONE" for default names (eg., EIC_A12_Z6_pion_10_100_4_0.root)
  NONE
-## 14), Debug, print out some useful information. Not in use now
+## 15), Debug, print out some useful information. Not in use now
  1
