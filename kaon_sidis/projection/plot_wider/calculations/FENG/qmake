@@ -1,0 +1,11 @@
+paste Collins_pip_central.dat Collins_pip_lower.dat Collins_pip_upper.dat | awk '{print $1, $2, $3, $4, $7, $8, $11, $12}' > tmp.dat
+mv tmp.dat Collins_pip.dat
+
+paste Collins_pim_central.dat Collins_pim_lower.dat Collins_pim_upper.dat | awk '{print $1, $2, $3, $4, $7, $8, $11, $12}' > tmp.dat
+mv tmp.dat Collins_pim.dat
+
+paste Sivers_pip_central.dat Sivers_pip_lower.dat Sivers_pip_upper.dat | awk '{print $1, $2, $3, $4, $7, $8, $11, $12}' > tmp.dat
+mv tmp.dat Sivers_pip.dat
+
+paste Sivers_pim_central.dat Sivers_pim_lower.dat Sivers_pim_upper.dat | awk '{print $1, $2, $3, $4, $7, $8, $11, $12}' > tmp.dat
+mv tmp.dat Sivers_pim.dat

@@ -1,0 +1,330 @@
+.x plot.C
+.x plot.C (2,1,1)
+.x plot.C (1,1,1)
+.x plot.C (1,1,2)
+.x plot.C (1,1,3)
+.x plot.C (1,1,4)
+.x plot.C (1,1,5)
+.x plot.C (1,1,6)
+.x plot.C (1,1,7)
+.x plot.C (1,1,8)
+.x plot.C (1,1,9)
+.q
+.x plot.C 
+.x plot.C (1,4,5)
+.x plot.C (1,3,5)
+.x plot.C (1,2,5)
+.q
+.x plot.C (1,2,5)
+.q
+.x plot_z1.C
+.q
+.x plot_z1.C
+.q
+.x plot_z1.C
+.q
+.x plot_z1.C
+.q
+.x plot.C
+.q
+.x plot.C
+.x plot.C (1,3,4)
+.q
+.x plot_z1.C
+.q
+.x plot_z1.C
+.q
+.x plot_z1.C
+.q
+.x plot_z1.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot.C
+.q
+.x plot.C
+.q
+.x plot.C
+.x plot_all.C
+.q
+.x plot.C 
+.q
+.x plot.C 
+.q
+.x plot_all.C
+.q
+.x plot.C 
+.x plot_all.C  
+.q
+.x plot_all.C  
+.q
+.x plot_all.C 
+.q
+.x plot_all.C 
+.q
+.x plot_all.C
+.q
+.x plot.C(1,1,1,1,0)
+.q
+.x plot.C(1,1,1,1,0)
+.q
+.x plot.C(1,1,1,1,0)
+.q
+.x plot.C(1,1,1,1,0)
+.q
+.x plot.C
+.q
+.x plot_all.C
+.q
+.x plot.C
+.x plot_all.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.x plot_cal.C(2)
+.x plot_cal.C()
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot.C(2,5,4)
+.x plot.C(1,5,4)
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+1./sqrt(50e3)
+1./sqrt(50.e3)
+1./sqrt(50.e3)*3*0.6*0.865
+1./sqrt(50.e3)*3/0.6/0.865
+1./sqrt(50.e3)*3/0.6/0.865*sqrt(3.)
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.x plot(1,6,5
+.x plot(1,6,5)
+.x plot.C(1,6,5)
+.x plot.C(1,6,6)
+.x plot.C(1,6,5)
+.x plot_all.C
+.x plot.C(1,1,4)
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.x plot.C (2,2,2)
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all1.C
+.q
+.x plot_special.C
+.q
+.x plot_special1.C
+.q
+.x plot_special1.C
+.q
+.x plot_all.C
+.q
+.x plot_special.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.! emacs plot_all.C &
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot_cal.C
+.q
+.x plot.C
+.x plot_special
+.x plot_special.Cq
+.x plot_special.C 
+.q
+.x plot.C
+.q
+.x plot_special.C
+.q
+.x plot_special1.C
+.q
+.x plot_all.C
+.q
+.x plot_all1.C
+.x plot.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.x plot_all1.C
+.q
+.x plot_all1.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C 
+.x plot_all1.C 
+.q
+.x plot_all1.C 
+.q
+.x plot_all.C
+.q
+.x plot.C
+.q
+.x plot.C
+.q
+.x plot_all.C
+.q
+.x plot_all.C
+.x plot_all1.C
+.q
+.x plot_all1.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.x plot_special1.C
+.q
+.x plot_special1.C
+.q
+.x plot_all.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.q
+.x plot_all.C
+.x plot_all1.C
+.q
+.x plot_all1.C
+.q
+.x plot_all.C
+.q
+.x plot1.C
+.q
+.x plot_all1.C
+.q
+.x plot_special.C
+.q
+.x plot_all.C
+.q
+.x plot_all1.C
+.q
+.x plot_special.C
+.x plot_special.C (2)
+.x plot_special.C(1)
+.q
+.x plot_special.C(1)
+.x plot_special.C(2)
+.q
+.x plot_special.C
+.q
+.x plot_special1.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.x plot_special.C(2)
+.q
+.x plot_special.C(2)
+.q
+.x plot_special.C
+.q
+.x plot_special1.C
+.q
+.x plot_special.C 
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.q
+.x plot_special1.C
+.q
+.x plot.C
+.q
+.x plot_all.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.q
+.x plot_all.C(2)
+.q
+.x plot.C
+.q
+.x plot_all.C
+.q
+.x plot_special.C
+.q
+.x plot_all.C
+.q
+.x plot_special.C
+.q
+.x plot_special.C
+.q
+.x plot_special1.C
+.q
